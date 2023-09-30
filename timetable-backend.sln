@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "src\Data
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "src\WebApi\WebApi.csproj", "{F3E3D460-B5BF-4EA3-BBDB-3BEC9F6FCAB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingGround", "src\TestingGround\TestingGround.csproj", "{610D157F-7D8B-41D4-AF35-5725F1FDC583}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestingGround", "src\TestingGround\TestingGround.csproj", "{610D157F-7D8B-41D4-AF35-5725F1FDC583}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

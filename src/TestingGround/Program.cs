@@ -1,6 +1,4 @@
-﻿using Core;
-using Core.LessonTimes;
-using Core.Timetables;
+﻿using Core.Timetables;
 using Core.Timetables.Cells;
 using System.Text.Json;
 

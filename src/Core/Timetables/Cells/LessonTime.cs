@@ -1,4 +1,4 @@
-﻿namespace Core.LessonTimes;
+﻿namespace Core.Timetables.Cells;
 
 public class LessonTime
 {

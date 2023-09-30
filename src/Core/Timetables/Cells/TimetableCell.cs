@@ -1,6 +1,4 @@
-﻿using Core.LessonTimes;
-
-namespace Core.Timetables.Cells
+﻿namespace Core.Timetables.Cells
 {
     /// <summary>
     /// Ячейка расписания

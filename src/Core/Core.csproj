@@ -14,8 +14,4 @@
     <Using Include="Throw" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Changes\" />
-  </ItemGroup>
-
 </Project>
