@@ -1,5 +1,7 @@
 ﻿using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
+using MySqlConnector;
+using Repository.Implementations.MySql;
 using System.Text.Json;
 
 namespace TestingGround;
@@ -9,7 +11,7 @@ internal class Program
 
     static void Main(string[] args)
     {
-        Random rand = new Random();
+        /*Random rand = new Random();
 
         var group = new Group(rand.Next(), "2ИП-2-20");
 
@@ -67,6 +69,6 @@ internal class Program
 
         var op = new JsonSerializerOptions() { WriteIndented = true };
         string json = JsonSerializer.Serialize(tt, op);
-        Console.WriteLine(json);
+        Console.WriteLine(json);*/
     }
 }

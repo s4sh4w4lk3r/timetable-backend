@@ -12,6 +12,8 @@ public class LessonTime
     public bool IsWeekEven { get; init; }
     public TimeOnly From { get; init; }
     public TimeOnly To { get; init; }
+
+    private LessonTime() { }
     public LessonTime(int lessonTimePk, int lessonNumber, bool isWeekEven, TimeOnly from, TimeOnly to)
     {
         LessonTimePK = lessonTimePk;

@@ -6,6 +6,7 @@ public class Cabinet
     public string? Address { get; init; }
     public string? Number { get; init; }
 
+    private Cabinet() { }
     public Cabinet(int cabinetPK, string address, string number)
     {
         address.ThrowIfNull().IfWhiteSpace();

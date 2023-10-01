@@ -8,6 +8,7 @@ public class Teacher
     public string? FirstName { get; init; }
     public string? MiddleName { get; init; }
 
+    private Teacher() { }
     public Teacher(int teacherPK, string surname, string firstname, string middlename)
     {
         surname.ThrowIfNull().IfWhiteSpace();
