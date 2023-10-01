@@ -1,6 +1,6 @@
-﻿using Core.Timetables.Cells;
+﻿using Models.Entities.Timetables.Cells;
 
-namespace Core.Timetables;
+namespace Models.Entities.Timetables;
 
 public class Timetable
 {
@@ -35,21 +35,20 @@ public class Timetable
 
             foreach (var timeTableCell in TimetableCells)
             {
-                
+
                 if (timeTableCell.LessonTime == lessonTime)
                 {
                     matches++;
                 }
 
-                if (matches > 1 && (timeTableCell.IsReplaced is false))
+                if (matches > 1 && timeTableCell.IsReplaced is false)
                 {
                     throw new ArgumentException($"В коллекции несколько занятий на одно и то же время. {timeTableCell.LessonTime}");
-                } 
-                    
+                }
+
             }
         }
 
         return true;
     }
-
 }

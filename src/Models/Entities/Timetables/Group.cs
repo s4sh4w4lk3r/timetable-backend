@@ -1,4 +1,4 @@
-﻿namespace Core.Timetables;
+﻿namespace Models.Entities.Timetables;
 
 public class Group
 {

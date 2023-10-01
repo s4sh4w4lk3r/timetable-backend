@@ -1,5 +1,5 @@
-﻿using Core.Timetables;
-using Core.Timetables.Cells;
+﻿using Models.Entities.Timetables;
+using Models.Entities.Timetables.Cells;
 using System.Text.Json;
 
 namespace TestingGround;
