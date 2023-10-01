@@ -6,11 +6,12 @@ using MySqlConnector;
 
 namespace Repository.Implementations.MySql;
 
-internal class MySqlDbContext : DbContext
+#warning сделать доступ контекста потом internal
+public class MySqlDbContext : DbContext
 {
     public DbSet<Cabinet> Cabinets => Set<Cabinet>();
     public DbSet<Group> Groups => Set<Group>();
-    public DbSet<LessonTime> LessonTime => Set<LessonTime>();
+    public DbSet<LessonTime> LessonTimes => Set<LessonTime>();
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<Teacher> Teachers => Set<Teacher>();
     public DbSet<User> Users => Set<User>();
@@ -20,8 +21,6 @@ internal class MySqlDbContext : DbContext
     public MySqlDbContext(MySqlConnection mySqlConnection)
     {
         _mySqlConnection = mySqlConnection;
-
-        Database.EnsureDeleted();
         Database.EnsureCreated();
     }
 
