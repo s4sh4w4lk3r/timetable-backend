@@ -2,11 +2,9 @@
 
 namespace Repository.Interfaces;
 
-internal interface IAdministratorRepository
+public interface IAdministratorRepository
 {
-    Task<Administrator?> GetAdministrator(int id);
-    Task<List<Administrator>?> GetAdministratorList();
-    Task<List<Administrator>?> GetAdministratorList(Predicate<Administrator> predicate);
+    IQueryable<Administrator> Administrators { get; }
     Task<bool> InsertAdministrator(Administrator administrator);
     Task<bool> DeleteAdministrator(int id);
     Task<bool> UpdateAdministrator(Administrator administrator);
