@@ -14,10 +14,11 @@ public class Timetable
     public IList<TimetableCell>? TimetableCells { get; private set; }
 
     private Timetable() { }
-    public Timetable(Group group, IEnumerable<TimetableCell> timetableCells)
+    public Timetable(int timeTablePk, Group group, IEnumerable<TimetableCell> timetableCells)
     {
         group.ThrowIfNull();
         timetableCells.Throw().IfEmpty();
+        TimetableId = timeTablePk;
         Group = group;
         TimetableCells = timetableCells.ToList();
     }
@@ -46,7 +47,7 @@ public class Timetable
 
                 if (matches > 1 && timeTableCell.IsReplaced is false)
                 {
-                    throw new ArgumentException($"В коллекции несколько занятий на одно и то же время. {timeTableCell.LessonTime}");
+                    return false;
                 }
             }
         }
