@@ -16,4 +16,9 @@ public class Cabinet
         Address = address;
         Number = number;
     }
+
+    public override string ToString()
+    {
+        return $"Id: {CabinetId}, Number: {Number}, Address: {Address}";
+    }
 }

@@ -13,4 +13,9 @@ public class Group
         GroupId = groupPk;
         Name = name;
     }
+
+    public override string ToString()
+    {
+        return $"Id: {GroupId}, Name: {Name}";
+    }
 }

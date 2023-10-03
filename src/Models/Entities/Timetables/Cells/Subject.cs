@@ -13,4 +13,9 @@ public class Subject
         SubjectId = subjectPK;
         Name = name;
     }
+
+    public override string ToString()
+    {
+        return $"Id: {SubjectId}, Name: {Name}";
+    }
 }

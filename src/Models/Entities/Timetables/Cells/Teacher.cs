@@ -21,4 +21,9 @@ public class Teacher
         FirstName = firstname;
         MiddleName = middlename;
     }
+
+    public override string ToString()
+    {
+        return $"Id: {TeacherId}, {Surname} {FirstName} {MiddleName}";
+    }
 }

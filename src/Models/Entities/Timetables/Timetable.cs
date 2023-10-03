@@ -20,16 +20,16 @@ public class Timetable
         timetableCells.Throw().IfEmpty();
         Group = group;
         TimetableCells = timetableCells.ToList();
-        EnsureTimeLessonsOk();
     }
 
     /// <summary>
     /// Проверяет, есть ли дубликаты занятий на одно и то же время.
     /// </summary>
     /// <returns> True если нет дубликатов, в противном случае false.</returns>
-    private bool EnsureTimeLessonsOk()
+    public bool IsTimeLessonsOk()
     {
-        TimetableCells.ThrowIfNull();
+        if (TimetableCells is null) {  return false; }
+
         var lessonTimes = TimetableCells.DistinctBy(c => c.LessonTime).Select(c => c.LessonTime);
 
         foreach (var lessonTime in lessonTimes)
@@ -50,7 +50,6 @@ public class Timetable
                 }
             }
         }
-
         return true;
     }
 }
