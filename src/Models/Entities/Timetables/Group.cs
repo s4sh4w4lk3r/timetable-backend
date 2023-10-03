@@ -3,13 +3,14 @@
 public class Group
 {
 
-    public int GroupPK { get; init; }
+    public int GroupId { get; init; }
     public string? Name { get; init; }
 
-    public Group(int groupPK, string name)
+    private Group() { }
+    public Group(int groupPk, string name)
     {
         name.ThrowIfNull().IfWhiteSpace();
-        GroupPK = groupPK;
+        GroupId = groupPk;
         Name = name;
     }
 }

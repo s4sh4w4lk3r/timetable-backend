@@ -5,16 +5,16 @@
     /// </summary>
     public class TimetableCell
     {
-        public int TimeTableCellPK { get; init; }
-        public LessonTime? LessonTime { get; init; }
-        public Cabinet? Cabinet { get; init; }
-        public Teacher? Teacher { get; init; }
-        public Subject? Subject { get; init; }
+        public int TimeTableCellId { get; init; }
+        public required LessonTime? LessonTime { get; init; }
+        public required Cabinet? Cabinet { get; init; }
+        public required Teacher? Teacher { get; init; }
+        public required Subject? Subject { get; init; }
         public bool IsReplaced { get; private set; }
 
         private TimetableCell? _replacingTimeTableCell;
         /// <summary>
-        /// Ссылка на пару, которую заменяют
+        /// Ссылка на пару, которую заменяют. Когда используется сеттер, то свойство IsReplaced становится true.
         /// </summary>
         public TimetableCell? ReplacingTimeTableCell
         {
@@ -27,18 +27,6 @@
             }
         }
 
-        public TimetableCell(int timeTableCellPK, LessonTime lessonTime, Cabinet cabinet, Teacher teacher, Subject subject)
-        {
-            subject.ThrowIfNull();
-            cabinet.ThrowIfNull();
-            teacher.ThrowIfNull();
-            lessonTime.ThrowIfNull();
-
-            TimeTableCellPK = timeTableCellPK;
-            Subject = subject;
-            Cabinet = cabinet;
-            Teacher = teacher;
-            LessonTime = lessonTime;
-        }
+        public TimetableCell() { }
     }
 }

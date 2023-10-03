@@ -2,7 +2,7 @@
 
 public class LessonTime
 {
-    public int LessonTimePK { get; init; }
+    public int LessonTimeId { get; init; }
     public int LessonNumber { get; init; }
     public DayOfWeek DayOfWeek { get; init; }
 
@@ -12,11 +12,12 @@ public class LessonTime
     public bool IsWeekEven { get; init; }
     public TimeOnly From { get; init; }
     public TimeOnly To { get; init; }
+    public List<TimetableCell>? TimetableCells { get; set; }
 
     private LessonTime() { }
     public LessonTime(int lessonTimePk, int lessonNumber, bool isWeekEven, TimeOnly from, TimeOnly to)
     {
-        LessonTimePK = lessonTimePk;
+        LessonTimeId = lessonTimePk;
         LessonNumber = lessonNumber;
         IsWeekEven = isWeekEven;
         From = from;
@@ -31,7 +32,7 @@ public class LessonTime
                IsWeekEven == time.IsWeekEven &&
                From.Equals(time.From) &&
                To.Equals(time.To) &&
-               LessonTimePK.Equals(time.LessonTimePK);
+               LessonTimeId.Equals(time.LessonTimeId);
     }
     public override int GetHashCode()
     {
@@ -47,6 +48,6 @@ public class LessonTime
     }
     public override string ToString()
     {
-        return $"LessonTimePK: {LessonTimePK}, LessonNumber: {LessonNumber}, DayOfWeek: {DayOfWeek}, IsWeekEven: {IsWeekEven}, From: {From}, To: {To}.";
+        return $"LessonTimePK: {LessonTimeId}, LessonNumber: {LessonNumber}, DayOfWeek: {DayOfWeek}, IsWeekEven: {IsWeekEven}, From: {From}, To: {To}.";
     }
 }

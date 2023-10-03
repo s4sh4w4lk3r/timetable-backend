@@ -4,14 +4,16 @@ namespace Models.Entities.Timetables;
 
 public class Timetable
 {
-    public Group Group { get; init; }
+    public int TimetableId { get; set; }
+    public Group? Group { get; init; }
 
     /// <summary>
     /// Полный список всех занятий, в том числе с заменами. Замены идут отдельной ячейкой и имеют ссылку на занятие, которое под замену.
     /// На клиенте надо делать выборку для формирования общего расписания.
     /// </summary>
-    public IList<TimetableCell> TimetableCells { get; private set; }
+    public IList<TimetableCell>? TimetableCells { get; private set; }
 
+    private Timetable() { }
     public Timetable(Group group, IEnumerable<TimetableCell> timetableCells)
     {
         group.ThrowIfNull();
@@ -27,6 +29,7 @@ public class Timetable
     /// <returns> True если нет дубликатов, в противном случае false.</returns>
     private bool EnsureTimeLessonsOk()
     {
+        TimetableCells.ThrowIfNull();
         var lessonTimes = TimetableCells.DistinctBy(c => c.LessonTime).Select(c => c.LessonTime);
 
         foreach (var lessonTime in lessonTimes)
@@ -45,7 +48,6 @@ public class Timetable
                 {
                     throw new ArgumentException($"В коллекции несколько занятий на одно и то же время. {timeTableCell.LessonTime}");
                 }
-
             }
         }
 

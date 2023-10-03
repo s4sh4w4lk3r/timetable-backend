@@ -2,13 +2,15 @@
 
 public class Subject
 {
-    public int SubjectPK { get; init; }
+    public int SubjectId { get; init; }
     public string? Name { get; init; }
+    public List<TimetableCell>? TimetableCells { get; set; }
 
+    private Subject() { }
     public Subject(int subjectPK, string? name)
     {
         name.ThrowIfNull().IfWhiteSpace();
-        SubjectPK = subjectPK;
+        SubjectId = subjectPK;
         Name = name;
     }
 }
