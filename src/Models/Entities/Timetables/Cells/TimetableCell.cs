@@ -27,6 +27,14 @@
             }
         }
 
+        /// <summary>
+        /// Убирает замену из свойства ReplacingTimeTableCell и IsReplaced становится обратно false.
+        /// </summary>
+        public void CancelReplace()
+        {
+            IsReplaced = false;
+            ReplacingTimeTableCell = null;
+        }
         public TimetableCell() { }
     }
 }
