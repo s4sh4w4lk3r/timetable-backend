@@ -5,8 +5,8 @@ namespace Models.Entities.Users;
 public abstract class User
 {
     public int UserId { get; init; }
-    public string? Email { get; init; }
-    public string? Password { get; init; }
+    public string? Email { get; set; }
+    public string? Password { get; set; }
 
     protected User() { }
     protected User(int userPK, string? email, string? password)
