@@ -5,7 +5,7 @@ namespace Repository.Interfaces;
 public interface IGroupRepository
 {
     IQueryable<Group> Groups { get; }
-    Task<bool> InsertGroup(Group group);
-    Task<bool> DeleteGroup(int id);
-    Task<bool> UpdateGroup(Group group);
+    Task InsertGroupAsync(Group group);
+    Task DeleteGroupAsync(int id);
+    Task UpdateGroupAsync(Group group);
 }

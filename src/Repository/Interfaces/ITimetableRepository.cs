@@ -5,7 +5,7 @@ namespace Repository.Interfaces;
 public interface ITimetableRepository
 {
     IQueryable<Timetable> Timetables { get; }
-    Task<bool> InsertTimetable(Timetable timetable);
-    Task<bool> DeleteTimetable(int id);
-    Task<bool> UpdateTimetable(Timetable timetable);
+    Task InsertTimetableAsync(Timetable timetable);
+    Task DeleteTimetableAsync(int id);
+    Task UpdateTimetableAsync(Timetable timetable);
 }

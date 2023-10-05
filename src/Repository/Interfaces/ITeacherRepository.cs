@@ -5,7 +5,7 @@ namespace Repository.Interfaces;
 public interface ITeacherRepository
 {
     IQueryable<Teacher> Teachers { get; }
-    Task<bool> InsertTeacher(Teacher teacher);
-    Task<bool> DeleteTeacher(int id);
-    Task<bool> UpdateTeacher(Teacher teacher);
+    Task InsertTeacherAsync(Teacher teacher);
+    Task DeleteTeacherAsync(int id);
+    Task UpdateTeacherAsync(Teacher teacher);
 }

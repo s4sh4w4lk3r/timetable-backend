@@ -5,7 +5,7 @@ namespace Repository.Interfaces;
 public interface ILessonTimeRepository
 {
     IQueryable<LessonTime> LessonTimes { get; }
-    Task<bool> InsertLessonTime(LessonTime lessonTime);
-    Task<bool> DeleteLessonTime(int id);
-    Task<bool> UpdateLessonTime(LessonTime lessonTime);
+    Task<bool> InsertLessonTimeAsync(LessonTime lessonTime);
+    Task<bool> DeleteLessonTimeAsync(int id);
+    Task<bool> UpdateLessonTimeAsync(LessonTime lessonTime);
 }
