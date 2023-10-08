@@ -5,10 +5,6 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "src\WebApi\WebApi.csproj", "{30F70B99-5991-4D21-884A-E72E2BF1F47F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestingGround", "src\TestingGround\TestingGround.csproj", "{2FBB6453-EE9E-4A93-B5FE-0F229EF11461}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "src\Services\Services.csproj", "{36009F9E-9BD2-409F-B864-BE67DA30745B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "src\Repository\Repository.csproj", "{829BD3F3-58E7-4A33-AEDB-273446447C8E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "src\Models\Models.csproj", "{80EA4527-8423-4452-A09C-FDE363622CD3}"
@@ -23,14 +19,6 @@ Global
 		{30F70B99-5991-4D21-884A-E72E2BF1F47F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30F70B99-5991-4D21-884A-E72E2BF1F47F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30F70B99-5991-4D21-884A-E72E2BF1F47F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2FBB6453-EE9E-4A93-B5FE-0F229EF11461}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2FBB6453-EE9E-4A93-B5FE-0F229EF11461}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2FBB6453-EE9E-4A93-B5FE-0F229EF11461}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2FBB6453-EE9E-4A93-B5FE-0F229EF11461}.Release|Any CPU.Build.0 = Release|Any CPU
-		{36009F9E-9BD2-409F-B864-BE67DA30745B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{36009F9E-9BD2-409F-B864-BE67DA30745B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{36009F9E-9BD2-409F-B864-BE67DA30745B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{36009F9E-9BD2-409F-B864-BE67DA30745B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{829BD3F3-58E7-4A33-AEDB-273446447C8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{829BD3F3-58E7-4A33-AEDB-273446447C8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{829BD3F3-58E7-4A33-AEDB-273446447C8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
