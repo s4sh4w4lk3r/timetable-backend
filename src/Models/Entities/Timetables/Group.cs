@@ -4,7 +4,7 @@ public class Group
 {
 
     public int GroupId { get; init; }
-    public string? Name { get; init; }
+    public string? Name { get; set; }
 
     private Group() { }
     public Group(int groupPk, string name)

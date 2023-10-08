@@ -4,9 +4,9 @@ public class Teacher
 {
 
     public int TeacherId { get; init; }
-    public string? Surname { get; init; }
-    public string? FirstName { get; init; }
-    public string? MiddleName { get; init; }
+    public string? Surname { get; set; }
+    public string? FirstName { get; set; }
+    public string? MiddleName { get; set; }
     public List<TimetableCell>? TimetableCells { get; set; }
 
     private Teacher() { }

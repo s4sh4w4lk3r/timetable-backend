@@ -3,7 +3,7 @@
 public class Subject
 {
     public int SubjectId { get; init; }
-    public string? Name { get; init; }
+    public string? Name { get; set; }
     public List<TimetableCell>? TimetableCells { get; set; }
 
     private Subject() { }

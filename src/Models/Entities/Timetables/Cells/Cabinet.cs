@@ -3,8 +3,8 @@
 public class Cabinet
 {
     public int CabinetId { get; init; }
-    public string? Address { get; init; }
-    public string? Number { get; init; }
+    public string? Address { get; set; }
+    public string? Number { get; set; }
     public List<TimetableCell>? TimetableCells { get; set; }
 
     private Cabinet() { }

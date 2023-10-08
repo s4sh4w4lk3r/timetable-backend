@@ -3,8 +3,8 @@
 public class LessonTime
 {
     public int LessonTimeId { get; init; }
-    public int LessonNumber { get; init; }
-    public DayOfWeek DayOfWeek { get; init; }
+    public int LessonNumber { get; set; }
+    public DayOfWeek DayOfWeek { get; set; }
 
     /// <summary>
     /// True если неделя четная, в противном случае false

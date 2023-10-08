@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Models.Entities.Timetables;
-using Models.Entities.Timetables.Cells;
 using Models.Validation.AllProperties;
 using Repository.Implementations.MySql;
 using Repository.Interfaces;
