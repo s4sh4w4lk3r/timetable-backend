@@ -12,13 +12,14 @@ namespace Repository.Implementations.EFCore
         private CancellationToken _cancellationToken;
         private IValidator<T> _validator;
 
-        public EFCoreRepository(MySqlDbContext context, IValidator<T> validator, CancellationToken cancellationToken = default)
+        public EFCoreRepository(string connectionString, IValidator<T> validator, CancellationToken cancellationToken = default)
         {
-            _context = context;
+            _context = new MySqlDbContext(connectionString);
             _cancellationToken = cancellationToken;
             _validator = validator;
-            _dbSet = context.Set<T>();
+            _dbSet = _context.Set<T>();
         }
+
 
         public IQueryable<T> Entites => _dbSet.AsQueryable();
 

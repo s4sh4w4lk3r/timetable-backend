@@ -3,11 +3,11 @@ using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Users;
 using MySqlConnector;
+using Throw;
 
 namespace Repository.Implementations.MySql;
 
-#warning сделать доступ контекста потом internal
-public class MySqlDbContext : DbContext
+internal class MySqlDbContext : DbContext
 {
     public DbSet<Cabinet> Cabinets => Set<Cabinet>();
     public DbSet<Group> Groups => Set<Group>();
@@ -19,11 +19,13 @@ public class MySqlDbContext : DbContext
     public DbSet<Timetable> Timetables => Set<Timetable>();
 
 
-    private readonly MySqlConnection _mySqlConnection;
+    private readonly string _connectionString;
 
-    public MySqlDbContext(MySqlConnection mySqlConnection)
+    public MySqlDbContext(string connectionString)
     {
-        _mySqlConnection = mySqlConnection;
+        connectionString.ThrowIfNull().IfWhiteSpace();
+
+        _connectionString = connectionString;
         //Database.EnsureDeleted();
         Database.EnsureCreated();
     }
@@ -32,8 +34,8 @@ public class MySqlDbContext : DbContext
     {
         try
         {
-            var serverVer = ServerVersion.AutoDetect(_mySqlConnection);
-            optionsBuilder.UseMySql(_mySqlConnection, serverVer);
+            var serverVer = ServerVersion.AutoDetect(_connectionString);
+            optionsBuilder.UseMySql(_connectionString, serverVer);
         }
         catch (MySqlException ex)
         {
@@ -48,8 +50,8 @@ public class MySqlDbContext : DbContext
         modelBuilder.Entity<Cabinet>(entity =>
         {
             entity.HasKey(c => c.CabinetId).HasName("PRIMARY");
-            entity.Property(c=>c.Address).HasMaxLength(255);
-            entity.Property(c=>c.Number).HasMaxLength(255);
+            entity.Property(c => c.Address).HasMaxLength(255);
+            entity.Property(c => c.Number).HasMaxLength(255);
         });
 
         modelBuilder.Entity<LessonTime>(entity =>
@@ -61,7 +63,7 @@ public class MySqlDbContext : DbContext
         modelBuilder.Entity<Subject>(entity =>
         {
             entity.HasKey(s => s.SubjectId).HasName("PRIMARY");
-            entity.Property(s=>s.Name).HasMaxLength(255);
+            entity.Property(s => s.Name).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Teacher>(entity =>
