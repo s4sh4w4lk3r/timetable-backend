@@ -7,15 +7,13 @@ namespace Repository.Implementations.EFCore
 {
     public class EFCoreRepository<T> : IRepository<T> where T : class
     {
-        private MySqlDbContext _context;
-        private DbSet<T> _dbSet;
-        private CancellationToken _cancellationToken;
-        private IValidator<T> _validator;
+        private readonly MySqlDbContext _context;
+        private readonly DbSet<T> _dbSet;
+        private readonly IValidator<T> _validator;
 
-        public EFCoreRepository(string connectionString, IValidator<T> validator, CancellationToken cancellationToken = default)
+        public EFCoreRepository(string connectionString, IValidator<T> validator)
         {
             _context = new MySqlDbContext(connectionString);
-            _cancellationToken = cancellationToken;
             _validator = validator;
             _dbSet = _context.Set<T>();
         }
@@ -23,29 +21,29 @@ namespace Repository.Implementations.EFCore
 
         public IQueryable<T> Entites => _dbSet.AsQueryable();
 
-        public async Task DeleteAsync(T entity)
+        public async Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
         {
             _validator.ValidateAndThrow(entity);
 
             _dbSet.Remove(entity);
-            await _context.SaveChangesAsync(_cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task InsertAsync(T entity)
+        public async Task InsertAsync(T entity, CancellationToken cancellationToken = default)
         {
             _validator.ValidateAndThrow(entity);
 
             _dbSet.Add(entity);
-            await _context.SaveChangesAsync(_cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task UpdateAsync(T entity)
+        public async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
         {
             _validator.ValidateAndThrow(entity);
 
             _dbSet.Update(entity);
 
-            await _context.SaveChangesAsync(_cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }
