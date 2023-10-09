@@ -7,13 +7,13 @@ namespace Repository.Implementations.EFCore
 {
     public class EFCoreRepository<T> : IRepository<T> where T : class
     {
-        private readonly MySqlDbContext _context;
+        private readonly SqlDbContext _context;
         private readonly DbSet<T> _dbSet;
         private readonly IValidator<T> _validator;
 
         public EFCoreRepository(string connectionString, IValidator<T> validator)
         {
-            _context = new MySqlDbContext(connectionString);
+            _context = new SqlDbContext(connectionString);
             _validator = validator;
             _dbSet = _context.Set<T>();
         }

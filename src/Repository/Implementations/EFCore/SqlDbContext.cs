@@ -7,7 +7,7 @@ using Throw;
 
 namespace Repository.Implementations.MySql;
 
-internal class MySqlDbContext : DbContext
+internal class SqlDbContext : DbContext
 {
     public DbSet<Cabinet> Cabinets => Set<Cabinet>();
     public DbSet<Group> Groups => Set<Group>();
@@ -21,12 +21,12 @@ internal class MySqlDbContext : DbContext
 
     private readonly string _connectionString;
 
-    public MySqlDbContext(string connectionString)
+    public SqlDbContext(string connectionString)
     {
         connectionString.ThrowIfNull().IfWhiteSpace();
 
         _connectionString = connectionString;
-        //Database.EnsureDeleted();
+        Database.EnsureDeleted();
         Database.EnsureCreated();
     }
 
@@ -34,41 +34,44 @@ internal class MySqlDbContext : DbContext
     {
         try
         {
-            var serverVer = ServerVersion.AutoDetect(_connectionString);
-            optionsBuilder.UseMySql(_connectionString, serverVer);
+            //var serverVer = ServerVersion.AutoDetect(_connectionString);
+            //optionsBuilder.UseMySql(_connectionString, serverVer);
+
+            optionsBuilder.UseNpgsql(_connectionString,
+                options => options.UseAdminDatabase("postgres"));
         }
-        catch (MySqlException ex)
+        catch (Exception ex)
         {
-            throw new InvalidOperationException($"Не получилось открыть соединение с MySql.", ex);
+            throw new InvalidOperationException($"Не получилось открыть соединение с базой SQL.", ex);
         }
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
-        modelBuilder.UseCollation("utf8mb4_unicode_ci").HasCharSet("utf8mb4");
+        //modelBuilder.HasDefaultSchema("public");
+        //modelBuilder.UseCollation("utf8mb4_unicode_ci").HasCharSet("utf8mb4");
 
         modelBuilder.Entity<Cabinet>(entity =>
         {
-            entity.HasKey(c => c.CabinetId).HasName("PRIMARY");
+            entity.HasKey(c => c.CabinetId).HasName("CabinetPRIMARY");
             entity.Property(c => c.Address).HasMaxLength(255);
             entity.Property(c => c.Number).HasMaxLength(255);
         });
 
         modelBuilder.Entity<LessonTime>(entity =>
         {
-            entity.HasKey(lt => lt.LessonTimeId).HasName("PRIMARY");
+            entity.HasKey(lt => lt.LessonTimeId).HasName("LessonTimePRIMARY");
             entity.Property(lt => lt.DayOfWeek).HasComment("Enum с днями недель.");
         });
 
         modelBuilder.Entity<Subject>(entity =>
         {
-            entity.HasKey(s => s.SubjectId).HasName("PRIMARY");
+            entity.HasKey(s => s.SubjectId).HasName("SubjectPRIMARY");
             entity.Property(s => s.Name).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Teacher>(entity =>
         {
-            entity.HasKey(t => t.TeacherId).HasName("PRIMARY");
+            entity.HasKey(t => t.TeacherId).HasName("TeacherPRIMARY");
             entity.Property(t => t.FirstName).HasMaxLength(255);
             entity.Property(t => t.MiddleName).HasMaxLength(255);
             entity.Property(t => t.Surname).HasMaxLength(255);
@@ -76,13 +79,13 @@ internal class MySqlDbContext : DbContext
 
         modelBuilder.Entity<Group>(entity =>
         {
-            entity.HasKey(g => g.GroupId).HasName("PRIMARY");
+            entity.HasKey(g => g.GroupId).HasName("GroupPRIMARY");
             entity.Property(g => g.Name).HasMaxLength(255);
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(u => u.UserId).HasName("PRIMARY");
+            entity.HasKey(u => u.UserId).HasName("UserPRIMARY");
             entity.UseTphMappingStrategy();
             entity.Property<string>("Discriminator").HasMaxLength(30);
             entity.HasIndex(u => u.Email, "email-unique").IsUnique();
@@ -97,7 +100,7 @@ internal class MySqlDbContext : DbContext
         modelBuilder.Entity<TimetableCell>(entity =>
         {
 
-            entity.HasKey(t => t.TimeTableCellId).HasName("PRIMARY");
+            entity.HasKey(t => t.TimeTableCellId).HasName("TimetableCellPRIMARY");
 
             entity.HasOne(e => e.Cabinet).WithMany(e => e.TimetableCells).IsRequired();
             entity.HasOne(e => e.Teacher).WithMany(e => e.TimetableCells).IsRequired();
@@ -108,7 +111,7 @@ internal class MySqlDbContext : DbContext
 
         modelBuilder.Entity<Timetable>(entity =>
         {
-            entity.HasKey(t => t.TimetableId).HasName("PRIMARY");
+            entity.HasKey(t => t.TimetableId).HasName("TimetablePRIMARY");
         }
         );
     }
