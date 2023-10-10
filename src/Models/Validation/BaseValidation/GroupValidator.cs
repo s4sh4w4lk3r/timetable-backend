@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Models.Entities.Timetables;
 
-namespace Models.Validation.AllProperties;
+namespace Models.Validation.BaseValidation;
 
 public class GroupValidator : AbstractValidator<Group>
 {

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Models.Entities.Timetables.Cells;
 
-namespace Models.Validation.AllProperties;
+namespace Models.Validation.BaseValidation;
 
 public class CabinetValidator : AbstractValidator<Cabinet>
 {

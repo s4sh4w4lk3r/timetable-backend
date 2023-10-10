@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using Models.Entities.Users;
 
-namespace Models.Validation.AllProperties;
+namespace Models.Validation.BaseValidation;
 
-public class AdminstratorValidator : AbstractValidator<Administrator>
+public class UserValidator : AbstractValidator<User>
 {
-    public AdminstratorValidator()
+    public UserValidator()
     {
         RuleFor(e => e.Email).NotEmpty();
         RuleFor(e => e.Password).NotEmpty();
