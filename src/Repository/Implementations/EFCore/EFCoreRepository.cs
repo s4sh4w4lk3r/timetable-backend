@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Repository.Implementations.MySql;
 using Repository.Interfaces;
+using Throw;
 
 namespace Repository.Implementations.EFCore
 {
@@ -11,9 +13,12 @@ namespace Repository.Implementations.EFCore
         private readonly DbSet<T> _dbSet;
         private readonly IValidator<T> _validator;
 
-        public EFCoreRepository(string connectionString, IValidator<T> validator)
+        public EFCoreRepository(IOptions<DbConfiguration> options, IValidator<T> validator)
         {
-            _context = new SqlDbContext(connectionString);
+            options.Value.ThrowIfNull();
+#warning сделать сюда основных (хост пароль..) валидацию настроек
+
+            _context = new SqlDbContext(options.Value);
             _validator = validator;
             _dbSet = _context.Set<T>();
         }

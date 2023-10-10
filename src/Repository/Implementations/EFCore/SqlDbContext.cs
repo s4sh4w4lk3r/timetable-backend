@@ -2,7 +2,6 @@
 using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Users;
-using MySqlConnector;
 using Throw;
 
 namespace Repository.Implementations.MySql;
@@ -19,14 +18,14 @@ internal class SqlDbContext : DbContext
     public DbSet<Timetable> Timetables => Set<Timetable>();
 
 
-    private readonly string _connectionString;
+    private readonly DbConfiguration _configuration;
 
-    public SqlDbContext(string connectionString)
+    public SqlDbContext(DbConfiguration configuration)
     {
-        connectionString.ThrowIfNull().IfWhiteSpace();
+        configuration.ThrowIfNull();
 
-        _connectionString = connectionString;
-        Database.EnsureDeleted();
+        _configuration = configuration;
+        //Database.EnsureDeleted();
         Database.EnsureCreated();
     }
 
@@ -34,21 +33,44 @@ internal class SqlDbContext : DbContext
     {
         try
         {
-            //var serverVer = ServerVersion.AutoDetect(_connectionString);
-            //optionsBuilder.UseMySql(_connectionString, serverVer);
+            switch (_configuration.DatabaseEngine)
+            {
+                case DatabaseEngine.MySql:
+                    var serverVer = ServerVersion.AutoDetect(_configuration.ConnectionString);
+                    optionsBuilder.UseMySql(_configuration.ConnectionString, serverVer);
+                    break;
 
-            optionsBuilder.UseNpgsql(_connectionString,
-                options => options.UseAdminDatabase("postgres"));
+                case DatabaseEngine.PostgreSql:
+                    optionsBuilder.UseNpgsql(_configuration.ConnectionString,
+                    options => options.UseAdminDatabase("postgres"));
+                    break;
+
+                default:
+                    throw new ArgumentException($"В контексте не реализована работа с типом БД {_configuration.DatabaseEngine}.");
+            }
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Не получилось открыть соединение с базой SQL.", ex);
+            throw new InvalidOperationException($"Не получилось открыть соединение с СУБД.", ex);
         }
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //modelBuilder.HasDefaultSchema("public");
-        //modelBuilder.UseCollation("utf8mb4_unicode_ci").HasCharSet("utf8mb4");
+        if (string.IsNullOrWhiteSpace(_configuration.CharSet) is false)
+        {
+            modelBuilder.HasCharSet(_configuration.CharSet);
+        }
+
+        if (string.IsNullOrWhiteSpace(_configuration.DefaultSchema) is false)
+        {
+            modelBuilder.HasDefaultSchema(_configuration.DefaultSchema);
+        }
+
+        if (string.IsNullOrWhiteSpace(_configuration.Collation) is false)
+        {
+            modelBuilder.UseCollation(_configuration.Collation);
+        }
+
 
         modelBuilder.Entity<Cabinet>(entity =>
         {
