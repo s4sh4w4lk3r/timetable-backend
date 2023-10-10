@@ -9,6 +9,5 @@ public class DbConfigurationValidator : AbstractValidator<DbConfiguration>
         RuleFor(e=>e.ConnectionString).NotEmpty();
         RuleFor(e=>e.DatabaseEngineName).NotEmpty();
         RuleFor(e => e.DatabaseEngine).IsInEnum();
-        RuleFor(e=>e.PostgresAdminDbName).NotEmpty();
     }
 }

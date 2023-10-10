@@ -27,5 +27,4 @@ namespace Repository
         public string? PostgresAdminDbName { get; init; } = "postgres";
     }
     public enum DatabaseEngine { MySql, PostgreSql }
-#warning отладить это
 }

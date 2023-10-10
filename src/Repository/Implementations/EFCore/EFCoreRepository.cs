@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Repository.Implementations.MySql;
 using Repository.Interfaces;
-using Throw;
 
 namespace Repository.Implementations.EFCore
 {
@@ -15,9 +14,6 @@ namespace Repository.Implementations.EFCore
 
         public EFCoreRepository(IOptions<DbConfiguration> options, IValidator<T> validator)
         {
-            options.Value.ThrowIfNull();
-#warning сделать сюда основных (хост пароль..) валидацию настроек
-
             _context = new SqlDbContext(options.Value);
             _validator = validator;
             _dbSet = _context.Set<T>();

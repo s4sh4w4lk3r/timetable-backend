@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Users;
+using Models.Entities.Users.Auth;
 using Throw;
 
 namespace Repository.Implementations.MySql;
@@ -16,16 +18,17 @@ internal class SqlDbContext : DbContext
     public DbSet<Administrator> Administrators => Set<Administrator>();
     public DbSet<TimetableCell> TimetableCells => Set<TimetableCell>();
     public DbSet<Timetable> Timetables => Set<Timetable>();
+    public DbSet<ApprovalCode> ApprovalCodes => Set<ApprovalCode>();
 
 
     private readonly DbConfiguration _configuration;
 
     public SqlDbContext(DbConfiguration configuration)
     {
-        configuration.ThrowIfNull();
+        new DbConfigurationValidator().ValidateAndThrow(configuration);
 
         _configuration = configuration;
-        //Database.EnsureDeleted();
+        Database.EnsureDeleted();
         Database.EnsureCreated();
     }
 
@@ -41,8 +44,10 @@ internal class SqlDbContext : DbContext
                     break;
 
                 case DatabaseEngine.PostgreSql:
+                    _configuration.PostgresAdminDbName.ThrowIfNull().IfWhiteSpace();
+
                     optionsBuilder.UseNpgsql(_configuration.ConnectionString,
-                    options => options.UseAdminDatabase("postgres"));
+                    options => options.UseAdminDatabase(_configuration.PostgresAdminDbName));
                     break;
 
                 default:
@@ -136,5 +141,11 @@ internal class SqlDbContext : DbContext
             entity.HasKey(t => t.TimetableId).HasName("TimetablePRIMARY");
         }
         );
+
+        modelBuilder.Entity<ApprovalCode>(entity =>
+        {
+            entity.HasKey(e => e.AprrovalCodeId).HasName("ApprovalCodePRIMARY");
+            entity.HasOne(e => e.User).WithMany(e => e.ApprovalCodes).IsRequired();
+        });
     }
 }
