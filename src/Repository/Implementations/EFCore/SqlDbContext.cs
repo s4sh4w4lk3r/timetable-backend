@@ -28,7 +28,7 @@ internal class SqlDbContext : DbContext
         new DbConfigurationValidator().ValidateAndThrow(configuration);
 
         _configuration = configuration;
-        Database.EnsureDeleted();
+        //Database.EnsureDeleted();
         Database.EnsureCreated();
     }
 
@@ -117,6 +117,7 @@ internal class SqlDbContext : DbContext
             entity.Property<string>("Discriminator").HasMaxLength(30);
             entity.HasIndex(u => u.Email, "email-unique").IsUnique();
             entity.Property(u => u.Email).HasMaxLength(255);
+            entity.Property(u => u.Password).HasMaxLength(72);
         });
 
         modelBuilder.Entity<Administrator>(entity =>
