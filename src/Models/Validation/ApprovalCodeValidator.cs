@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Models.Entities.Users.Auth;
-using Models.Validation.BaseValidation;
 
 namespace Models.Validation;
 

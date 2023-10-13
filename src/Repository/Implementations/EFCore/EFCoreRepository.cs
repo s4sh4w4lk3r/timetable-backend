@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Repository.Implementations.MySql;
 using Repository.Interfaces;
@@ -12,9 +13,9 @@ namespace Repository.Implementations.EFCore
         private readonly DbSet<T> _dbSet;
         private readonly IValidator<T> _validator;
 
-        public EFCoreRepository(IOptions<DbConfiguration> options, IValidator<T> validator)
+        public EFCoreRepository(IOptions<DbConfiguration> options, IValidator<T> validator, ILoggerFactory loggerFactory)
         {
-            _context = new SqlDbContext(options.Value);
+            _context = new SqlDbContext(options.Value, loggerFactory);
             _validator = validator;
             _dbSet = _context.Set<T>();
         }

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Users;
@@ -20,13 +21,15 @@ internal class SqlDbContext : DbContext
     public DbSet<Timetable> Timetables => Set<Timetable>();
     public DbSet<ApprovalCode> ApprovalCodes => Set<ApprovalCode>();
 
-
     private readonly DbConfiguration _configuration;
+    private readonly ILoggerFactory _loggerFactory;
 
-    public SqlDbContext(DbConfiguration configuration)
+    public SqlDbContext(DbConfiguration configuration, ILoggerFactory loggerFactory)
     {
         new DbConfigurationValidator().ValidateAndThrow(configuration);
+        loggerFactory.ThrowIfNull();
 
+        _loggerFactory = loggerFactory;
         _configuration = configuration;
         //Database.EnsureDeleted();
         Database.EnsureCreated();
@@ -34,6 +37,8 @@ internal class SqlDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        optionsBuilder.UseLoggerFactory(_loggerFactory);
+
         try
         {
             switch (_configuration.DatabaseEngine)
