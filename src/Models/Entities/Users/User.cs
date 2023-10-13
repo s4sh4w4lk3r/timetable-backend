@@ -8,14 +8,11 @@ public abstract class User
     public int UserId { get; init; }
     public string? Email { get; set; }
     public string? Password { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime RefreshTokenExpiryTime { get; init; }
+
+#warning может для этих полей валидатор надо сделать
     public List<ApprovalCode>? ApprovalCodes { get; init; }
 
     protected User() { }
-    protected User(int userPK, string? email, string? password)
-    {
-        email.ThrowIfNull().IfWhiteSpace().IfNotMatches(new Regex("^\\S+@\\S+\\.\\S+$"));
-        UserId = userPK;
-        Email = email;
-        Password = password;
-    }
 }

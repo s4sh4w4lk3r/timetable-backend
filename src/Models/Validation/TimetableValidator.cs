@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Models.Entities.Timetables;
 
-namespace Models.Validation.BaseValidation;
+namespace Models.Validation;
 
 public class TimetableValidator : AbstractValidator<Timetable>
 {

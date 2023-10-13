@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Models.Entities.Timetables.Cells;
 
-namespace Models.Validation.BaseValidation;
+namespace Models.Validation;
 
 public class TeacherValidator : AbstractValidator<Teacher>
 {
