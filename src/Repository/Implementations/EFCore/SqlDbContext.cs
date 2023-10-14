@@ -16,7 +16,7 @@ internal class SqlDbContext : DbContext
     public DbSet<LessonTime> LessonTimes => Set<LessonTime>();
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<Teacher> Teachers => Set<Teacher>();
-    public DbSet<Administrator> Administrators => Set<Administrator>();
+    public DbSet<User> Administrators => Set<User>();
     public DbSet<TimetableCell> TimetableCells => Set<TimetableCell>();
     public DbSet<Timetable> Timetables => Set<Timetable>();
     public DbSet<ApprovalCode> ApprovalCodes => Set<ApprovalCode>();
@@ -123,11 +123,6 @@ internal class SqlDbContext : DbContext
             entity.HasIndex(u => u.Email, "email-unique").IsUnique();
             entity.Property(u => u.Email).HasMaxLength(255);
             entity.Property(u => u.Password).HasMaxLength(72);
-        });
-
-        modelBuilder.Entity<Administrator>(entity =>
-        {
-            entity.HasBaseType<User>();
         });
 
         modelBuilder.Entity<TimetableCell>(entity =>
