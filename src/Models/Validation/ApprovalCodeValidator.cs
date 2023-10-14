@@ -8,6 +8,6 @@ public class ApprovalCodeValidator : AbstractValidator<ApprovalCode>
     public ApprovalCodeValidator()
     {
         RuleFor(e => e.User).NotEmpty().SetValidator(new UserValidator()!);
-        RuleFor(e => e).Must(e => e.IsValid());
+        RuleFor(e => e).Must(e => e.IsNotExpired());
     }
 }

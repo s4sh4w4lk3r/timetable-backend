@@ -1,5 +1,4 @@
 ﻿using Models.Entities.Users.Auth;
-using System.Text.RegularExpressions;
 
 namespace Models.Entities.Users;
 
@@ -11,9 +10,8 @@ public class User
     public UserRole Role { get; set; } = UserRole.Common;
 
     public IList<ApprovalCode>? ApprovalCodes { get; init; } = new List<ApprovalCode>();
+    public IList<UserSession>? UserSessions { get; init; } = new List<UserSession>();
 
-#warning может для этих полей валидатор надо сделать
-    public List<ApprovalCode>? ApprovalCodes { get; init; }
     public User() { }
 
     public enum UserRole { Common,  Admininstrator}
