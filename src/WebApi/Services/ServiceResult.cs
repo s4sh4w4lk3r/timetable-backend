@@ -3,7 +3,7 @@
 public class ServiceResult
 {
     public bool Success { get; init; }
-    public string Description = string.Empty;
+    public string Description { get; init; } = string.Empty;
     public ServiceResult? InnerServiceResult { get; init; }
     public ServiceResult(bool success, string description)
     {

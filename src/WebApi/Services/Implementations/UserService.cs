@@ -41,11 +41,12 @@ public class UserService
         }
 
         user.IsEmailConfirmed = false;
-        await _userRepo.UpdateAsync(user, cancellationToken);
+        user.Password = HashPassword(user.Password!);
+        await _userRepo.InsertAsync(user, cancellationToken);
         return new ServiceResult(true, "Пользователь добавлен в базу, но Email не подтвержден.");
     }
 
-    public async Task<ServiceResult> VerifyEmail(User user, int approvalCode, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> ConfirmEmailAsync(User user, int approvalCode, CancellationToken cancellationToken = default)
     {
         var userVal = _userValidator.Validate(user, o => o.IncludeRuleSets("default"));
         if (userVal.IsValid is false)

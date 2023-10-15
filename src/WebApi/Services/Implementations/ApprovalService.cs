@@ -78,7 +78,7 @@ public class ApprovalService
         }
 
         var approval = new ApprovalCode(user, approvalCodeType);
-        var sendTask = _approvalCodeRepository.InsertAsync(approval);
+        var sendTask = _approvalCodeRepository.InsertAsync(approval, cancellationToken);
 
         string message = approvalCodeType switch
         {
