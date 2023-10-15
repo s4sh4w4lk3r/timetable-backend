@@ -10,7 +10,6 @@ public class UserValidator : AbstractValidator<User>
     {
         RuleFor(e => e.Email).NotEmpty().Matches(new Regex("^\\S+@\\S+\\.\\S+$")).WithMessage("Email имеет неверный формат");
         RuleFor(e => e.Password).NotEmpty();
-        RuleFor(e => e.UserId).NotEmpty();
 
         RuleSet("password_regex", () =>
         {

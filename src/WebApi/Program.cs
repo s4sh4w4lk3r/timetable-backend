@@ -20,6 +20,7 @@ namespace WebApi
             .WriteTo.File($"./logs/log.log", rollingInterval: RollingInterval.Day)
             .ReadFrom.Configuration(ctx.Configuration));
 
+        builder.Services.AddControllers();
             builder.Services.Configure<DbConfiguration>(builder.Configuration.GetRequiredSection(nameof(DbConfiguration)));
             builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetRequiredSection(nameof(JwtConfiguration)));
 
@@ -27,9 +28,7 @@ namespace WebApi
 
             builder.Services.AddValidatorsFromAssemblyContaining<ApprovalCodeValidator>();
             builder.Services.AddValidatorsFromAssemblyContaining<CabinetValidator>();
-            builder.Services.AddValidatorsFromAssemblyContaining<GroupValidator>();
             builder.Services.AddValidatorsFromAssemblyContaining<LessonTimeValidator>();
-            builder.Services.AddValidatorsFromAssemblyContaining<SubjectValidator>();
             builder.Services.AddValidatorsFromAssemblyContaining<TeacherValidator>();
             builder.Services.AddValidatorsFromAssemblyContaining<TimetableCellValidator>();
             builder.Services.AddValidatorsFromAssemblyContaining<TimetableValidator>();
@@ -39,6 +38,9 @@ namespace WebApi
             var app = builder.Build();
 
             app.UseSerilogRequestLogging();
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.MapControllers();
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {

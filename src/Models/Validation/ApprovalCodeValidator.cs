@@ -9,5 +9,6 @@ public class ApprovalCodeValidator : AbstractValidator<ApprovalCode>
     {
         RuleFor(e => e.User).NotEmpty().SetValidator(new UserValidator()!);
         RuleFor(e => e).Must(e => e.IsNotExpired());
+#warning может убрать проверку на не истек ли
     }
 }

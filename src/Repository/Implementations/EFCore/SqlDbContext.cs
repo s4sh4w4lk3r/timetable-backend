@@ -11,18 +11,10 @@ namespace Repository.Implementations.MySql;
 
 internal class SqlDbContext : DbContext
 {
-    public DbSet<Cabinet> Cabinets => Set<Cabinet>();
-    public DbSet<Group> Groups => Set<Group>();
-    public DbSet<LessonTime> LessonTimes => Set<LessonTime>();
-    public DbSet<Subject> Subjects => Set<Subject>();
-    public DbSet<Teacher> Teachers => Set<Teacher>();
-    public DbSet<User> Administrators => Set<User>();
-    public DbSet<TimetableCell> TimetableCells => Set<TimetableCell>();
-    public DbSet<Timetable> Timetables => Set<Timetable>();
-    public DbSet<ApprovalCode> ApprovalCodes => Set<ApprovalCode>();
 
     private readonly DbConfiguration _configuration;
     private readonly ILoggerFactory _loggerFactory;
+    private static bool IsEnsureCreated = false;
 
     public SqlDbContext(DbConfiguration configuration, ILoggerFactory loggerFactory)
     {
@@ -31,8 +23,13 @@ internal class SqlDbContext : DbContext
 
         _loggerFactory = loggerFactory;
         _configuration = configuration;
+
+        if (IsEnsureCreated is false)
+        {
         //Database.EnsureDeleted();
         Database.EnsureCreated();
+            IsEnsureCreated = true;
+    }
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -118,8 +115,6 @@ internal class SqlDbContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(u => u.UserId).HasName("UserPRIMARY");
-            entity.UseTphMappingStrategy();
-            entity.Property<string>("Discriminator").HasMaxLength(30);
             entity.HasIndex(u => u.Email, "email-unique").IsUnique();
             entity.Property(u => u.Email).HasMaxLength(255);
             entity.Property(u => u.Password).HasMaxLength(72);
@@ -129,7 +124,6 @@ internal class SqlDbContext : DbContext
         {
 
             entity.HasKey(t => t.TimeTableCellId).HasName("TimetableCellPRIMARY");
-
             entity.HasOne(e => e.Cabinet).WithMany(e => e.TimetableCells).IsRequired();
             entity.HasOne(e => e.Teacher).WithMany(e => e.TimetableCells).IsRequired();
             entity.HasOne(e => e.LessonTime).WithMany(e => e.TimetableCells).IsRequired();

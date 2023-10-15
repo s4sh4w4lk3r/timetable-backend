@@ -10,6 +10,5 @@ public class TeacherValidator : AbstractValidator<Teacher>
         RuleFor(e => e.FirstName).NotEmpty();
         RuleFor(e => e.Surname).NotEmpty();
         RuleFor(e => e.MiddleName).NotEmpty();
-        RuleFor(e => e.TeacherId).NotEmpty();
     }
 }
