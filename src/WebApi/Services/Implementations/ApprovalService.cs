@@ -11,63 +11,74 @@ public class ApprovalService
 {
     private readonly IRepository<ApprovalCode> _approvalCodeRepository;
     private readonly IValidator<User> _userValidator;
+    private readonly IEmailClient _emailClient;
 
-    public ApprovalService(IRepository<ApprovalCode> approvalCodeRepository, IValidator<User> validator)
+    public ApprovalService(IRepository<ApprovalCode> approvalCodeRepository, IValidator<User> validator, IEmailClient emailClient)
     {
         _approvalCodeRepository = approvalCodeRepository;
         _userValidator = validator;
+        _emailClient = emailClient;
     }
 
-    public async Task<bool> VerifyCodeAsync(User user, int approvalCode, ApprovalCode.ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> VerifyCodeAsync(User user, int approvalCode, ApprovalCode.ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
     {
-#warning метод не проверен
-        if (_userValidator.Validate(user).IsValid is false)
-        { 
-            return false;
+        var valResult = _userValidator.Validate(user);
+        if (valResult.IsValid is false)
+        {
+            return new ServiceResult(false, valResult.ToString());
         }
 
         var approval = await _approvalCodeRepository.Entites
-            .Where(e => e.User!.Email == user.Email && e.User.UserId == user.UserId 
+            .Where(e => e.User!.UserId == user.UserId 
             && e.Code == approvalCode && e.CodeType == approvalCodeType)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (approval is not null && approval.IsNotExpired())
+        if (approval == null)
         {
-            await RevokeAsync(approval, cancellationToken: cancellationToken);
-            return true;
+            return new ServiceResult(false, "Код подтверждения не был найден в бд.");
         }
-        else return false;
+
+        if (approval.IsNotExpired() is false)
+        {
+            return new ServiceResult(false, "Код подтверждения просрочен.");
+        }
+
+        await RevokeAsync(approval, cancellationToken: cancellationToken);
+        return new ServiceResult(true, "Код подтверждения был подтвержден.");
+        #warning метод не проверен
     }
 
-    public async Task<bool> RevokeAsync(ApprovalCode approvalCode, bool deleteRequired = true, CancellationToken cancellationToken = default)
+    private async Task<ServiceResult> RevokeAsync(ApprovalCode approvalCode, bool deleteRequired = true, CancellationToken cancellationToken = default)
     {
         if (approvalCode is null) 
         {
-            return false; 
+            return new ServiceResult(false, "approvalCode is null.");
         }
 
         if (deleteRequired)
         {
-            await _approvalCodeRepository.DeleteAsync(approvalCode, cancellationToken); 
-            return true;
+            await _approvalCodeRepository.DeleteAsync(approvalCode, cancellationToken);
+            return new ServiceResult(true, "Код подтверждения был удален из бд.");
         }
         else
         {
             approvalCode.SetRevoked();
             await _approvalCodeRepository.UpdateAsync(approvalCode, cancellationToken);
 #warning проверить нормально ли обновляется
-            return true;
+            return new ServiceResult(true, "Код подтверждения был помечен как использованный в бд.");
         }
     }
 
-    public bool SendCode(User user, ApprovalCode.ApprovalCodeType approvalCodeType, IEmailClient emailClient)
+    public async Task<ServiceResult> SendCodeAsync(User user, ApprovalCode.ApprovalCodeType approvalCodeType)
     {
-        if (_userValidator.Validate(user).IsValid is false)
+        var valResult = _userValidator.Validate(user);
+        if (valResult.IsValid is false)
         {
-            return false;
+            return new ServiceResult(false, valResult.ToString());
         }
 
         var approval = new ApprovalCode(user, approvalCodeType);
+        var sendTask = _approvalCodeRepository.InsertAsync(approval);
 
         string message = approvalCodeType switch
         {
@@ -78,7 +89,8 @@ public class ApprovalService
             _ => throw new NotImplementedException()
         };
 
-        emailClient.SendEmail(message, user.Email!);
-        return true;
+        _emailClient.SendEmail(message, user.Email!);
+        await sendTask;
+        return new ServiceResult(true, "Код подтверждения должен будет отправится.");
     }
 }
