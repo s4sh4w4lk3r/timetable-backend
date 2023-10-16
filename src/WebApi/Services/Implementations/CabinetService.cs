@@ -1,51 +1,59 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Models.Entities.Timetables.Cells;
-using Repository.Interfaces;
+using WebApi.Services;
 
 namespace Services.Implementations;
 
 public class CabinetService
 {
-    private readonly IRepository<Cabinet> _repository;
+    private readonly DbContext _dbContext;
     private readonly IValidator<Cabinet> _validator;
-    public IQueryable<Cabinet> Cabinets => _repository.Entites;
+    public IQueryable<Cabinet> Cabinets => _dbContext.Set<Cabinet>();
 
-    public CabinetService(IRepository<Cabinet> repository, IValidator<Cabinet> validator)
+    public CabinetService(DbContext dbContext, IValidator<Cabinet> validator)
     {
-        _repository = repository;
+        _dbContext = dbContext;
         _validator = validator;
     }
 
-    public async Task<bool> CreateCabinet(Cabinet cabinet, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> CreateCabinet(Cabinet cabinet, CancellationToken cancellationToken = default)
     {
-        if (_validator.Validate(cabinet).IsValid is false)
+        var valResult = _validator.Validate(cabinet);
+        if (valResult.IsValid is false)
         {
-            return false;
+            return new ServiceResult(false, valResult.ToString());
         }
 
-        await _repository.InsertAsync(cabinet, cancellationToken);
-        return true;
+        await _dbContext.Set<Cabinet>().AddAsync(cabinet, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return new ServiceResult(true, "Кабинет внесен в базу данных.");
     }
 
-    public async Task<bool> DeleteCabinet(Cabinet cabinet, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> DeleteCabinet(Cabinet cabinet, CancellationToken cancellationToken = default)
     {
-        if (_validator.Validate(cabinet).IsValid is false)
+        var valResult = _validator.Validate(cabinet);
+        if (valResult.IsValid is false)
         {
-            return false;
+            return new ServiceResult(false, valResult.ToString());
         }
 
-        await _repository.DeleteAsync(cabinet, cancellationToken);
-        return true;
+        _dbContext.Set<Cabinet>().Remove(cabinet);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return new ServiceResult(true, "Кабинет удален из базы данных.");
     }
 
-    public async Task<bool> UpdateCabinet(Cabinet cabinet, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> UpdateCabinet(Cabinet cabinet, CancellationToken cancellationToken = default)
     {
-        if (_validator.Validate(cabinet).IsValid is false)
+        var valResult = _validator.Validate(cabinet);
+        if (valResult.IsValid is false)
         {
-            return false;
-}
+            return new ServiceResult(false, valResult.ToString());
+        }
 
-        await _repository.UpdateAsync(cabinet, cancellationToken);
-        return true;
+        _dbContext.Set<Cabinet>().Update(cabinet);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return new ServiceResult(true, "Кабинет обновлен в базе данных.");
     }
 }
+#warning проверить все эти методы

@@ -1,35 +1,36 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Users;
 using Models.Entities.Users.Auth;
 using Throw;
 
-namespace Repository.Implementations.MySql;
+namespace Repository;
 
-internal class SqlDbContext : DbContext
+public class SqlDbContext : DbContext
 {
 
     private readonly DbConfiguration _configuration;
     private readonly ILoggerFactory _loggerFactory;
     private static bool IsEnsureCreated = false;
 
-    public SqlDbContext(DbConfiguration configuration, ILoggerFactory loggerFactory)
+    public SqlDbContext(IOptions<DbConfiguration> options, ILoggerFactory loggerFactory)
     {
-        new DbConfigurationValidator().ValidateAndThrow(configuration);
+        new DbConfigurationValidator().ValidateAndThrow(options.Value);
         loggerFactory.ThrowIfNull();
 
         _loggerFactory = loggerFactory;
-        _configuration = configuration;
+        _configuration = options.Value;
 
         if (IsEnsureCreated is false)
         {
-        //Database.EnsureDeleted();
-        Database.EnsureCreated();
+            //Database.EnsureDeleted();
+            Database.EnsureCreated();
             IsEnsureCreated = true;
-    }
+        }
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -141,6 +142,12 @@ internal class SqlDbContext : DbContext
         {
             entity.HasKey(e => e.AprrovalCodeId).HasName("ApprovalCodePRIMARY");
             entity.HasOne(e => e.User).WithMany(e => e.ApprovalCodes).IsRequired();
+        });
+
+        modelBuilder.Entity<UserSession>(enitiy =>
+        {
+            enitiy.HasKey(e => e.UserSessionId).HasName("UserSessionPRIMARY");
+            enitiy.HasOne(e => e.User).WithMany(e => e.UserSessions).IsRequired();
         });
     }
 }
