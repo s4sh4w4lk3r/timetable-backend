@@ -15,3 +15,16 @@ public class ServiceResult
         InnerServiceResult = innerServiceResult;
     }
 }
+public class ServiceResult<T> : ServiceResult
+{
+    public T? Value { get; init; }
+    public ServiceResult(bool success, string description, T? value) : base(success, description)
+    {
+        Value = value;
+    }
+
+    public ServiceResult(bool success, string description, ServiceResult innerServiceResult, T? value) : base(success, description, innerServiceResult)
+    {
+        Value = value;
+    }
+}

@@ -4,11 +4,9 @@ public class ApprovalCode
     public int AprrovalCodeId { get; init; }
     public int Code { get; init; }
     public User? User { get; init; }
-    public DateTime CreateTime { get; init; }
+    public DateTime ExpiryTime { get; init; } 
     public ApprovalCodeType CodeType { get; init; }
     public bool IsRevoked { get; private set; }
-
-    private readonly TimeSpan ApprovalInterval = TimeSpan.FromMinutes(120);
 
     private ApprovalCode() { }
     public ApprovalCode(User user, ApprovalCodeType approvalCodeType)
@@ -17,10 +15,10 @@ public class ApprovalCode
         User = user;
         CodeType = approvalCodeType;
         Code = GenerateRandomCode();
-        CreateTime = DateTime.UtcNow;
+        ExpiryTime = DateTime.Now.AddMinutes(120);
     }
 
-    public bool IsNotExpired() => DateTime.UtcNow - CreateTime < ApprovalInterval;
+    public bool IsNotExpired() => DateTime.UtcNow < ExpiryTime;
     public void SetRevoked() => IsRevoked = true;
 
     private static int GenerateRandomCode() => new Random().Next(111111, 999999);

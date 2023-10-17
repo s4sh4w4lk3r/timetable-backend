@@ -84,40 +84,45 @@ public class UserService
     {
 #warning проверить работу
 
-        var validUser = await _userRepo.Entites.FirstOrDefaultAsync(e => e.UserId == user.UserId, cancellationToken);
+        var validUser = await _users.FirstOrDefaultAsync(e => e.UserId == user.UserId, cancellationToken);
         if (validUser is null)
         {
             return new ServiceResult(false, "Пользователь не найден в бд.");
         }
 
-        var approvalServiceResult = await _approvalService.VerifyCodeAsync(validUser, approvalCode, ApprovalCode.ApprovalCodeType.Unregistration, cancellationToken);
+        var approvalServiceResult = await _approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Unregistration, cancellationToken);
         if (approvalServiceResult.Success is false)
         {
             return new ServiceResult(false, "Код подтверждения для удаления аккаунта не принят.", approvalServiceResult);
         }
 
-        await _userRepo.DeleteAsync(validUser, cancellationToken);
+        _users.Remove(validUser);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Аккаунт пользователя удален.");
     }
     
-    public async Task<ServiceResult> UpdateEmail(User newUser, int approvalCode, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> UpdateEmail(int newUserId, int approvalCode, CancellationToken cancellationToken = default)
     {
-        var valResult = _userValidator.Validate(newUser, o => o.IncludeRuleSets("default"));
-        if (valResult.IsValid is false)
+#warning не проверен
+        if (newUserId == default)
         {
-            return new ServiceResult(false, valResult.ToString());
+            return new ServiceResult(false, "Некорректный id пользователя.");
+        }
+        if (approvalCode == default)
+        {
+            return new ServiceResult(false, "Некорректный approvalCode пользователя.");
         }
 
-        var approvalServiceResult = await _approvalService.VerifyCodeAsync(newUser, approvalCode, ApprovalCode.ApprovalCodeType.UpdateMail, cancellationToken);
+        var validUser = await _users.FirstOrDefaultAsync(e => e.UserId == newUserId, cancellationToken);
+        if (validUser is null)
+        {
+            return new ServiceResult(false, "Пользователь не найден в бд.");
+        }
+
+        var approvalServiceResult = await _approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.UpdateMail, cancellationToken);
         if (approvalServiceResult.Success is false)
         {
             return new ServiceResult(false, "Код подтверждения для изменения почты не принят.", approvalServiceResult);
-        }
-
-        var validUser = await _userRepo.Entites.FirstOrDefaultAsync(e => e.UserId == newUser.UserId, cancellationToken);
-        if (validUser is null)
-        {
-            return new ServiceResult(false, "Пользователь с таким Id не найден.");
         }
 
         var validUserValResult = _userValidator.Validate(validUser, o => o.IncludeRuleSets("default"));
@@ -126,26 +131,37 @@ public class UserService
             throw new Exception($"Пользователь из бд оказался невалидным\n{validUserValResult}");
         }
 
-        validUser.Email = newUser.Email;
-        await _userRepo.UpdateAsync(newUser, cancellationToken);
+        validUser.Email = validUser.Email;
+        _dbContext.Set<User>().Update(validUser);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Email пользователя обновлен.");
     }
 
-    public async Task<ServiceResult> UpdatePassword(User newUser, int approvalCode, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> UpdatePassword([Bind("UserId", "Password")]User newUser, int approvalCode, CancellationToken cancellationToken = default)
     {
+#warning не проверен
+        if (newUser.UserId == default)
+        {
+            return new ServiceResult(false, "Некорректный id пользователя.");
+        }
+        if (approvalCode == default)
+        {
+            return new ServiceResult(false, "Некорректный approvalCode пользователя.");
+        }
+
         var valResult = _userValidator.Validate(newUser, o => o.IncludeRuleSets("password_regex"));
         if (valResult.IsValid is false)
         {
             return new ServiceResult(false, valResult.ToString());
         }
 
-        var approvalServiceResult = await _approvalService.VerifyCodeAsync(newUser, approvalCode, ApprovalCode.ApprovalCodeType.UpdatePassword, cancellationToken);
+        var approvalServiceResult = await _approvalService.VerifyCodeAsync(newUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.UpdatePassword, cancellationToken);
         if (approvalServiceResult.Success is false)
         {
             return new ServiceResult(false, "Код подтверждения для изменения пароля не принят.", approvalServiceResult);
         }
 
-        var validUser = await _userRepo.Entites.FirstOrDefaultAsync(e => e.UserId == newUser.UserId, cancellationToken);
+        var validUser = await _users.FirstOrDefaultAsync(e => e.UserId == newUser.UserId, cancellationToken);
         if (validUser is null)
         {
             return new ServiceResult(false, "Пользователь с таким Id не найден.");
@@ -157,44 +173,44 @@ public class UserService
         }
 
         validUser.Password = HashPassword(newUser.Password!);
-        await _userRepo.UpdateAsync(newUser, cancellationToken);
+        _users.Update(newUser);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Пароль пользователя обновлен.");
     }
 
-    public async Task<ServiceResult> CheckLoginDataAsync(User user, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult<User>> CheckLoginDataAsync(User user, CancellationToken cancellationToken = default)
     {
         var valResult = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex_matching"));
         if (valResult.IsValid is false)
         {
-            return new ServiceResult(false, valResult.ToString());
+            return new ServiceResult<User>(false, valResult.ToString(), null);
         }
 
-        var userFromRepo = await _userRepo.Entites.FirstOrDefaultAsync(e => e.Email == user.Email, cancellationToken);
+        var userFromRepo = await _users.FirstOrDefaultAsync(e => e.Email == user.Email, cancellationToken);
         if (userFromRepo is null)
         {
-            return new ServiceResult(false, "Пользователя нет в бд.");
+            return new ServiceResult<User>(false, "Пользователя нет в бд.", null);
         }
 
         if (userFromRepo.IsEmailConfirmed is false)
         {
-            return new ServiceResult(false, "Пользователь найден, но Email не подтвержден.");
+            return new ServiceResult<User>(false, "Пользователь найден, но Email не подтвержден.", null);
         }
 
         string? hashFromRepo = userFromRepo.Password;
         if (string.IsNullOrWhiteSpace(hashFromRepo))
         {
-            return new ServiceResult(false, "Пользователь найден, но его пароль почему-то пуст.");
+            return new ServiceResult<User>(false, "Пользователь найден, но его пароль почему-то пуст.", null);
         }
 
         if (ValidatePassword(hashFromRepo, user.Password!) is true)
         {
-            return new ServiceResult(true, "Пароль подтвержден.");
+            return new ServiceResult<User>(true, "Пароль подтвержден.", userFromRepo);
         }
         else
         {
-            return new ServiceResult(false, "Пароль неверный.");
+            return new ServiceResult<User>(false, "Пароль неверный.", null);
         }
-#warning проверить надо метод.
     }
 
     private static string HashPassword(string password) =>

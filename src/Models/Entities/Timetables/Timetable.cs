@@ -13,6 +13,7 @@ public class Timetable
     /// </summary>
     public IList<TimetableCell>? TimetableCells { get; private set; }
 
+#warning кажется бизнес-логику не продумал.
     private Timetable() { }
     public Timetable(int timeTablePk, Group group, IEnumerable<TimetableCell> timetableCells)
     {

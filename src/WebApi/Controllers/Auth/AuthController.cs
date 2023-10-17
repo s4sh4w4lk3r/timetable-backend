@@ -1,11 +1,12 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Models.Entities.Users;
+using Models.Entities.Users.Auth;
 using Services.Implementations;
 using System.Security.Claims;
+using WebApi.Services;
 using WebApi.Services.Implementations;
+using WebApi.Services.Interfaces;
 
 namespace WebApi.Controllers.Auth;
 
@@ -23,7 +24,8 @@ public class AuthController : ControllerBase
 
     [HttpPost, Route("login")]
     public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] User user, 
-        [FromQuery] string? returnUrl, CancellationToken cancellationToken = default)
+        [FromServices] ITokenService tokenService, [FromServices] UserSessionService userSessionService, 
+        CancellationToken cancellationToken = default)
     {
         var userValidation = _userValidator.Validate(user, o => o.IncludeRuleSets("default","password_regex").IncludeProperties(e => e.Email));
         if (userValidation.IsValid is false)
@@ -31,23 +33,38 @@ public class AuthController : ControllerBase
             return BadRequest(userValidation);
         }
 
-        if ((await _userService.CheckLoginDataAsync(user, cancellationToken)).Success is false)
+        var checkLoginDataResult = await _userService.CheckLoginDataAsync(user, cancellationToken);
+        if (checkLoginDataResult.Success is false || checkLoginDataResult.Value is null)
         {
-            return BadRequest("Неверная почта или пароль.");
+            return BadRequest(new ServiceResult(false, "Неудачная попытка входа.", checkLoginDataResult));
         }
+        user = checkLoginDataResult.Value;
 
         var claims = new List<Claim> 
         { 
-            new Claim(ClaimTypes.Name, user.Email!), 
-            new Claim(user.UserId.ToString(), ClaimTypes.NameIdentifier) 
+            new Claim(user.UserId.ToString(), ClaimTypes.NameIdentifier),
+            new Claim(ClaimTypes.Email, user.Email!),
         };
 
-        ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+        string accessToken = tokenService.GenerateAccessToken(claims);
+        string refreshToken = tokenService.GenerateRefreshToken();
 
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-        return Redirect(returnUrl ?? "/");
+        var userSession = new UserSession()
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
+            DeviceInfo = HttpContext.Request.Headers.UserAgent.ToString(),
+            User = user
+        };
 
-#warning надо добавить работу с токенами.
+        var userSessionResult = await userSessionService.AddUserSessionAsync(userSession, cancellationToken);
+        if (userSessionResult.Success is false)
+        {
+            return BadRequest(new ServiceResult(false, "Сессия не добавлена в бд.", userSessionResult));
+        }
+
+        return Ok(new AuthenticatedResponse(accessToken, refreshToken));
+#warning не проверен.
     }
 
 
@@ -88,4 +105,5 @@ public class AuthController : ControllerBase
         return Ok(confirmResult);
     }
 
+    public record class AuthenticatedResponse(string? AccessToken, string? RefreshToken);
 }
