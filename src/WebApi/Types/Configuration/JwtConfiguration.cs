@@ -2,7 +2,7 @@
 using System.Text;
 using Throw;
 
-namespace WebApi.ConfigurationTypes;
+namespace WebApi.Types.Configuration;
 
 public class JwtConfiguration
 {
