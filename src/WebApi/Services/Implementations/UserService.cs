@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
 using Models.Entities.Users.Auth;
-using Repository.Interfaces;
+using System.Net.Mail;
 using WebApi.Services;
 using WebApi.Services.Implementations;
 
@@ -10,72 +11,73 @@ namespace Services.Implementations;
 
 public class UserService
 {
-    private readonly IRepository<User> _userRepo;
+    private readonly DbContext _dbContext;
     private readonly IValidator<User> _userValidator;
     private readonly ApprovalService _approvalService;
+    private readonly DbSet<User> _users;
 
-    public UserService(IRepository<User> repository, IValidator<User> validator, ApprovalService approvalService)
+    public UserService(DbContext dbContext, IValidator<User> validator, ApprovalService approvalService)
     {
-        _userRepo = repository;
+        _dbContext = dbContext;
         _userValidator = validator;
         _approvalService = approvalService;
+        _users = _dbContext.Set<User>();
     }
 
     public async Task<ServiceResult> RegisterAsync(User user, CancellationToken cancellationToken = default)
     {
-#warning проверить работу
         var userVal = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex_matching"));
         if (userVal.IsValid is false)
         {
             return new ServiceResult(false, userVal.ToString());
         }
 
-        if ((await _userRepo.Entites.AnyAsync(x => x.Email == user.Email && x.IsEmailConfirmed == true, cancellationToken)) is true)
+        if ((await _users.AnyAsync(x => x.Email == user.Email && x.IsEmailConfirmed == true, cancellationToken)) is true)
         {
             return new ServiceResult(false, "Пользователь с таким Email уже есть в бд.");
         }
 
-        if ((await _userRepo.Entites.AnyAsync(x => x.Email == user.Email && x.IsEmailConfirmed == false, cancellationToken)) is true)
+        if ((await _users.AnyAsync(x => x.Email == user.Email && x.IsEmailConfirmed == false, cancellationToken)) is true)
         {
             return new ServiceResult(false, "Пользователь с таким Email уже есть в бд, но Email не подтвержден.");
         }
 
         user.IsEmailConfirmed = false;
         user.Password = HashPassword(user.Password!);
-        await _userRepo.InsertAsync(user, cancellationToken);
+        await _users.AddAsync(user, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Пользователь добавлен в базу, но Email не подтвержден.");
     }
 
-    public async Task<ServiceResult> ConfirmEmailAsync(User user, int approvalCode, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> ConfirmEmailAsync(string userEmail, int approvalCode, CancellationToken cancellationToken = default)
     {
-        var userVal = _userValidator.Validate(user, o => o.IncludeRuleSets("default"));
-        if (userVal.IsValid is false)
+        if (approvalCode == default)
         {
-            return new ServiceResult(false, userVal.ToString());
+            return new ServiceResult(false, "Некорректный approvalCode пользователя.");
         }
 
-        var validUser = await _userRepo.Entites.FirstOrDefaultAsync(e => e.Email == e.Email, cancellationToken: cancellationToken);
+        var emailOk = MailAddress.TryCreate(userEmail, out _);
+        if (emailOk is false)
+        {
+            return new ServiceResult(false, "Email имеет неправильный формат.");
+        }
+
+        var validUser = await _users.Where(e => e.Email == userEmail).FirstOrDefaultAsync(cancellationToken);
         if (validUser is null)
         {
             return new ServiceResult(false, "Пользователь для валидации не был найден в бд.");
         }
 
-        var validUserVal = _userValidator.Validate(validUser, o => o.IncludeRuleSets("default"));
-
-        if (validUserVal.IsValid is false)
-        {
-            throw new Exception($"Пользователь из бд оказался невалидным\n{userVal}");
-        }
-
-        var approvalServiceResult = await _approvalService.VerifyCodeAsync(user, approvalCode, ApprovalCode.ApprovalCodeType.Registration, cancellationToken);
+        var approvalServiceResult = await _approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Registration, cancellationToken);
         if (approvalServiceResult.Success is false)
         {
             return new ServiceResult(false, "Код подтверждения регистрации не принят.", approvalServiceResult);
         }
 
         validUser.IsEmailConfirmed = true;
-        await _userRepo.UpdateAsync(validUser, cancellationToken);
-        return new ServiceResult(false, "Email пользователя подтвержден.");
+        _dbContext.Set<User>().Update(validUser);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return new ServiceResult(true, "Email пользователя подтвержден.");
     }
 
     public async Task<ServiceResult> UnregisterAsync(User user, int approvalCode, CancellationToken cancellationToken = default)
