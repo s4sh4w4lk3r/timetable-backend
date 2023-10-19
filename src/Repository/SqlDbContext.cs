@@ -141,13 +141,13 @@ public class SqlDbContext : DbContext
         modelBuilder.Entity<ApprovalCode>(entity =>
         {
             entity.HasKey(e => e.AprrovalCodeId).HasName("ApprovalCodePRIMARY");
-            entity.HasOne(e => e.User).WithMany(e => e.ApprovalCodes).IsRequired();
+            entity.HasOne(e => e.User).WithMany(e => e.ApprovalCodes).HasForeignKey(e=>e.UserId).IsRequired();
         });
 
         modelBuilder.Entity<UserSession>(enitiy =>
         {
             enitiy.HasKey(e => e.UserSessionId).HasName("UserSessionPRIMARY");
-            enitiy.HasOne(e => e.User).WithMany(e => e.UserSessions).IsRequired();
+            enitiy.HasOne(e => e.User).WithMany(e => e.UserSessions).HasForeignKey(e=>e.UserId).IsRequired();
         });
     }
 }

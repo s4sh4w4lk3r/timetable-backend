@@ -2,20 +2,16 @@
 public class ApprovalCode
 {
     public int AprrovalCodeId { get; init; }
-    public int Code { get; init; }
+    public int Code { get; init; } = GenerateRandomCode();
     public User? User { get; init; }
-    public DateTime ExpiryTime { get; init; } 
-    public ApprovalCodeType CodeType { get; init; }
+    public required int UserId { get; init; }
+    public DateTime ExpiryTime { get; init; } = DateTime.UtcNow.AddMinutes(120);
+    public required ApprovalCodeType CodeType { get; init; }
     public bool IsRevoked { get; private set; }
 
-    private ApprovalCode() { }
-    public ApprovalCode(User user, ApprovalCodeType approvalCodeType)
+    public ApprovalCode() 
     {
-        user.ThrowIfNull();
-        User = user;
-        CodeType = approvalCodeType;
-        Code = GenerateRandomCode();
-        ExpiryTime = DateTime.Now.AddMinutes(120);
+        
     }
 
     public bool IsNotExpired() => DateTime.UtcNow < ExpiryTime;

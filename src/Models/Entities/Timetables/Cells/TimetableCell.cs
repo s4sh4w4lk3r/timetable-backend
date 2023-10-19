@@ -6,11 +6,21 @@
     public class TimetableCell
     {
         public int TimeTableCellId { get; init; }
-        public required LessonTime? LessonTime { get; set; }
-        public required Cabinet? Cabinet { get; set; }
-        public required Teacher? Teacher { get; set; }
-        public required Subject? Subject { get; set; }
+
+        public LessonTime? LessonTime { get; set; }
+        public required int LessonTimeId { get; set; }
+
+        public Cabinet? Cabinet { get; set; }
+        public required int CabinetId { get; set; }
+
+        public Teacher? Teacher { get; set; }
+        public required int TeacherId { get; set; }
+
+        public Subject? Subject { get; set; }
+        public required int SubjectId { get; set; }
+
         public bool IsReplaced { get; private set; }
+
 
         private TimetableCell? _replacingTimeTableCell;
         /// <summary>

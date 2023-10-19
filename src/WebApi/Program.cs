@@ -29,20 +29,17 @@ namespace WebApi;
         builder.Services.AddControllers();
 
         var jwtConfigurationSection = builder.Configuration.GetRequiredSection(nameof(JwtConfiguration));
-        var jwtConfigurationValue = jwtConfigurationSection
-            #error опять не вытаскивается конфигурация
-#error также надо пересоздать бд.
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                ValidIssuer = jwtConfigurationValue.Issuer,
+                ValidIssuer = jwtConfigurationSection["Issuer"],
                 ValidateAudience = true,
-                ValidAudience = jwtConfigurationValue.Audience,
+                ValidAudience = jwtConfigurationSection["Audience"],
                 ValidateLifetime = true,
-                IssuerSigningKey = jwtConfigurationValue.GetSymmetricSecurityKey(),
+                IssuerSigningKey = JwtConfiguration.GetSymmetricSecurityKey(jwtConfigurationSection["SecurityKey"]!),
                 ValidateIssuerSigningKey = true
             };
         });

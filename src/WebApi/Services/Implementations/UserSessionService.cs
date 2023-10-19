@@ -8,19 +8,18 @@ public class UserSessionService
 {
     private readonly DbContext _dbContext;
     private readonly DbSet<UserSession> _userSessions;
-    private readonly IValidator<UserSession> _userValidator;
+    private readonly IValidator<UserSession> _userSessionValidator;
 
     public UserSessionService(DbContext dbContext, IValidator<UserSession> validator)
     {
         _dbContext = dbContext;
         _userSessions = _dbContext.Set<UserSession>();
-        _userValidator = validator;
+        _userSessionValidator = validator;
     }
 
     public async Task<ServiceResult> AddUserSessionAsync(UserSession userSession, CancellationToken cancellationToken = default)
     {
-#warning не проверен
-        var validationResult = _userValidator.Validate(userSession);
+        var validationResult = _userSessionValidator.Validate(userSession);
         if (validationResult.IsValid is false)
         {
             return new ServiceResult(false, validationResult.ToString());
@@ -33,7 +32,7 @@ public class UserSessionService
     public async Task<ServiceResult> UpdateUserSessionAsync(UserSession userSession, CancellationToken cancellationToken = default)
     {
 #warning не проверен
-        var validationResult = _userValidator.Validate(userSession);
+        var validationResult = _userSessionValidator.Validate(userSession);
         if (validationResult.IsValid is false)
         {
             return new ServiceResult(false, validationResult.ToString());

@@ -6,12 +6,14 @@ namespace WebApi.Types.Configuration;
 
 public class JwtConfiguration
 {
-    public string? Issuer { get; set; }
-    public string? Audience { get; set; }
-    public string? SecurityKey { get; set; }
-    public SymmetricSecurityKey GetSymmetricSecurityKey()
+    public required string Issuer { get; set; }
+    public required string Audience { get; set; }
+    public required string SecurityKey { get; set; }
+
+    public SymmetricSecurityKey GetSymmetricSecurityKey() => GetSymmetricSecurityKey(SecurityKey);
+    public static SymmetricSecurityKey GetSymmetricSecurityKey(string securityKey)
     {
-        SecurityKey.ThrowIfNull().IfWhiteSpace();
-        return new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecurityKey));
+        securityKey.ThrowIfNull().IfWhiteSpace();
+        return new SymmetricSecurityKey(Encoding.UTF8.GetBytes(securityKey));
     }
 }

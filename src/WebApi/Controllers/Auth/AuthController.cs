@@ -51,10 +51,9 @@ public class AuthController : ControllerBase
 
         var userSession = new UserSession()
         {
-            AccessToken = accessToken,
             RefreshToken = refreshToken,
             DeviceInfo = HttpContext.Request.Headers.UserAgent.ToString(),
-            User = user
+            UserId = user.UserId
         };
 
         var userSessionResult = await userSessionService.AddUserSessionAsync(userSession, cancellationToken);
@@ -70,7 +69,7 @@ public class AuthController : ControllerBase
 
     [HttpPost, Route("register")]
     public async Task<IActionResult> Register([FromBody, Bind("Email", "Password")] User user, 
-        [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)
     {
         var userValidation = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex").IncludeProperties(e => e.Email));
         if (userValidation.IsValid is false)
@@ -82,12 +81,6 @@ public class AuthController : ControllerBase
         if (regResult.Success is false)
         {
             return BadRequest(regResult);
-        }
-
-        var sendApprovalResult = await approvalService.SendCodeAsync(user, Models.Entities.Users.Auth.ApprovalCode.ApprovalCodeType.Registration, cancellationToken);
-        if (sendApprovalResult.Success is false)
-        {
-            return BadRequest(sendApprovalResult);
         }
 
         return Ok(regResult);
@@ -104,6 +97,25 @@ public class AuthController : ControllerBase
         }
         return Ok(confirmResult);
     }
+
+
+    [HttpPost, Route("sendemail")]
+    public async Task<IActionResult> SendRegisterEmail([FromQuery] string userEmail, [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(userEmail) is true)
+        {
+            return BadRequest(new ServiceResult(false, "Почта не введена."));
+        }
+
+        var sendApprovalResult = await approvalService.SendCodeAsync(userEmail, ApprovalCode.ApprovalCodeType.Registration, cancellationToken);
+        if (sendApprovalResult.Success is false)
+        {
+            return BadRequest(sendApprovalResult);
+        }
+
+        return Ok("Письмо с кодом подтверждения отправлено на почту.");
+    }
+
 
     public record class AuthenticatedResponse(string? AccessToken, string? RefreshToken);
 }

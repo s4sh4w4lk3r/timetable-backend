@@ -46,7 +46,7 @@ public class UserService
         user.Password = HashPassword(user.Password!);
         await _users.AddAsync(user, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        return new ServiceResult(true, "Пользователь добавлен в базу, но Email не подтвержден.");
+        return new ServiceResult(true, "Пользователь добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
     }
 
     public async Task<ServiceResult> ConfirmEmailAsync(string userEmail, int approvalCode, CancellationToken cancellationToken = default)
@@ -100,7 +100,7 @@ public class UserService
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Аккаунт пользователя удален.");
     }
-    
+
     public async Task<ServiceResult> UpdateEmail(int newUserId, int approvalCode, CancellationToken cancellationToken = default)
     {
 #warning не проверен

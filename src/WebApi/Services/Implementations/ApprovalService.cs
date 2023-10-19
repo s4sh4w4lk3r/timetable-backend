@@ -64,15 +64,25 @@ public class ApprovalService
         }
     }
 
-    public async Task<ServiceResult> SendCodeAsync(User user, ApprovalCode.ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> SendCodeAsync(string userEmail, ApprovalCode.ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
     {
-        var valResult = _userValidator.Validate(user);
+        var valResult = _userValidator.Validate(new User() { Email = userEmail}, o =>o.IncludeProperties(e=>e.Email));
         if (valResult.IsValid is false)
         {
             return new ServiceResult(false, valResult.ToString());
         }
 
-        var approval = new ApprovalCode(user, approvalCodeType);
+        var userFromRepo = await _dbContext.Set<User>().FirstOrDefaultAsync(e=>e.Email == userEmail, cancellationToken);
+        if (userFromRepo is null)
+        {
+            return new ServiceResult(false, "Пользователь не был найден в бд.");
+        }
+
+        var approval = new ApprovalCode()
+        {
+            CodeType = approvalCodeType,
+            UserId = userFromRepo.UserId
+        };
         await _dbContext.Set<ApprovalCode>().AddAsync(approval, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -85,7 +95,7 @@ public class ApprovalService
             _ => throw new NotImplementedException()
         };
 
-        _emailClient.SendEmail(message, user.Email!);
+        _emailClient.SendEmail(message, userFromRepo.Email!);
         return new ServiceResult(true, "Код подтверждения должен будет отправится.");
     }
 }

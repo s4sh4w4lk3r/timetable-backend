@@ -4,10 +4,14 @@ public class UserSession
 {
     public int UserSessionId { get; init; } 
     public User? User { get; init; }
-    public string? DeviceInfo { get; set; }
-    public string? RefreshToken { get; set; }
-    public DateTime RefreshTokenExpiryTime { get; init; } = DateTime.Now.AddDays(2);
-    public string? AccessToken { get; set; }
+    public required int UserId { get; init; }
+    public required string DeviceInfo { get; set; }
+    public required string RefreshToken { get; set; }
+    public DateTime RefreshTokenExpiryTime { get; init; } = DateTime.UtcNow.AddDays(2);
 
-    public bool IsNotExpired() => DateTime.Now < RefreshTokenExpiryTime;
+    public UserSession()
+    {
+    }
+
+    public bool RefreshIsNotExpired() => DateTime.UtcNow < RefreshTokenExpiryTime;
 }
