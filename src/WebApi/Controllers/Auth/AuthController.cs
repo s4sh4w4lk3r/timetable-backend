@@ -63,7 +63,6 @@ public class AuthController : ControllerBase
         }
 
         return Ok(new AuthenticatedResponse(accessToken, refreshToken));
-#warning не проверен.
     }
 
 
@@ -86,7 +85,7 @@ public class AuthController : ControllerBase
         return Ok(regResult);
     }
 
-    [HttpPost, Route("confirmemail")]
+    [HttpPost, Route("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userEmail,
         [FromQuery] int approvalCode = default, CancellationToken cancellationToken = default)
     {
@@ -99,7 +98,7 @@ public class AuthController : ControllerBase
     }
 
 
-    [HttpPost, Route("sendemail")]
+    [HttpPost, Route("send-email")]
     public async Task<IActionResult> SendRegisterEmail([FromQuery] string userEmail, [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(userEmail) is true)
