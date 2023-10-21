@@ -59,7 +59,7 @@ public class UserService
             return new ServiceResult(false, "Email имеет неправильный формат.");
         }
 
-        var validUser = await _users.Where(e => e.Email == userEmail).FirstOrDefaultAsync(cancellationToken);
+        var validUser = await _users.Where(e => e.Email == userEmail).SingleOrDefaultAsync(cancellationToken);
         if (validUser is null)
         {
             return new ServiceResult(false, "Пользователь для валидации не был найден в бд.");
@@ -84,7 +84,7 @@ public class UserService
             return ServiceResult.Fail("Id пользователя не должен быть равен нулю.");
         }
 
-        var validUser = await _users.FirstOrDefaultAsync(e => e.UserId == userId, cancellationToken);
+        var validUser = await _users.SingleOrDefaultAsync(e => e.UserId == userId, cancellationToken);
         if (validUser is null)
         {
             return new ServiceResult(false, "Пользователь не найден в бд.");
@@ -120,7 +120,7 @@ public class UserService
             return new ServiceResult(false, "Некорректный approvalCode пользователя.");
         }
 
-        var validUser = await _users.FirstOrDefaultAsync(e => e.UserId == user.UserId, cancellationToken);
+        var validUser = await _users.SingleOrDefaultAsync(e => e.UserId == user.UserId, cancellationToken);
         if (validUser is null)
         {
             return new ServiceResult(false, "Пользователь не найден в бд.");
@@ -169,7 +169,7 @@ public class UserService
             return new ServiceResult(false, "Код подтверждения для изменения пароля не принят.", approvalServiceResult);
         }
 
-        var validUser = await _users.FirstOrDefaultAsync(e => e.UserId == newUser.UserId, cancellationToken);
+        var validUser = await _users.SingleOrDefaultAsync(e => e.UserId == newUser.UserId, cancellationToken);
         if (validUser is null)
         {
             return new ServiceResult(false, "Пользователь с таким Id не найден.");
@@ -194,7 +194,7 @@ public class UserService
             return new ServiceResult<User>(false, valResult.ToString(), null);
         }
 
-        var userFromRepo = await _users.FirstOrDefaultAsync(e => e.Email == user.Email, cancellationToken);
+        var userFromRepo = await _users.SingleOrDefaultAsync(e => e.Email == user.Email, cancellationToken);
         if (userFromRepo is null)
         {
             return new ServiceResult<User>(false, "Пользователя нет в бд.", null);

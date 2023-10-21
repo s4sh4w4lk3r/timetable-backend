@@ -72,7 +72,7 @@ public class ApprovalService
             return new ServiceResult(false, valResult.ToString());
         }
 
-        var userFromRepo = await _dbContext.Set<User>().FirstOrDefaultAsync(e=>e.Email == userEmail, cancellationToken);
+        var userFromRepo = await _dbContext.Set<User>().SingleOrDefaultAsync(e=>e.Email == userEmail, cancellationToken);
         if (userFromRepo is null)
         {
             return new ServiceResult(false, "Пользователь не был найден в бд.");
