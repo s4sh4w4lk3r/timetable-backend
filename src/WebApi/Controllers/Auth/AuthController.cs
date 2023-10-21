@@ -53,8 +53,9 @@ public class AuthController : ControllerBase
         {
             RefreshToken = refreshToken,
             DeviceInfo = HttpContext.Request.Headers.UserAgent.ToString(),
-            UserId = user.UserId
-        };
+            UserId = user.UserId,
+            RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2)
+    };
 
         var userSessionResult = await userSessionService.AddUserSessionAsync(userSession, cancellationToken);
         if (userSessionResult.Success is false)
@@ -87,9 +88,9 @@ public class AuthController : ControllerBase
 
     [HttpPost, Route("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userEmail,
-        [FromQuery] int approvalCode = default, CancellationToken cancellationToken = default)
+        [FromQuery] int approvalCode, [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
     {
-        var confirmResult = await _userService.ConfirmEmailAsync(userEmail, approvalCode, cancellationToken);
+        var confirmResult = await _userService.ConfirmEmailAsync(userEmail, approvalCode, approvalService, cancellationToken);
         if (confirmResult.Success is false)
         {
             return BadRequest(confirmResult);
@@ -118,3 +119,5 @@ public class AuthController : ControllerBase
 
     public record class AuthenticatedResponse(string? AccessToken, string? RefreshToken);
 }
+#warning наверное уже в другом контроллере реализовать все методы сервисов
+#warning также закончить авторизацию по токену, а именно обновление токенов и сессий.

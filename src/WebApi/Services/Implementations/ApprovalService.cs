@@ -26,7 +26,7 @@ public class ApprovalService
             && e.Code == approvalCode && e.CodeType == approvalCodeType)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (approval == null)
+        if (approval is null)
         {
             return new ServiceResult(false, "Код подтверждения не был найден в бд.");
         }

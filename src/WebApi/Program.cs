@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Models.Entities.Users.Auth;
 using Models.Validation;
 using Repository;
 using Serilog;
@@ -19,6 +20,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        #region Настройка билдера.
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console()
@@ -27,12 +29,11 @@ public class Program
 
         builder.Services.AddControllers();
 
-        var jwtConfigurationSection = builder.Configuration.GetRequiredSection(nameof(JwtConfiguration));
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
         .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, options => { });
 
         builder.Services.Configure<DbConfiguration>(builder.Configuration.GetRequiredSection(nameof(DbConfiguration)));
-        builder.Services.Configure<JwtConfiguration>(jwtConfigurationSection);
+        builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetRequiredSection(nameof(JwtConfiguration)));
 
         builder.Services.AddScoped<DbContext, SqlDbContext>();
         builder.Services.AddScoped<CabinetService>();
@@ -41,7 +42,6 @@ public class Program
         builder.Services.AddScoped<ApprovalService>();
         builder.Services.AddTransient<IEmailClient, EmailSimulator>();
         builder.Services.AddScoped<UserSessionService>();
-
 
         builder.Services.AddValidatorsFromAssemblyContaining<ApprovalCodeValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<CabinetValidator>();
@@ -54,6 +54,7 @@ public class Program
         builder.Services.AddValidatorsFromAssemblyContaining<UserSessionValidator>();
 
         var app = builder.Build();
+        #endregion
 
         app.UseSerilogRequestLogging();
         app.UseAuthentication();

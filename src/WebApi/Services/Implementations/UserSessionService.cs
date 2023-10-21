@@ -46,7 +46,7 @@ public class UserSessionService
     {
         if (userSessionId == default)
         {
-            return new ServiceResult(false, "Сессия не удалена, id не может быть нулевым.");
+            return new ServiceResult(false, "Сессия не удалена, id не может быть равен нулю.");
         }
 
         var validUserSession = await _userSessions.FirstOrDefaultAsync(e => e.User!.UserId == userSessionId, cancellationToken);
