@@ -26,7 +26,7 @@ public class TokenService : ITokenService
             issuer: _jwtConfiguration.Issuer,
             audience: _jwtConfiguration.Audience,
             claims: claims,
-            expires: DateTime.Now.AddMinutes(15),
+            expires: DateTime.UtcNow.AddMinutes(30),
             signingCredentials: new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256)
         );
 
@@ -49,7 +49,7 @@ public class TokenService : ITokenService
     /// </summary>
     /// <param name="token"></param>
     /// <returns>Вернет ClaimsPrincipal если токен валидный, а если нет, то вернет null.</returns>
-    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+    public ServiceResult<ClaimsPrincipal?> GetPrincipalFromAccessToken(string token)
     {
         var tokenValidationParameters = new TokenValidationParameters
         {
@@ -62,17 +62,28 @@ public class TokenService : ITokenService
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.SecurityKey!)),
 
-            ValidateLifetime = true
+            ValidateLifetime = true,
+            
+            //Параметр задает мнимальное допустимое время отставание часов клиента от часов сервера,
+            //использующееся при валидации времени токена. По дефолту 5 мин.
+            //ClockSkew = TimeSpan.FromSeconds(10)
         };
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        if (tokenHandler.CanValidateToken is false) return null;
+        try
+        {
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
 
-        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return ServiceResult<ClaimsPrincipal?>.Fail("Валидация токена не прошла.", null);
+            }
 
-        if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-            return null;
-
-        return principal;
+            return ServiceResult<ClaimsPrincipal?>.Ok("Валидация токена прошла успешно", principal);
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<ClaimsPrincipal?>.Fail(ex.Message, null);
+        }
     }
 }

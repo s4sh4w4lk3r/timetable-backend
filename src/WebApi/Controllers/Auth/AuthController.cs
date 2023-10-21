@@ -42,7 +42,7 @@ public class AuthController : ControllerBase
 
         var claims = new List<Claim> 
         { 
-            new Claim(user.UserId.ToString(), ClaimTypes.NameIdentifier),
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Email, user.Email!),
         };
 

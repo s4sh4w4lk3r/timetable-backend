@@ -213,6 +213,20 @@ public class UserService
         }
     }
 
+    public async Task<ServiceResult> CheckUserExist(int id, CancellationToken cancellationToken = default)
+    {
+        if (id == default)
+        {
+            return new ServiceResult(false, "Введен id=0.");
+        }
+
+        if (await _users.AnyAsync(e=>e.UserId == id, cancellationToken) is false)
+        {
+            return new ServiceResult(false, "Пользователь не найден в бд.");
+        }
+
+        return new ServiceResult(true, "Пользователь успешно найден в бд.");
+    }
     private static string HashPassword(string password) =>
         BCrypt.Net.BCrypt.EnhancedHashPassword(password);
 

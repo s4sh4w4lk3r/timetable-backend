@@ -6,6 +6,7 @@ public class Timetable
 {
     public int TimetableId { get; set; }
     public Group? Group { get; init; }
+    public required int GroupId { get; init; }
 
     /// <summary>
     /// Полный список всех занятий, в том числе с заменами. Замены идут отдельной ячейкой и имеют ссылку на занятие, которое под замену.
