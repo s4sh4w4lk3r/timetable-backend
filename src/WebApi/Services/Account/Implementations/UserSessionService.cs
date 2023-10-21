@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Models.Entities.Users.Auth;
+using Models.Entities.Users;
 
-namespace WebApi.Services.Implementations;
+namespace WebApi.Services.Account.Implementations;
 
 public class UserSessionService
 {
@@ -32,7 +32,7 @@ public class UserSessionService
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Сессия пользователя добавлена в бд.");
     }
-    
+
     public async Task<ServiceResult> UpdateUserSessionAsync(UserSession userSession, CancellationToken cancellationToken = default)
     {
         var validationResult = _userSessionValidator.Validate(userSession);
@@ -45,7 +45,7 @@ public class UserSessionService
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Сессия пользователя обновлена в бд.");
     }
-    
+
     public async Task<ServiceResult> DeleteSessionAsync(int userSessionId, string refreshToken, CancellationToken cancellationToken = default)
     {
         if (userSessionId == default)
@@ -58,7 +58,7 @@ public class UserSessionService
         if (validUserSession is null)
         {
             return new ServiceResult(false, "Сессия не найдена в бд для удаления.");
-        }    
+        }
 
         _userSessions.Remove(validUserSession);
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -72,7 +72,7 @@ public class UserSessionService
             return ServiceResult.Fail("Id пользователя не может быть равным нулю");
         }
 
-        await _userSessions.Where(e=>e.UserId == userId).ExecuteDeleteAsync(cancellationToken);
+        await _userSessions.Where(e => e.UserId == userId).ExecuteDeleteAsync(cancellationToken);
         return ServiceResult.Ok("Все сессии пользователя удалены.");
     }
 }

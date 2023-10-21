@@ -1,4 +1,4 @@
-﻿namespace Services.Interfaces;
+﻿namespace WebApi.Services.Account.Interfaces;
 
 public interface IEmailClient
 {

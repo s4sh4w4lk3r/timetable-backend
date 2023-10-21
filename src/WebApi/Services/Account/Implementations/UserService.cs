@@ -1,12 +1,9 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
-using Models.Entities.Users.Auth;
 using System.Net.Mail;
-using WebApi.Services;
-using WebApi.Services.Implementations;
 
-namespace Services.Implementations;
+namespace WebApi.Services.Account.Implementations;
 
 public class UserService
 {
@@ -29,12 +26,12 @@ public class UserService
             return new ServiceResult(false, userVal.ToString());
         }
 
-        if ((await _users.AnyAsync(x => x.Email == user.Email && x.IsEmailConfirmed == true, cancellationToken)) is true)
+        if (await _users.AnyAsync(x => x.Email == user.Email && x.IsEmailConfirmed == true, cancellationToken) is true)
         {
             return new ServiceResult(false, "Пользователь с таким Email уже есть в бд.");
         }
 
-        if ((await _users.AnyAsync(x => x.Email == user.Email && x.IsEmailConfirmed == false, cancellationToken)) is true)
+        if (await _users.AnyAsync(x => x.Email == user.Email && x.IsEmailConfirmed == false, cancellationToken) is true)
         {
             return new ServiceResult(false, "Пользователь с таким Email уже есть в бд, но Email не подтвержден.");
         }
@@ -109,7 +106,7 @@ public class UserService
             return ServiceResult.Fail("Id пользователя не должен быть равен нулю.");
         }
 
-        if (_userValidator.Validate(user, o=>o.IncludeProperties(e=>e.Email)).IsValid is false)
+        if (_userValidator.Validate(user, o => o.IncludeProperties(e => e.Email)).IsValid is false)
         {
 #warning не проверена проверка почты
             return ServiceResult.Fail("Некорректный формат почты.");
@@ -144,7 +141,7 @@ public class UserService
         return new ServiceResult(true, "Email пользователя обновлен.");
     }
 
-    public async Task<ServiceResult> UpdatePassword(User newUser, int approvalCode, ApprovalService approvalService, 
+    public async Task<ServiceResult> UpdatePassword(User newUser, int approvalCode, ApprovalService approvalService,
         CancellationToken cancellationToken = default)
     {
 #warning не проверен
@@ -157,7 +154,7 @@ public class UserService
             return new ServiceResult(false, "Некорректный approvalCode пользователя.");
         }
 
-        var valResult = _userValidator.Validate(newUser, o => o.IncludeProperties(e=>e.Password).IncludeRuleSets("password_regex"));
+        var valResult = _userValidator.Validate(newUser, o => o.IncludeProperties(e => e.Password).IncludeRuleSets("password_regex"));
         if (valResult.IsValid is false)
         {
             return new ServiceResult(false, valResult.ToString());
@@ -228,7 +225,7 @@ public class UserService
             return ServiceResult.Fail("Id пользователя не должен быть равен нулю.");
         }
 
-        if (await _users.AnyAsync(e=>e.UserId == id, cancellationToken) is false)
+        if (await _users.AnyAsync(e => e.UserId == id, cancellationToken) is false)
         {
             return new ServiceResult(false, "Пользователь не найден в бд.");
         }

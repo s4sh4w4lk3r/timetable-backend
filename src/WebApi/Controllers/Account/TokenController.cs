@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using WebApi.Services.Implementations;
-using WebApi.Services.Interfaces;
+using WebApi.Services.Account.Implementations;
+using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Controllers.Auth;
 

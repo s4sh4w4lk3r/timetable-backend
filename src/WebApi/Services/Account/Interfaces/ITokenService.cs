@@ -1,7 +1,6 @@
-﻿using Models.Entities.Users.Auth;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
-namespace WebApi.Services.Interfaces;
+namespace WebApi.Services.Account.Interfaces;
 
 public interface ITokenService
 {

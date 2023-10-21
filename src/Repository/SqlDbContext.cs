@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Users;
-using Models.Entities.Users.Auth;
 using Throw;
 
 namespace Repository;

@@ -1,10 +1,9 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
-using Models.Entities.Users.Auth;
-using Services.Interfaces;
+using WebApi.Services.Account.Interfaces;
 
-namespace WebApi.Services.Implementations;
+namespace WebApi.Services.Account.Implementations;
 
 public class ApprovalService
 {
@@ -44,7 +43,7 @@ public class ApprovalService
 
     private async Task<ServiceResult> RevokeAsync(ApprovalCode approvalCode, bool deleteRequired = true, CancellationToken cancellationToken = default)
     {
-        if (approvalCode is null) 
+        if (approvalCode is null)
         {
             return new ServiceResult(false, "approvalCode is null.");
         }
@@ -66,13 +65,13 @@ public class ApprovalService
 
     public async Task<ServiceResult> SendCodeAsync(string userEmail, ApprovalCode.ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
     {
-        var valResult = _userValidator.Validate(new User() { Email = userEmail}, o =>o.IncludeProperties(e=>e.Email));
+        var valResult = _userValidator.Validate(new User() { Email = userEmail }, o => o.IncludeProperties(e => e.Email));
         if (valResult.IsValid is false)
         {
             return new ServiceResult(false, valResult.ToString());
         }
 
-        var userFromRepo = await _dbContext.Set<User>().SingleOrDefaultAsync(e=>e.Email == userEmail, cancellationToken);
+        var userFromRepo = await _dbContext.Set<User>().SingleOrDefaultAsync(e => e.Email == userEmail, cancellationToken);
         if (userFromRepo is null)
         {
             return new ServiceResult(false, "Пользователь не был найден в бд.");

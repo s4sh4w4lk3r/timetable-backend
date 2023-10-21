@@ -1,4 +1,4 @@
-﻿namespace Models.Entities.Users.Auth;
+﻿namespace Models.Entities.Users;
 public class ApprovalCode
 {
     public int AprrovalCodeId { get; init; }
@@ -9,9 +9,9 @@ public class ApprovalCode
     public required ApprovalCodeType CodeType { get; init; }
     public bool IsRevoked { get; private set; }
 
-    public ApprovalCode() 
+    public ApprovalCode()
     {
-        
+
     }
 
     public bool IsNotExpired() => DateTime.UtcNow < ExpiryTime;

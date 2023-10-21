@@ -1,8 +1,8 @@
-﻿namespace Models.Entities.Users.Auth;
+﻿namespace Models.Entities.Users;
 
 public class UserSession
 {
-    public int UserSessionId { get; init; } 
+    public int UserSessionId { get; init; }
     public User? User { get; init; }
     public required int UserId { get; init; }
     public required string DeviceInfo { get; set; }

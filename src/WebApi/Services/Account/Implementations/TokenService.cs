@@ -5,10 +5,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using WebApi.Services.Interfaces;
+using WebApi.Services.Account.Interfaces;
 using WebApi.Types.Configuration;
 
-namespace WebApi.Services.Implementations;
+namespace WebApi.Services.Account.Implementations;
 
 public class TokenService : ITokenService
 {
@@ -61,7 +61,7 @@ public class TokenService : ITokenService
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.SecurityKey!)),
 
             ValidateLifetime = isLifetimeValidationRequired,
-            
+
             //Параметр задает мнимальное допустимое время отставание часов клиента от часов сервера,
             //использующееся при валидации времени токена. По дефолту 5 мин.
             //ClockSkew = TimeSpan.FromSeconds(10)

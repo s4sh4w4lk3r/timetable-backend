@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Services.Implementations.Timetables;
+using WebApi.Services.Timetables;
 
 namespace WebApi.Controllers;
 

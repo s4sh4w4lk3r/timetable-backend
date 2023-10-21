@@ -1,6 +1,4 @@
-﻿using Models.Entities.Users.Auth;
-
-namespace Models.Entities.Users;
+﻿namespace Models.Entities.Users;
 
 public class User
 {

@@ -1,6 +1,6 @@
-﻿using Services.Interfaces;
+﻿using WebApi.Services.Account.Interfaces;
 
-namespace WebApi.Services.Implementations;
+namespace WebApi.Services.Account.Implementations;
 
 public class EmailSimulator : IEmailClient
 {

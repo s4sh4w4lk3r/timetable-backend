@@ -2,12 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Entities.Users;
-using Models.Entities.Users.Auth;
-using Services.Implementations;
 using System.Security.Claims;
 using WebApi.Services;
-using WebApi.Services.Implementations;
-using WebApi.Services.Interfaces;
+using WebApi.Services.Account.Implementations;
+using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Controllers.Auth;
 

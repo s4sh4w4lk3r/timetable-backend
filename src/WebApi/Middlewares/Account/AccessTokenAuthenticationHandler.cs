@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
-using Services.Implementations;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using WebApi.Services.Interfaces;
+using WebApi.Services.Account.Implementations;
+using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Middlewares.Auth;
 

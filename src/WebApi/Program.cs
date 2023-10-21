@@ -4,12 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Models.Validation;
 using Repository;
 using Serilog;
-using Services.Implementations;
-using Services.Interfaces;
 using WebApi.Middlewares.Auth;
-using WebApi.Services.Implementations;
-using WebApi.Services.Implementations.Timetables;
-using WebApi.Services.Interfaces;
+using WebApi.Services.Account.Implementations;
+using WebApi.Services.Account.Interfaces;
+using WebApi.Services.Timetables;
 using WebApi.Types.Configuration;
 using WebApi.Types.Validation;
 

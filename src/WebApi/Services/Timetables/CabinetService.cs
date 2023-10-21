@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Timetables.Cells;
 
-namespace WebApi.Services.Implementations.Timetables;
+namespace WebApi.Services.Timetables;
 
 public class CabinetService
 {
