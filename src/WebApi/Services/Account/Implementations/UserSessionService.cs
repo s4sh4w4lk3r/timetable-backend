@@ -53,15 +53,13 @@ public class UserSessionService
             return new ServiceResult(false, "Сессия не удалена, id не может быть равен нулю.");
         }
 
-        var validUserSession = await _userSessions.FirstOrDefaultAsync(e => e.User!.UserId == userSessionId && e.RefreshToken == refreshToken, cancellationToken);
+        var validUserSession = await _userSessions.Where(e => e.User!.UserId == userSessionId && e.RefreshToken == refreshToken).ExecuteDeleteAsync(cancellationToken);
 
-        if (validUserSession is null)
+        if (validUserSession == 0)
         {
             return new ServiceResult(false, "Сессия не найдена в бд для удаления.");
         }
 
-        _userSessions.Remove(validUserSession);
-        await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Сессия пользователя удалена из бд.");
     }
 

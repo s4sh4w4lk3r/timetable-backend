@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
 using System.Security.Claims;
 using WebApi.Services;
@@ -9,42 +10,42 @@ using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Controllers.Auth;
 
-[ApiController, Route("api/auth")]
+[ApiController, Route("api/account")]
 public class AuthController : ControllerBase
 {
-    private readonly IValidator<User> _userValidator;
-    private readonly UserService _userService;
+    private readonly UserSessionService _userSessionService;
+    private readonly ITokenService _tokenService;
 
-    public AuthController(IValidator<User> userValidator, UserService userService)
+    public AuthController(UserSessionService userSessionService, ITokenService tokenService)
     {
-        _userValidator = userValidator;
-        _userService = userService;
+        _userSessionService = userSessionService;
+        _tokenService = tokenService;
     }
 
     [HttpPost, Route("login")]
-    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] User user, [FromServices] ITokenService tokenService, [FromServices] UserSessionService userSessionService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] User user, [FromServices] IValidator<User> userValidator, [FromServices] UserService userService, CancellationToken cancellationToken = default)
     {
-        var userValidation = _userValidator.Validate(user, o => o.IncludeRuleSets("default","password_regex").IncludeProperties(e => e.Email));
+        var userValidation = userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex").IncludeProperties(e => e.Email));
         if (userValidation.IsValid is false)
         {
             return BadRequest(userValidation);
         }
 
-        var checkLoginDataResult = await _userService.CheckLoginDataAsync(user, cancellationToken);
+        var checkLoginDataResult = await userService.CheckLoginDataAsync(user, cancellationToken);
         if (checkLoginDataResult.Success is false || checkLoginDataResult.Value is null)
         {
             return BadRequest(new ServiceResult(false, "Неудачная попытка входа.", checkLoginDataResult));
         }
         user = checkLoginDataResult.Value;
 
-        var claims = new List<Claim> 
-        { 
+        var claims = new List<Claim>
+        {
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Email, user.Email!),
         };
 
-        string accessToken = tokenService.GenerateAccessToken(claims);
-        string refreshToken = tokenService.GenerateRefreshToken();
+        string accessToken = _tokenService.GenerateAccessToken(claims);
+        string refreshToken = _tokenService.GenerateRefreshToken();
 
         var userSession = new UserSession()
         {
@@ -55,65 +56,17 @@ public class AuthController : ControllerBase
             IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty
         };
 
-        var userSessionResult = await userSessionService.AddUserSessionAsync(userSession, cancellationToken);
+        var userSessionResult = await _userSessionService.AddUserSessionAsync(userSession, cancellationToken);
         if (userSessionResult.Success is false)
         {
             return BadRequest(new ServiceResult(false, "Сессия не добавлена в бд.", userSessionResult));
         }
 
-        return Ok(new TokenController.TokenPair(accessToken, refreshToken));
-    }
-
-
-    [HttpPost, Route("register")]
-    public async Task<IActionResult> Register([FromBody, Bind("Email", "Password")] User user, CancellationToken cancellationToken = default)
-    {
-        var userValidation = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex").IncludeProperties(e => e.Email));
-        if (userValidation.IsValid is false)
-        {
-            return BadRequest(userValidation);
-        }
-
-        var regResult = await _userService.RegisterAsync(user, cancellationToken);
-        if (regResult.Success is false)
-        {
-            return BadRequest(regResult);
-        }
-
-        return Ok(regResult);
-    }
-
-    [HttpPost, Route("confirm-email")]
-    public async Task<IActionResult> ConfirmEmail([FromQuery] string userEmail, [FromQuery] int approvalCode, [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
-    {
-        var confirmResult = await _userService.ConfirmEmailAsync(userEmail, approvalCode, approvalService, cancellationToken);
-        if (confirmResult.Success is false)
-        {
-            return BadRequest(confirmResult);
-        }
-        return Ok(confirmResult);
-    }
-
-
-    [HttpPost, Route("send-email")]
-    public async Task<IActionResult> SendRegisterEmail([FromQuery] string userEmail, [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(userEmail) is true)
-        {
-            return BadRequest(new ServiceResult(false, "Почта не введена."));
-        }
-
-        var sendApprovalResult = await approvalService.SendCodeAsync(userEmail, ApprovalCode.ApprovalCodeType.Registration, cancellationToken);
-        if (sendApprovalResult.Success is false)
-        {
-            return BadRequest(sendApprovalResult);
-        }
-
-        return Ok("Письмо с кодом подтверждения отправлено на почту.");
+        return Ok(new TokenPair(accessToken, refreshToken));
     }
 
     [HttpGet, Authorize, Route("global-logout")]
-    public async Task<IActionResult> GlobalLogout([FromQuery]int userId, [FromServices] UserSessionService userSessionService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GlobalLogout([FromQuery] int userId, [FromServices] UserSessionService userSessionService, CancellationToken cancellationToken = default)
     {
         if (userId == default)
         {
@@ -140,5 +93,90 @@ public class AuthController : ControllerBase
 
         return Ok(revokeResult);
     }
+
+    [HttpGet, Route("token/refresh")]
+    public async Task<IActionResult> Refresh([Bind("AccessToken", "RefreshToken")] TokenPair tokenPair, CancellationToken cancellationToken)
+    {
+        string? accessToken = tokenPair.AccessToken;
+        string? refreshToken = tokenPair.RefreshToken;
+
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return BadRequest("Отсутствует RefreshToken в теле запроса.");
+        }
+        
+        if (string.IsNullOrWhiteSpace(accessToken))
+        {
+            return BadRequest("Отсутствует AccessToken в заголовке Authorization.");
+        }
+
+        accessToken = accessToken.Replace("Bearer ", string.Empty);
+
+        var tokenSerivceResult = _tokenService.GetPrincipalFromAccessToken(accessToken, isLifetimeValidationRequired: false);
+        if (tokenSerivceResult.Success is false)
+        {
+            return BadRequest(tokenSerivceResult);
+        }
+
+        var claimPrincipal = tokenSerivceResult.Value;
+        if (claimPrincipal is null)
+        {
+            return BadRequest("ClaimPrincipal is null.");
+        }
+
+        string? userIdStr = claimPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+        bool idOk = int.TryParse(userIdStr, out var userId);
+        if (idOk is false)
+        {
+            return BadRequest("Не получилось вытащить id из claimов.");
+        }
+
+        var userSessionFromRepo = await _userSessionService.UserSessions.SingleOrDefaultAsync(e => e.UserId == userId && e.RefreshToken == refreshToken, cancellationToken);
+        if (userSessionFromRepo is null)
+        {
+            return BadRequest("Связка AccessToken и RefreshToken невалидная.");
+        }
+
+        if (userSessionFromRepo.RefreshTokenIsNotExpired() is false)
+        {
+            return BadRequest("RefreshToken просрочен.");
+        }
+
+        refreshToken = _tokenService.GenerateRefreshToken();
+        accessToken = _tokenService.GenerateAccessToken(claimPrincipal.Claims);
+
+        userSessionFromRepo.SetNewRefreshToken(refreshToken);
+        userSessionFromRepo.DeviceInfo = HttpContext.Request.Headers.UserAgent.ToString();
+        userSessionFromRepo.IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+        await _userSessionService.UpdateUserSessionAsync(userSessionFromRepo, cancellationToken);
+
+        return Ok(new TokenPair(accessToken, refreshToken));
+    }
+
+    [HttpPost, Authorize, Route("token/revoke")]
+    public async Task<IActionResult> Revoke([FromBody] TokenPair tokenPair, CancellationToken cancellationToken)
+    {
+        string? refreshToken = tokenPair.RefreshToken;
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            return BadRequest("RefreshToken не получен.");
+        }
+
+        string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        bool idOk = int.TryParse(userIdStr, out var id);
+        if (idOk is false)
+        {
+            return BadRequest("Не получилось вытащить id из claimов.");
+        }
+
+        var userSessionResult = await _userSessionService.DeleteSessionAsync(id, refreshToken, cancellationToken);
+        if (userSessionResult.Success is false)
+        {
+            return BadRequest(userSessionResult);
+        }
+
+        return Ok(userSessionResult);
+    }
+
+    public record class TokenPair(string? AccessToken, string? RefreshToken);
 }
-#warning наверное уже в другом контроллере реализовать все методы сервисов

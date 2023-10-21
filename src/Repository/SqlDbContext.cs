@@ -116,8 +116,8 @@ public class SqlDbContext : DbContext
         {
             entity.HasKey(u => u.UserId).HasName("UserPRIMARY");
             entity.HasIndex(u => u.Email, "email-unique").IsUnique();
-            entity.Property(u => u.Email).HasMaxLength(255);
-            entity.Property(u => u.Password).HasMaxLength(72);
+            entity.Property(u => u.Email).HasMaxLength(255).IsRequired();
+            entity.Property(u => u.Password).HasMaxLength(72).IsRequired();
         });
 
         modelBuilder.Entity<TimetableCell>(entity =>

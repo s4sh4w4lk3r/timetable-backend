@@ -77,6 +77,11 @@ public class ApprovalService
             return new ServiceResult(false, "Пользователь не был найден в бд.");
         }
 
+        if (userFromRepo.IsEmailConfirmed == true)
+        {
+            return ServiceResult.Fail("У пользователя уже подтверждена почта.");
+        }
+
         var approval = new ApprovalCode()
         {
             CodeType = approvalCodeType,
