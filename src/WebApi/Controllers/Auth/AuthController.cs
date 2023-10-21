@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Entities.Users;
 using Models.Entities.Users.Auth;
@@ -112,6 +113,34 @@ public class AuthController : ControllerBase
 
         return Ok("Письмо с кодом подтверждения отправлено на почту.");
     }
+
+    [HttpGet, Authorize, Route("global-logout")]
+    public async Task<IActionResult> GlobalLogout([FromQuery]int userId, [FromServices] UserSessionService userSessionService, CancellationToken cancellationToken = default)
+    {
+        if (userId == default)
+        {
+            return BadRequest("Id пользователя не может быть равным нулю");
+        }
+
+        string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        bool idOk = int.TryParse(userIdStr, out var idFromToken);
+        if (idOk is false)
+        {
+            return BadRequest("Не получилось вытащить id из claimов.");
+        }
+
+        if (idFromToken != userId)
+        {
+            return BadRequest("Вы пытаетесь удалить сессии другого пользователя.");
+        }
+
+        var revokeResult = await userSessionService.RevokeAllAsync(userId, cancellationToken);
+        if (revokeResult.Success is false)
+        {
+            return BadRequest(revokeResult);
+        }
+
+        return Ok(revokeResult);
+    }
 }
 #warning наверное уже в другом контроллере реализовать все методы сервисов
-#warning также закончить авторизацию по токену, а именно обновление токенов и сессий.

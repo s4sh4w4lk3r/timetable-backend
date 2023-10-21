@@ -22,7 +22,6 @@ public class TokenController : ControllerBase
     [HttpGet, Route("refresh")]
     public async Task<IActionResult> Refresh([Bind("AccessToken", "RefreshToken")] TokenPair tokenPair, CancellationToken cancellationToken)
     {
-        #warning кажется jwt токены calimы вставляют друг в друга
         string? accessToken = tokenPair.AccessToken;
         string? refreshToken = tokenPair.RefreshToken;
 
@@ -107,4 +106,3 @@ public class TokenController : ControllerBase
 
     public record class TokenPair(string? AccessToken, string? RefreshToken);
 }
-#warning добавить глобальный логаут для всех сессий пользователя.
