@@ -101,19 +101,26 @@ public class UserService
         return new ServiceResult(true, "Аккаунт пользователя удален.");
     }
 
-    public async Task<ServiceResult> UpdateEmail(int userId, int approvalCode, ApprovalService approvalService, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> UpdateEmail(User user, int approvalCode, ApprovalService approvalService, CancellationToken cancellationToken = default)
     {
 #warning не проверен
-        if (userId == default)
+        if (user.UserId == default)
         {
             return ServiceResult.Fail("Id пользователя не должен быть равен нулю.");
         }
+
+        if (_userValidator.Validate(user, o=>o.IncludeProperties(e=>e.Email)).IsValid is false)
+        {
+#warning не проверена проверка почты
+            return ServiceResult.Fail("Некорректный формат почты.");
+        }
+
         if (approvalCode == default)
         {
             return new ServiceResult(false, "Некорректный approvalCode пользователя.");
         }
 
-        var validUser = await _users.FirstOrDefaultAsync(e => e.UserId == userId, cancellationToken);
+        var validUser = await _users.FirstOrDefaultAsync(e => e.UserId == user.UserId, cancellationToken);
         if (validUser is null)
         {
             return new ServiceResult(false, "Пользователь не найден в бд.");
@@ -131,8 +138,8 @@ public class UserService
             throw new Exception($"Пользователь из бд оказался невалидным\n{validUserValResult}");
         }
 
-        validUser.Email = validUser.Email;
-        _dbContext.Set<User>().Update(validUser);
+        validUser.Email = user.Email;
+        _users.Update(validUser);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Email пользователя обновлен.");
     }
@@ -174,7 +181,7 @@ public class UserService
         }
 
         validUser.Password = HashPassword(newUser.Password!);
-        _users.Update(newUser);
+        _users.Update(validUser);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Пароль пользователя обновлен.");
     }

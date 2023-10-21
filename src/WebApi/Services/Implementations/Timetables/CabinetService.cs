@@ -55,4 +55,3 @@ public class CabinetService
         return new ServiceResult(true, "Кабинет обновлен в базе данных.");
     }
 }
-#warning проверить все эти методы

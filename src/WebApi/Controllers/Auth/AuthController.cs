@@ -23,9 +23,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost, Route("login")]
-    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] User user, 
-        [FromServices] ITokenService tokenService, [FromServices] UserSessionService userSessionService, 
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] User user, [FromServices] ITokenService tokenService, [FromServices] UserSessionService userSessionService, CancellationToken cancellationToken = default)
     {
         var userValidation = _userValidator.Validate(user, o => o.IncludeRuleSets("default","password_regex").IncludeProperties(e => e.Email));
         if (userValidation.IsValid is false)
@@ -54,8 +52,9 @@ public class AuthController : ControllerBase
             RefreshToken = refreshToken,
             DeviceInfo = HttpContext.Request.Headers.UserAgent.ToString(),
             UserId = user.UserId,
-            RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2)
-    };
+            RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30),
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty
+        };
 
         var userSessionResult = await userSessionService.AddUserSessionAsync(userSession, cancellationToken);
         if (userSessionResult.Success is false)
@@ -63,13 +62,12 @@ public class AuthController : ControllerBase
             return BadRequest(new ServiceResult(false, "Сессия не добавлена в бд.", userSessionResult));
         }
 
-        return Ok(new AuthenticatedResponse(accessToken, refreshToken));
+        return Ok(new TokenController.TokenPair(accessToken, refreshToken));
     }
 
 
     [HttpPost, Route("register")]
-    public async Task<IActionResult> Register([FromBody, Bind("Email", "Password")] User user, 
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Register([FromBody, Bind("Email", "Password")] User user, CancellationToken cancellationToken = default)
     {
         var userValidation = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex").IncludeProperties(e => e.Email));
         if (userValidation.IsValid is false)
@@ -87,8 +85,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost, Route("confirm-email")]
-    public async Task<IActionResult> ConfirmEmail([FromQuery] string userEmail,
-        [FromQuery] int approvalCode, [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> ConfirmEmail([FromQuery] string userEmail, [FromQuery] int approvalCode, [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
     {
         var confirmResult = await _userService.ConfirmEmailAsync(userEmail, approvalCode, approvalService, cancellationToken);
         if (confirmResult.Success is false)
@@ -115,9 +112,6 @@ public class AuthController : ControllerBase
 
         return Ok("Письмо с кодом подтверждения отправлено на почту.");
     }
-
-
-    public record class AuthenticatedResponse(string? AccessToken, string? RefreshToken);
 }
 #warning наверное уже в другом контроллере реализовать все методы сервисов
 #warning также закончить авторизацию по токену, а именно обновление токенов и сессий.

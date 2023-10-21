@@ -24,9 +24,8 @@ public class TokenService : ITokenService
 
         var tokenOptions = new JwtSecurityToken(
             issuer: _jwtConfiguration.Issuer,
-            audience: _jwtConfiguration.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(30),
+            expires: DateTime.UtcNow.AddHours(2),
             signingCredentials: new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256)
         );
 
@@ -49,12 +48,11 @@ public class TokenService : ITokenService
     /// </summary>
     /// <param name="token"></param>
     /// <returns>Вернет ClaimsPrincipal если токен валидный, а если нет, то вернет null.</returns>
-    public ServiceResult<ClaimsPrincipal?> GetPrincipalFromAccessToken(string token)
+    public ServiceResult<ClaimsPrincipal?> GetPrincipalFromAccessToken(string token, bool isLifetimeValidationRequired = true)
     {
         var tokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = true,
-            ValidAudience = _jwtConfiguration.Audience,
+            ValidateAudience = false,
 
             ValidateIssuer = true,
             ValidIssuer = _jwtConfiguration.Issuer,
@@ -62,7 +60,7 @@ public class TokenService : ITokenService
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.SecurityKey!)),
 
-            ValidateLifetime = true,
+            ValidateLifetime = isLifetimeValidationRequired,
             
             //Параметр задает мнимальное допустимое время отставание часов клиента от часов сервера,
             //использующееся при валидации времени токена. По дефолту 5 мин.
@@ -76,7 +74,7 @@ public class TokenService : ITokenService
 
             if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
             {
-                return ServiceResult<ClaimsPrincipal?>.Fail("Валидация токена не прошла.", null);
+                return ServiceResult<ClaimsPrincipal?>.Fail("Валидация сигнатуры токена не прошла.", null);
             }
 
             return ServiceResult<ClaimsPrincipal?>.Ok("Валидация токена прошла успешно", principal);

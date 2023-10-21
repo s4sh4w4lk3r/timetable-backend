@@ -10,6 +10,8 @@ public class UserSessionService
     private readonly DbSet<UserSession> _userSessions;
     private readonly IValidator<UserSession> _userSessionValidator;
 
+    public IQueryable<UserSession> UserSessions => _userSessions.AsQueryable();
+
     public UserSessionService(DbContext dbContext, IValidator<UserSession> validator)
     {
         _dbContext = dbContext;
@@ -42,18 +44,18 @@ public class UserSessionService
         return new ServiceResult(true, "Сессия пользователя обновлена в бд.");
     }
 
-    public async Task<ServiceResult> DeleteSessionAsync(int userSessionId, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> DeleteSessionAsync(int userSessionId, string refreshToken, CancellationToken cancellationToken = default)
     {
         if (userSessionId == default)
         {
             return new ServiceResult(false, "Сессия не удалена, id не может быть равен нулю.");
         }
 
-        var validUserSession = await _userSessions.FirstOrDefaultAsync(e => e.User!.UserId == userSessionId, cancellationToken);
+        var validUserSession = await _userSessions.FirstOrDefaultAsync(e => e.User!.UserId == userSessionId && e.RefreshToken == refreshToken, cancellationToken);
 
         if (validUserSession is null)
         {
-            return new ServiceResult(false, "Сессия не найдена в бд для удаления..");
+            return new ServiceResult(false, "Сессия не найдена в бд для удаления.");
         }    
 
         _userSessions.Remove(validUserSession);

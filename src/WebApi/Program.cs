@@ -1,7 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Models.Entities.Users.Auth;
 using Models.Validation;
 using Repository;
 using Serilog;
@@ -20,7 +19,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        #region ÐÐ°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ° Ð±Ð¸Ð»Ð´ÐµÑ€Ð°.
+        #region Íàñòðîéêà áèëäåðà.
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console()

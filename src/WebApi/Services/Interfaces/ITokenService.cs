@@ -7,5 +7,5 @@ public interface ITokenService
 {
     string GenerateAccessToken(IEnumerable<Claim> claims);
     string GenerateRefreshToken();
-    ServiceResult<ClaimsPrincipal?> GetPrincipalFromAccessToken(string token);
+    ServiceResult<ClaimsPrincipal?> GetPrincipalFromAccessToken(string token, bool isLifetimeValidationRequired = true);
 }
