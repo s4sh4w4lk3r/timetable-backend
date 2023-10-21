@@ -31,7 +31,6 @@ public class UserSessionService
     }
     public async Task<ServiceResult> UpdateUserSessionAsync(UserSession userSession, CancellationToken cancellationToken = default)
     {
-#warning не проверен
         var validationResult = _userSessionValidator.Validate(userSession);
         if (validationResult.IsValid is false)
         {
@@ -45,7 +44,6 @@ public class UserSessionService
 
     public async Task<ServiceResult> DeleteSessionAsync(int userSessionId, CancellationToken cancellationToken = default)
     {
-#warning не проверен
         if (userSessionId == default)
         {
             return new ServiceResult(false, "Сессия не удалена, id не может быть нулевым.");
