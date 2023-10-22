@@ -13,14 +13,14 @@ namespace WebApi.Controllers.Auth;
 public class RegistrationController : ControllerBase
 {
     private readonly IValidator<User> _userValidator;
-    private readonly UserService _userService;
     private readonly ApprovalService _approvalService;
+    private readonly RegisterService _registerService;
 
-    public RegistrationController(IValidator<User> userValidator, UserService userService, ApprovalService approvalService)
+    public RegistrationController(IValidator<User> userValidator, ApprovalService approvalService, RegisterService registerService)
     {
         _userValidator = userValidator;
-        _userService = userService;
         _approvalService = approvalService;
+        _registerService = registerService;
     }
 
     [HttpPost, Route("register")]
@@ -32,7 +32,7 @@ public class RegistrationController : ControllerBase
             return BadRequest(userValidation);
         }
 
-        var regResult = await _userService.RegisterAsync(user, cancellationToken);
+        var regResult = await _registerService.RegisterAsync(user, cancellationToken);
         if (regResult.Success is false)
         {
             return BadRequest(regResult);
@@ -45,7 +45,7 @@ public class RegistrationController : ControllerBase
     [HttpPost, Route("register/confirm")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userEmail, [FromQuery] int approvalCode, CancellationToken cancellationToken = default)
     {
-        var confirmResult = await _userService.ConfirmEmailAsync(userEmail, approvalCode, _approvalService, cancellationToken);
+        var confirmResult = await _registerService.ConfirmEmailAsync(userEmail, approvalCode, _approvalService, cancellationToken);
         if (confirmResult.Success is false)
         {
             return BadRequest(confirmResult);
@@ -109,7 +109,7 @@ public class RegistrationController : ControllerBase
             return BadRequest("Id пользователя не может быть равным нулю.");
         }
 
-        var unregisterResult = await _userService.UnregisterAsync(userId, approvalCode, _approvalService, cancellationToken);
+        var unregisterResult = await _registerService.UnregisterAsync(userId, approvalCode, _approvalService, cancellationToken);
         if (unregisterResult.Success is false)
         {
             return BadRequest(unregisterResult);

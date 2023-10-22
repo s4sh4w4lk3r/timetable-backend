@@ -43,11 +43,7 @@ public class TokenService : ITokenService
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="token"></param>
-    /// <returns>Вернет ClaimsPrincipal если токен валидный, а если нет, то вернет null.</returns>
+
     public ServiceResult<ClaimsPrincipal?> GetPrincipalFromAccessToken(string token, bool isLifetimeValidationRequired = true)
     {
         var tokenValidationParameters = new TokenValidationParameters
