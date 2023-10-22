@@ -1,9 +1,11 @@
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Models.Validation;
 using Repository;
 using Serilog;
+using Throw;
 using WebApi.Middlewares.Auth;
 using WebApi.Services.Account.Implementations;
 using WebApi.Services.Account.Interfaces;
@@ -17,7 +19,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        #region ��������� �������.
+        #region Настройка билдера.
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console()
@@ -31,6 +33,7 @@ public class Program
 
         builder.Services.Configure<DbConfiguration>(builder.Configuration.GetRequiredSection(nameof(DbConfiguration)));
         builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetRequiredSection(nameof(JwtConfiguration)));
+        builder.Services.Configure<ApiSettings>(builder.Configuration.GetRequiredSection(nameof(ApiSettings)));
 
         builder.Services.AddScoped<DbContext, SqlDbContext>();
         builder.Services.AddScoped<CabinetService>();
@@ -57,6 +60,7 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+        app.Use(CheckApiKey);
 
         app.UseForwardedHeaders(new ForwardedHeadersOptions
         {
@@ -66,5 +70,30 @@ public class Program
         app.MapGet("/", () => "Hello World!");
 
         app.Run();
+    }
+    async static Task CheckApiKey(HttpContext context, Func<Task> next)
+    {
+        const string API_KEY = "Api-Key";
+
+        string? apiKey = context.Request.Headers.Where(e => e.Key == API_KEY).Select(e => e.Value).FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(apiKey) is true)
+        {
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsync($"Для доступа к timetable-API требуется {API_KEY} в заголовках.");
+            return;
+        }
+
+        string validApiKey = context.RequestServices.GetRequiredService<IOptions<ApiSettings>>().Value.ApiKey;
+        validApiKey.ThrowIfNull().IfWhiteSpace();
+
+        if (apiKey != validApiKey)
+        {
+            context.Response.StatusCode = 401;
+            await context.Response.WriteAsync($"Неверный {API_KEY}.");
+            return;
+        }
+        
+
+        await next.Invoke();
     }
 }

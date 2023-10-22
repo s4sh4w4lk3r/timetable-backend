@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
+using Models.Validation;
 using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Services.Account.Implementations;
@@ -8,13 +9,11 @@ namespace WebApi.Services.Account.Implementations;
 public class ApprovalService
 {
     private readonly DbContext _dbContext;
-    private readonly IValidator<User> _userValidator;
     private readonly IEmailClient _emailClient;
 
-    public ApprovalService(DbContext dbContext, IValidator<User> validator, IEmailClient emailClient)
+    public ApprovalService(DbContext dbContext, IEmailClient emailClient)
     {
         _dbContext = dbContext;
-        _userValidator = validator;
         _emailClient = emailClient;
     }
 
@@ -65,10 +64,9 @@ public class ApprovalService
 
     public async Task<ServiceResult> SendCodeAsync(string userEmail, ApprovalCode.ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
     {
-        var valResult = _userValidator.Validate(new User() { Email = userEmail }, o => o.IncludeProperties(e => e.Email));
-        if (valResult.IsValid is false)
+        if (StaticValidator.ValidateEmail(userEmail) is false)
         {
-            return new ServiceResult(false, valResult.ToString());
+            return ServiceResult.Fail("Email имеет неверный формат.");
         }
 
         var userFromRepo = await _dbContext.Set<User>().SingleOrDefaultAsync(e => e.Email == userEmail, cancellationToken);
