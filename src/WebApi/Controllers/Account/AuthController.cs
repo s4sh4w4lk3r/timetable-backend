@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
 using System.Security.Claims;
+using WebApi.Extensions;
 using WebApi.Services;
 using WebApi.Services.Account.Implementations;
 using WebApi.Services.Account.Interfaces;
@@ -66,23 +67,16 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet, Authorize, Route("global-logout")]
-    public async Task<IActionResult> GlobalLogout([FromQuery] int userId, [FromServices] UserSessionService userSessionService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GlobalLogout([FromServices] UserSessionService userSessionService, CancellationToken cancellationToken = default)
     {
-        if (userId == default)
-        {
-            return BadRequest("Id пользователя не может быть равным нулю");
-        }
-
-        string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        bool idOk = int.TryParse(userIdStr, out var idFromToken);
-        if (idOk is false)
+        if (User.TryGetIdFromClaimPrincipal(out int userId) is false)
         {
             return BadRequest("Не получилось вытащить id из claimов.");
         }
 
-        if (idFromToken != userId)
+        if (userId == default)
         {
-            return BadRequest("Вы пытаетесь удалить сессии другого пользователя.");
+            return BadRequest("Id пользователя не может быть равным нулю");
         }
 
         var revokeResult = await userSessionService.RevokeAllAsync(userId, cancellationToken);

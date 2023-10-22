@@ -75,7 +75,8 @@ public class ApprovalService
             return new ServiceResult(false, "Пользователь не был найден в бд.");
         }
 
-        if (userFromRepo.IsEmailConfirmed == true)
+        //Нужно только для тех слуаче, если зареганный пользователь пытается подтвердить свою почту.
+        if (approvalCodeType is ApprovalCode.ApprovalCodeType.Registration && (userFromRepo.IsEmailConfirmed is true))
         {
             return ServiceResult.Fail("У пользователя уже подтверждена почта.");
         }
