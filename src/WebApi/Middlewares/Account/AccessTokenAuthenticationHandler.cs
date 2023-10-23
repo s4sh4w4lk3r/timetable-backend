@@ -1,22 +1,25 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System.Net.Mail;
+using Models.Entities.Users;
+using Models.Validation;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using WebApi.Services.Account.Implementations;
+using WebApi.Extensions;
 using WebApi.Services.Account.Interfaces;
+using WebApi.Types.Account;
 
 namespace WebApi.Middlewares.Auth;
 
 public class AccessTokenAuthenticationHandler : AuthenticationHandler<AccessTokenAuthenticationOptions>
 {
-    private readonly UserService _userService;
+    private readonly DbContext _dbContext;
     private readonly ITokenService _tokenService;
     public AccessTokenAuthenticationHandler(IOptionsMonitor<AccessTokenAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock,
-        UserService userService, ITokenService tokenService) : base(options, logger, encoder, clock)
+        DbContext dbContext, ITokenService tokenService) : base(options, logger, encoder, clock)
     {
         _tokenService = tokenService;
-        _userService = userService;
+        _dbContext = dbContext;
     }
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -40,16 +43,19 @@ public class AccessTokenAuthenticationHandler : AuthenticationHandler<AccessToke
         }
         var claimsPrinciapal = claimsPrinciapalResult.Value;
 
-        string? idStr = claimsPrinciapal.FindFirstValue(ClaimTypes.NameIdentifier);
-        bool idOk = int.TryParse(idStr, out int id);
-        bool emailOk = MailAddress.TryCreate(claimsPrinciapal.FindFirstValue(ClaimTypes.Email), out _);
+        string? email = claimsPrinciapal.FindFirstValue(TimetableClaimTypes.Email);
+        string? userSessionIdStr = claimsPrinciapal.FindFirstValue(TimetableClaimTypes.UserSessionId);
 
-        if (idOk is false)
+        bool userIdOk = claimsPrinciapal.TryGetUserIdFromClaimPrincipal(out int userId);
+        bool emailOk = StaticValidator.ValidateEmail(email);
+        bool userSessionIdOk = int.TryParse(userSessionIdStr, out int userSessionId);
+
+        if (userIdOk is false)
         {
             return AuthenticateResult.Fail("Валидация AccessToken не прошла. Id имеет неверный формат.");
         }
 
-        if (id == default)
+        if (userId == default)
         {
             return AuthenticateResult.Fail("Валидация AccessToken не прошла. Id равен нулю.");
         }
@@ -59,11 +65,22 @@ public class AccessTokenAuthenticationHandler : AuthenticationHandler<AccessToke
             return AuthenticateResult.Fail("Валидация AccessToken не прошла. Email имеет неверный формат.");
         }
 
-        var userServiceResult = await _userService.CheckUserExist(id);
-        if (userServiceResult.Success is false)
+        if (userSessionIdOk is false)
         {
-            return AuthenticateResult.Fail($"Валидация AccessToken не прошла. {userServiceResult.Description}");
+            return AuthenticateResult.Fail("Валидация AccessToken не прошла. UserSessionId имеет неверный формат.");
         }
+
+        if (userSessionId == default)
+        {
+            return AuthenticateResult.Fail("Валидация AccessToken не прошла. UserSessionId равен нулю.");
+        }
+
+        bool userAndSessionIsMatch = await _dbContext.Set<UserSession>().AnyAsync(e => e.UserId == userId && e.UserSessionId == userSessionId);
+        if (userAndSessionIsMatch is false)
+        {
+            return AuthenticateResult.Fail("Валидация AccessToken не прошла. Не найдена пара UserId и UserSessionId в бд.");
+        }
+
 
         return AuthenticateResult.Success(new AuthenticationTicket(claimsPrinciapal, this.Scheme.Name));
     }

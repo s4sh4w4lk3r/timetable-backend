@@ -75,7 +75,7 @@ public class RegistrationController : ControllerBase
     [HttpGet, Route("unregister/send-email"), Authorize]
     public async Task<IActionResult> UnregisterSendMail([FromServices] DbContext dbContext, CancellationToken cancellationToken = default)
     {
-        if (HttpContext.User.TryGetIdFromClaimPrincipal(out int userId) is false)
+        if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {
             return BadRequest("Не получилось считать id из клеймов.");
         }
@@ -99,7 +99,7 @@ public class RegistrationController : ControllerBase
     [HttpPost, Route("unregister/confirm"), Authorize]
     public async Task<IActionResult> ConfirmUnregistration(int approvalCode, CancellationToken cancellationToken)
     {
-        if (HttpContext.User.TryGetIdFromClaimPrincipal(out int userId) is false)
+        if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {
             return BadRequest("Не получилось считать id из клеймов.");
         }

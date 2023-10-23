@@ -8,6 +8,7 @@ using WebApi.Extensions;
 using WebApi.Services;
 using WebApi.Services.Account.Implementations;
 using WebApi.Services.Account.Interfaces;
+using WebApi.Types.Account;
 
 namespace WebApi.Controllers.Auth;
 
@@ -39,13 +40,6 @@ public class AuthController : ControllerBase
         }
         user = checkLoginDataResult.Value;
 
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-            new Claim(ClaimTypes.Email, user.Email!),
-        };
-
-        string accessToken = _tokenService.GenerateAccessToken(claims);
         string refreshToken = _tokenService.GenerateRefreshToken();
 
         var userSession = new UserSession()
@@ -63,13 +57,23 @@ public class AuthController : ControllerBase
             return BadRequest(new ServiceResult(false, "Сессия не добавлена в бд.", userSessionResult));
         }
 
+        var claims = new List<Claim>
+        {
+            new Claim(TimetableClaimTypes.UserId, user.UserId.ToString()),
+            new Claim(TimetableClaimTypes.Email, user.Email!),
+            new Claim(TimetableClaimTypes.UserSessionId, userSession.UserSessionId.ToString())
+        };
+
+        string accessToken = _tokenService.GenerateAccessToken(claims);
+
+
         return Ok(new TokenPair(accessToken, refreshToken));
     }
 
     [HttpGet, Authorize, Route("global-logout")]
     public async Task<IActionResult> GlobalLogout([FromServices] UserSessionService userSessionService, CancellationToken cancellationToken = default)
     {
-        if (User.TryGetIdFromClaimPrincipal(out int userId) is false)
+        if (User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {
             return BadRequest("Не получилось вытащить id из claimов.");
         }
@@ -118,8 +122,7 @@ public class AuthController : ControllerBase
             return BadRequest("ClaimPrincipal is null.");
         }
 
-        string? userIdStr = claimPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
-        bool idOk = int.TryParse(userIdStr, out var userId);
+        bool idOk = claimPrincipal.TryGetUserIdFromClaimPrincipal(out int userId);
         if (idOk is false)
         {
             return BadRequest("Не получилось вытащить id из claimов.");
@@ -156,14 +159,13 @@ public class AuthController : ControllerBase
             return BadRequest("RefreshToken не получен.");
         }
 
-        string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        bool idOk = int.TryParse(userIdStr, out var id);
+        bool idOk = User.TryGetUserIdFromClaimPrincipal(out int userId);
         if (idOk is false)
         {
             return BadRequest("Не получилось вытащить id из claimов.");
         }
 
-        var userSessionResult = await _userSessionService.DeleteSessionAsync(id, refreshToken, cancellationToken);
+        var userSessionResult = await _userSessionService.DeleteSessionAsync(userId, refreshToken, cancellationToken);
         if (userSessionResult.Success is false)
         {
             return BadRequest(userSessionResult);
