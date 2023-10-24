@@ -60,28 +60,17 @@ public class UserService
         return new ServiceResult(true, "Email пользователя обновлен.");
     }
 
-    public async Task<ServiceResult> UpdatePassword(int userId, string newPassword, int approvalCode, ApprovalService approvalService,
-        CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> UpdatePassword(int userId, string newPassword, CancellationToken cancellationToken = default)
     {
-#warning не проверен
         if (userId == default)
         {
             return ServiceResult.Fail("Id пользователя не должен быть равен нулю.");
         }
-        if (approvalCode == default)
-        {
-            return new ServiceResult(false, "Некорректный approvalCode пользователя.");
-        }
+
 
         if (StaticValidator.ValidatePassword(newPassword) is false)
         {
             return new ServiceResult(false, "В пароле должно быть не менее 8 символов, большие и маленькие латинские буквы, цифры и спецсимволы #?!@$%^&*-");
-        }
-
-        var approvalServiceResult = await approvalService.VerifyCodeAsync(userId, approvalCode, ApprovalCode.ApprovalCodeType.UpdatePassword, cancellationToken);
-        if (approvalServiceResult.Success is false)
-        {
-            return new ServiceResult(false, "Код подтверждения для изменения пароля не принят.", approvalServiceResult);
         }
 
         var userFromRepo = await _users.SingleOrDefaultAsync(e => e.UserId == userId, cancellationToken);

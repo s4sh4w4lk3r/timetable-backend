@@ -91,7 +91,6 @@ public class ApprovalService
 
         string message = approvalCodeType switch
         {
-            ApprovalCode.ApprovalCodeType.UpdatePassword => $"Код подтверждения для обновления пароля: {approval.Code}.",
             ApprovalCode.ApprovalCodeType.UpdateMail => $"Код подтверждения для смены адреса почты: {approval.Code}.",
             ApprovalCode.ApprovalCodeType.Registration => $"Код подтверждения для регистрации: {approval.Code}.",
             ApprovalCode.ApprovalCodeType.Unregistration => $"Код подтверждения для удаления аккаунта: {approval.Code}.",

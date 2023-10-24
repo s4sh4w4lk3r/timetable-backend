@@ -26,10 +26,10 @@ public static partial class StaticValidator
     }
 
     /// <summary>
-    /// Проверяет строку с паролем с помощью регулярного выражения на наличие больших, маленьких букв, цифр, спецсимволов и мин. длины 8 симв.
+    /// Проверяет строку с паролем с помощью регулярного выражения на наличие больших, маленьких букв, цифр, спецсимволов и мин. длины 8 симв. Также на IsNullOrWhiteSpace.
     /// </summary>
     /// <param name="password"></param>
-    /// <returns>True если адрес имеет валидный формат, иначе False</returns>
+    /// <returns>True если адрес имеет валидный формат, иначе False.</returns>
     public static bool ValidatePassword(string? password)
     {
         if (string.IsNullOrWhiteSpace(password) is true)
