@@ -5,9 +5,9 @@ public class UserSession
     public int UserSessionId { get; init; }
     public User? User { get; init; }
     public required int UserId { get; init; }
-    public required string DeviceInfo { get; set; }
-    public required string IpAddress { get; set; }
-    public required string RefreshToken { get; set; }
+    public required string? DeviceInfo { get; set; }
+    public required string? IpAddress { get; set; }
+    public required string? RefreshToken { get; set; }
     public required DateTime RefreshTokenExpiryTime { get; set; }
 
     public UserSession()

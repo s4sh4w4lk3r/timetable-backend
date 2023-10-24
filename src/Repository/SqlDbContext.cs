@@ -143,10 +143,19 @@ public class SqlDbContext : DbContext
             entity.HasOne(e => e.User).WithMany(e => e.ApprovalCodes).HasForeignKey(e=>e.UserId).IsRequired();
         });
 
-        modelBuilder.Entity<UserSession>(enitiy =>
+        modelBuilder.Entity<UserSession>(entity =>
         {
-            enitiy.HasKey(e => e.UserSessionId).HasName("UserSessionPRIMARY");
-            enitiy.HasOne(e => e.User).WithMany(e => e.UserSessions).HasForeignKey(e=>e.UserId).IsRequired();
+            entity.HasKey(e => e.UserSessionId).HasName("UserSessionPRIMARY");
+            entity.HasOne(e => e.User).WithMany(e => e.UserSessions).HasForeignKey(e=>e.UserId).IsRequired();
+        });
+
+        modelBuilder.Entity<EmailUpdateEntity>(entity =>
+        {
+            entity.HasKey(e => e.EmailUpdateEntityId).HasName("EmailUpdateEntityPRIMARY");
+            entity.HasOne(e=>e.User).WithMany(e=>e.EmailUpdateEntities).HasForeignKey(e=>e.UserId).IsRequired();
+            entity.HasOne(e => e.Approval).WithOne(e => e.EmailUpdateEntity).IsRequired();
+            entity.Property(e => e.OldEmail).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.NewEmail).IsRequired().HasMaxLength(255);
         });
     }
 }

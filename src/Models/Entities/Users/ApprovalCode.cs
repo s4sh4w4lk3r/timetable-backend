@@ -9,6 +9,7 @@ public class ApprovalCode
     public required ApprovalCodeType CodeType { get; init; }
     public bool IsRevoked { get; private set; } = false;
 
+    public EmailUpdateEntity? EmailUpdateEntity { get; init; }
 
     public bool IsNotExpired() => DateTime.UtcNow < ExpiryTime;
     public void SetRevoked() => IsRevoked = true;

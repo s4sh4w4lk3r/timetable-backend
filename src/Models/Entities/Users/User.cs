@@ -10,6 +10,7 @@ public class User
 
     public IList<ApprovalCode>? ApprovalCodes { get; init; } = new List<ApprovalCode>();
     public IList<UserSession>? UserSessions { get; init; } = new List<UserSession>();
+    public IList<EmailUpdateEntity>? EmailUpdateEntities { get; init; } = new List<EmailUpdateEntity>();
 
     public User() { }
 
