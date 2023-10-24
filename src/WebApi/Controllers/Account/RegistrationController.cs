@@ -24,7 +24,7 @@ public class RegistrationController : ControllerBase
     }
 
     [HttpPost, Route("register")]
-    public async Task<IActionResult> Register([FromBody, Bind("Email", "Password")] User user, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Register([FromBody, Bind("Email", "Password")] User user, [FromServices] PasswordService passwordService, CancellationToken cancellationToken = default)
     {
         var userValidation = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex").IncludeProperties(e => e.Email));
         if (userValidation.IsValid is false)
@@ -32,7 +32,7 @@ public class RegistrationController : ControllerBase
             return BadRequest(userValidation);
         }
 
-        var regResult = await _registerService.RegisterAsync(user, cancellationToken);
+        var regResult = await _registerService.RegisterAsync(user, passwordService, cancellationToken);
         if (regResult.Success is false)
         {
             return BadRequest(regResult);

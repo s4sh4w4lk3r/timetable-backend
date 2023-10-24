@@ -10,15 +10,9 @@ namespace WebApi.Controllers.Account;
 [ApiController, Route("api/account")]
 public class UpdateController : Controller
 {
-    private readonly UserService _userService;
-
-    public UpdateController(UserService userService)
-    {
-        _userService = userService;
-    }
 
     [HttpPost, Route("update/password"), Authorize]
-    public async Task<IActionResult> UpdatePassword([Bind("Password")] User user, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdatePassword([Bind("Password")] User user, [FromServices] PasswordService passwordService, CancellationToken cancellationToken)
     {
         if (StaticValidator.ValidatePassword(user.Password) is false)
         {
@@ -30,7 +24,7 @@ public class UpdateController : Controller
             return BadRequest("Не получилось получить id из клеймов.");
         }
 
-        var updatePasswordResult = await _userService.UpdatePassword(userId, user.Password!, cancellationToken);
+        var updatePasswordResult = await passwordService.UpdatePassword(userId, user.Password!, cancellationToken);
         if (updatePasswordResult.Success is false)
         {
             return BadRequest(updatePasswordResult);

@@ -17,7 +17,7 @@ public class RegisterService
         _userValidator = validator;
         _users = _dbContext.Set<User>();
     }
-    public async Task<ServiceResult> RegisterAsync(User user, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> RegisterAsync(User user, PasswordService passwordService, CancellationToken cancellationToken = default)
     {
         var userVal = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex_matching"));
         if (userVal.IsValid is false)
@@ -36,7 +36,7 @@ public class RegisterService
         }
 
         user.IsEmailConfirmed = false;
-        user.Password = UserService.HashPassword(user.Password!);
+        user.Password = PasswordService.HashPassword(user.Password!);
         await _users.AddAsync(user, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Пользователь добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");

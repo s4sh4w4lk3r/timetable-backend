@@ -25,7 +25,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost, Route("login")]
-    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] User user, [FromServices] IValidator<User> userValidator, [FromServices] UserService userService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] User user, [FromServices] IValidator<User> userValidator, [FromServices] PasswordService passwordService, CancellationToken cancellationToken = default)
     {
         var userValidation = userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex").IncludeProperties(e => e.Email));
         if (userValidation.IsValid is false)
@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
             return BadRequest(userValidation);
         }
 
-        var checkLoginDataResult = await userService.CheckLoginDataAsync(user, cancellationToken);
+        var checkLoginDataResult = await passwordService.CheckLoginDataAsync(user, cancellationToken);
         if (checkLoginDataResult.Success is false || checkLoginDataResult.Value is null)
         {
             return BadRequest(new ServiceResult(false, "Неудачная попытка входа.", checkLoginDataResult));

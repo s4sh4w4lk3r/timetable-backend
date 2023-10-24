@@ -37,7 +37,9 @@ public class Program
 
         builder.Services.AddScoped<DbContext, SqlDbContext>();
         builder.Services.AddScoped<CabinetService>();
-        builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<EmailService>();
+        builder.Services.AddScoped<PasswordService>();
+        builder.Services.AddScoped<RegisterService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<ApprovalService>();
         builder.Services.AddTransient<IEmailClient, EmailSimulator>();
