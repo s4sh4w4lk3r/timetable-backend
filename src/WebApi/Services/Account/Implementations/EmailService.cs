@@ -16,7 +16,7 @@ public class EmailService
         _users = _dbContext.Set<User>();
     }
 
-    public async Task<ServiceResult> UpdateEmail(int userId, int approvalCode, ApprovalService approvalService, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> UpdateEmailAsync(int userId, int approvalCode, ApprovalService approvalService, CancellationToken cancellationToken = default)
     {
 #warning не проверен
         if (userId == default)
@@ -54,7 +54,7 @@ public class EmailService
         return ServiceResult.Ok("Email адрес обновлен.");
     }
 
-    public async Task<ServiceResult> SendUpdateMail(int userId, string newEmail, ApprovalService approvalService, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> SendUpdateMailAsync(int userId, string newEmail, ApprovalService approvalService, CancellationToken cancellationToken = default)
     {
         if (userId == default)
         {
