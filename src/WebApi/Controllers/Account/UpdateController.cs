@@ -34,7 +34,7 @@ public class UpdateController : Controller
     }
 
     [HttpPost, Route("update/email"), Authorize]
-    public async Task<IActionResult> UpdateEmail([FromQuery] string newEmail)
+    public async Task<IActionResult> UpdateEmail([FromQuery] string newEmail, [FromServices] EmailService emailService)
     {
         /*if (StaticValidator.ValidateEmail(newEmail) is false)
         {
@@ -48,8 +48,7 @@ public class UpdateController : Controller
 
         _userService.UpdateEmail*/
         throw new NotImplementedException();
-#warning надо делать еще и подтверждение новой почты
-#warning добавил сущность в контекст, осталось реализовать.
-#warning возможно надо сделать чтобы при разворачивании приложения была 1 учетка админа, а он уже вручную регистрирует других админов. Добавить enum с большим админом, который может удалять маленьких админов.
+#warning написал сервис, осталось в контроллере реализовать его
+#warning возможно надо сделать чтобы при разворачивании приложения была 1 учетка админа, а он уже вручную регистрирует других админов. Добавить enum с большим админом, который может удалять маленьких админов. Или может сделать приватный ендпоинт для регистрации админов.
     }
 }

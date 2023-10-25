@@ -43,7 +43,6 @@ public class TokenService : ITokenService
         }
     }
 
-
     public ServiceResult<ClaimsPrincipal?> GetPrincipalFromAccessToken(string token, bool isLifetimeValidationRequired = true)
     {
         var tokenValidationParameters = new TokenValidationParameters

@@ -17,7 +17,7 @@ public class ApprovalService
         _emailClient = emailClient;
     }
 
-    public async Task<ServiceResult> VerifyCodeAsync(int userId, int approvalCode, ApprovalCode.ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult<ApprovalCode>> VerifyCodeAsync(int userId, int approvalCode, ApprovalCode.ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
     {
         var approval = await _dbContext.Set<ApprovalCode>()
             .Where(e => e.User!.UserId == userId
@@ -26,18 +26,18 @@ public class ApprovalService
 
         if (approval is null)
         {
-            return new ServiceResult(false, "Код подтверждения не был найден в бд.");
+            return ServiceResult<ApprovalCode>.Fail("Код подтверждения не был найден в бд.", null);
         }
 
         if (approval.IsNotExpired() is false)
         {
             _dbContext.Set<ApprovalCode>().Remove(approval);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            return new ServiceResult(false, "Код подтверждения просрочен.");
+            return ServiceResult<ApprovalCode>.Fail("Код подтверждения просрочен.", null);
         }
 
         await RevokeAsync(approval, cancellationToken: cancellationToken);
-        return new ServiceResult(true, "Код подтверждения был подтвержден.");
+        return ServiceResult<ApprovalCode>.Ok("Код подтверждения был подтвержден.", approval);
     }
 
     private async Task<ServiceResult> RevokeAsync(ApprovalCode approvalCode, bool deleteRequired = true, CancellationToken cancellationToken = default)
@@ -62,23 +62,23 @@ public class ApprovalService
         }
     }
 
-    public async Task<ServiceResult> SendCodeAsync(string userEmail, ApprovalCode.ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult<ApprovalCode?>> SendCodeAsync(string userEmail, ApprovalCode.ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
     {
         if (StaticValidator.ValidateEmail(userEmail) is false)
         {
-            return ServiceResult.Fail("Email имеет неверный формат.");
+            return ServiceResult<ApprovalCode?>.Fail("Email имеет неверный формат.", null);
         }
 
         var userFromRepo = await _dbContext.Set<User>().SingleOrDefaultAsync(e => e.Email == userEmail, cancellationToken);
         if (userFromRepo is null)
         {
-            return new ServiceResult(false, "Пользователь не был найден в бд.");
+            return ServiceResult<ApprovalCode?>.Fail("Пользователь не был найден в бд.", null);
         }
 
         //Нужно только для тех слуаче, если зареганный пользователь пытается подтвердить свою почту.
         if (approvalCodeType is ApprovalCode.ApprovalCodeType.Registration && (userFromRepo.IsEmailConfirmed is true))
         {
-            return ServiceResult.Fail("У пользователя уже подтверждена почта.");
+            return ServiceResult<ApprovalCode?>.Fail("У пользователя уже подтверждена почта.", null);
         }
 
         var approval = new ApprovalCode()
@@ -98,6 +98,6 @@ public class ApprovalService
         };
 
         _emailClient.SendEmail(message, userFromRepo.Email!);
-        return new ServiceResult(true, "Код подтверждения должен будет отправится.");
+        return ServiceResult<ApprovalCode?>.Ok("Код подтверждения должен будет отправится.", approval);
     }
 }
