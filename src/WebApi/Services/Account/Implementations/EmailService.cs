@@ -18,7 +18,6 @@ public class EmailService
 
     public async Task<ServiceResult> UpdateEmailAsync(int userId, int approvalCode, ApprovalService approvalService, CancellationToken cancellationToken = default)
     {
-#warning не проверен
         if (userId == default)
         {
             return ServiceResult.Fail("Id пользователя не должен быть равен нулю.");
@@ -35,7 +34,7 @@ public class EmailService
             return new ServiceResult(false, "Пользователь не найден в бд.");
         }
 
-        var approvalServiceResult = await approvalService.VerifyCodeAsync(userFromRepo.UserId, approvalCode, ApprovalCode.ApprovalCodeType.UpdateMail, cancellationToken);
+        var approvalServiceResult = await approvalService.VerifyCodeAsync(userFromRepo.UserId, approvalCode, ApprovalCode.ApprovalCodeType.UpdateMail, deleteRequired: false, cancellationToken: cancellationToken);
         if ((approvalServiceResult.Success is false) || (approvalServiceResult.Value is null))
         {
             return new ServiceResult(false, "Код подтверждения для изменения почты не принят.", approvalServiceResult);
@@ -77,10 +76,10 @@ public class EmailService
             return ServiceResult.Fail("Пользователь с таким email уже зарегистрирован.");
         }
 
-        var approvalResult = await approvalService.SendCodeAsync(newEmail, ApprovalCode.ApprovalCodeType.UpdateMail, cancellationToken);
+        var approvalResult = await approvalService.SendUpdateMailCodeAsync(userId, newEmail, cancellationToken);
         if ((approvalResult.Success is false) || (approvalResult.Value is null))
         {
-            return ServiceResult.Fail("Письмо на почту для подтверждения Email не было отправлено.", approvalResult);
+            return ServiceResult.Fail("Письмо на почту для подтверждения нового Email не было отправлено.", approvalResult);
         }
 
 
@@ -94,6 +93,6 @@ public class EmailService
 
         _dbContext.Set<EmailUpdateEntity>().Add(emailUpdateInstance);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        return ServiceResult.Ok("Письмо для подтверждения Email было отправлено усшено.");
+        return ServiceResult.Ok("Письмо для подтверждения нового Email было отправлено успешно.");
     }
 }

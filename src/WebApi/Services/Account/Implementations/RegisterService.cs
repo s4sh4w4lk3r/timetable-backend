@@ -61,7 +61,7 @@ public class RegisterService
             return new ServiceResult(false, "Пользователь для валидации не был найден в бд.");
         }
 
-        var approvalServiceResult = await approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Registration, cancellationToken);
+        var approvalServiceResult = await approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Registration, cancellationToken: cancellationToken);
         if (approvalServiceResult.Success is false)
         {
             return new ServiceResult(false, "Код подтверждения регистрации не принят.", approvalServiceResult);
@@ -86,7 +86,7 @@ public class RegisterService
             return new ServiceResult(false, "Пользователь не найден в бд.");
         }
 
-        var approvalServiceResult = await approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Unregistration, cancellationToken);
+        var approvalServiceResult = await approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Unregistration, cancellationToken: cancellationToken);
         if (approvalServiceResult.Success is false)
         {
             return new ServiceResult(false, "Код подтверждения для удаления аккаунта не принят.", approvalServiceResult);

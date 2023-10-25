@@ -92,7 +92,8 @@ public class RegistrationController : ControllerBase
             return BadRequest(sendCodeResult);
         }
 
-        return Ok(sendCodeResult);
+        // Если вернуть тут сам объект SeriviceResult, то получается reference loop по свойствам и сериализер кидает исключение.
+        return Ok(sendCodeResult.Description);
     }
 
     

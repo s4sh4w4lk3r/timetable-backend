@@ -56,7 +56,7 @@ public class UpdateController : Controller
     }
 
     [HttpPost, Route("update/email/confirm"), Authorize]
-    public async Task<IActionResult> ConfirmUpdateEmail([FromQuery] int approval, [FromServices] EmailService emailService, [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> ConfirmUpdateEmail([FromQuery] int approvalCode, [FromServices] EmailService emailService, [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
     {
 
         if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
@@ -64,12 +64,12 @@ public class UpdateController : Controller
             return BadRequest("Не получилось получить id из клеймов.");
         }
 
-        if (approval == default)
+        if (approvalCode == default)
         {
             return BadRequest("Approval не может быть равен нулю.");
         }
 
-        var serviceResult = await emailService.UpdateEmailAsync(userId, approval, approvalService, cancellationToken);
+        var serviceResult = await emailService.UpdateEmailAsync(userId, approvalCode, approvalService, cancellationToken);
         if (serviceResult.Success is false)
         {
             return BadRequest(serviceResult);
@@ -79,5 +79,4 @@ public class UpdateController : Controller
     }
 
 }
-#warning проверить тут всё
 #warning возможно надо сделать чтобы при разворачивании приложения была 1 учетка админа, а он уже вручную регистрирует других админов. Добавить enum с большим админом, который может удалять маленьких админов. Или может сделать приватный ендпоинт для регистрации админов.
