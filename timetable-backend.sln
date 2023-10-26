@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "src\Repositor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "src\Models\Models.csproj", "{80EA4527-8423-4452-A09C-FDE363622CD3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.Tests", "WebApi.Tests\WebApi.Tests.csproj", "{BCF9539E-3ACE-43A3-A8BA-3A6894AB2043}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{80EA4527-8423-4452-A09C-FDE363622CD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80EA4527-8423-4452-A09C-FDE363622CD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80EA4527-8423-4452-A09C-FDE363622CD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCF9539E-3ACE-43A3-A8BA-3A6894AB2043}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCF9539E-3ACE-43A3-A8BA-3A6894AB2043}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCF9539E-3ACE-43A3-A8BA-3A6894AB2043}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCF9539E-3ACE-43A3-A8BA-3A6894AB2043}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
