@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
 using Models.Validation;
 using WebApi.Extensions;
+using WebApi.Services;
 using WebApi.Services.Account.Implementations;
 
 namespace WebApi.Controllers.Auth;
@@ -92,8 +93,7 @@ public class RegistrationController : ControllerBase
             return BadRequest(sendCodeResult);
         }
 
-        // Если вернуть тут сам объект SeriviceResult, то получается reference loop по свойствам и сериализер кидает исключение.
-        return Ok(sendCodeResult.Description);
+        return Ok((ServiceResult)sendCodeResult);
     }
 
     
