@@ -36,7 +36,7 @@ public class Program
         builder.Services.Configure<ApiSettings>(builder.Configuration.GetRequiredSection(nameof(ApiSettings)));
         builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetRequiredSection(nameof(EmailConfiguration)));
 
-        builder.Services.AddScoped<DbContext, SqlDbContext>();
+        builder.Services.AddDbContext<SqlDbContext>();
         builder.Services.AddScoped<CabinetService>();
         builder.Services.AddScoped<EmailService>();
         builder.Services.AddScoped<PasswordService>();

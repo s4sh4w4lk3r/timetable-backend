@@ -2,15 +2,16 @@
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
 using Models.Validation;
+using Repository;
 
 namespace WebApi.Services.Account.Implementations;
 
 public class EmailService
 {
-    private readonly DbContext _dbContext;
+    private readonly SqlDbContext _dbContext;
     private readonly DbSet<User> _users;
     
-    public EmailService(DbContext dbContext)
+    public EmailService(SqlDbContext dbContext)
     {
         _dbContext = dbContext;
         _users = _dbContext.Set<User>();

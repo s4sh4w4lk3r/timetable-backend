@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Models.Entities.Users;
 using Models.Validation;
+using Repository;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using WebApi.Extensions;
@@ -13,10 +14,10 @@ namespace WebApi.Middlewares.Auth;
 
 public class AccessTokenAuthenticationHandler : AuthenticationHandler<AccessTokenAuthenticationOptions>
 {
-    private readonly DbContext _dbContext;
+    private readonly SqlDbContext _dbContext;
     private readonly ITokenService _tokenService;
     public AccessTokenAuthenticationHandler(IOptionsMonitor<AccessTokenAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock,
-        DbContext dbContext, ITokenService tokenService) : base(options, logger, encoder, clock)
+        SqlDbContext dbContext, ITokenService tokenService) : base(options, logger, encoder, clock)
     {
         _tokenService = tokenService;
         _dbContext = dbContext;

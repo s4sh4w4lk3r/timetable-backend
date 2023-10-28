@@ -1,18 +1,19 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
+using Repository;
 
 namespace WebApi.Services.Account.Implementations;
 
 public class UserSessionService
 {
-    private readonly DbContext _dbContext;
+    private readonly SqlDbContext _dbContext;
     private readonly DbSet<UserSession> _userSessions;
     private readonly IValidator<UserSession> _userSessionValidator;
 
     public IQueryable<UserSession> UserSessions => _userSessions.AsQueryable();
 
-    public UserSessionService(DbContext dbContext, IValidator<UserSession> validator)
+    public UserSessionService(SqlDbContext dbContext, IValidator<UserSession> validator)
     {
         _dbContext = dbContext;
         _userSessions = _dbContext.Set<UserSession>();

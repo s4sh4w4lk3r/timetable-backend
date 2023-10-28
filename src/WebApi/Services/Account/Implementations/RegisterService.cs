@@ -1,17 +1,18 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
+using Repository;
 using System.Net.Mail;
 
 namespace WebApi.Services.Account.Implementations;
 
 public class RegisterService
 {
-    private readonly DbContext _dbContext;
+    private readonly SqlDbContext _dbContext;
     private readonly IValidator<User> _userValidator;
     private readonly DbSet<User> _users;
 
-    public RegisterService(DbContext dbContext, IValidator<User> validator)
+    public RegisterService(SqlDbContext dbContext, IValidator<User> validator)
     {
         _dbContext = dbContext;
         _userValidator = validator;

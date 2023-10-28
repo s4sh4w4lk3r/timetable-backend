@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
 using Models.Validation;
+using Repository;
 using WebApi.Extensions;
 using WebApi.Services;
 using WebApi.Services.Account.Implementations;
@@ -74,7 +75,7 @@ public class RegistrationController : ControllerBase
 
     
     [HttpGet, Route("unregister/send-email"), Authorize]
-    public async Task<IActionResult> UnregisterSendMail([FromServices] DbContext dbContext, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> UnregisterSendMail([FromServices] SqlDbContext dbContext, CancellationToken cancellationToken = default)
     {
         if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {

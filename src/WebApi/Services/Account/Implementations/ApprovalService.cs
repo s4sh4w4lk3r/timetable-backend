@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
 using Models.Validation;
+using Repository;
 using WebApi.Services.Account.Interfaces;
 using static Models.Entities.Users.ApprovalCode;
 
@@ -9,10 +10,10 @@ namespace WebApi.Services.Account.Implementations;
 
 public class ApprovalService
 {
-    private readonly DbContext _dbContext;
+    private readonly SqlDbContext _dbContext;
     private readonly IEmailClient _emailClient;
 
-    public ApprovalService(DbContext dbContext, IEmailClient emailClient)
+    public ApprovalService(SqlDbContext dbContext, IEmailClient emailClient)
     {
         _dbContext = dbContext;
         _emailClient = emailClient;
