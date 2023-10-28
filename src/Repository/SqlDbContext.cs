@@ -159,4 +159,3 @@ public class SqlDbContext : DbContext
         });
     }
 }
-#warning может в будущем создавать разные дб контексты для обной бд.
