@@ -2,5 +2,5 @@
 
 public interface IEmailClient
 {
-    void SendEmail(string message, string emailAddress);
+    Task SendEmail(string subject, string message, string emailAddress);
 }

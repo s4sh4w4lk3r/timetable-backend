@@ -34,6 +34,7 @@ public class Program
         builder.Services.Configure<DbConfiguration>(builder.Configuration.GetRequiredSection(nameof(DbConfiguration)));
         builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetRequiredSection(nameof(JwtConfiguration)));
         builder.Services.Configure<ApiSettings>(builder.Configuration.GetRequiredSection(nameof(ApiSettings)));
+        builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetRequiredSection(nameof(EmailConfiguration)));
 
         builder.Services.AddScoped<DbContext, SqlDbContext>();
         builder.Services.AddScoped<CabinetService>();
@@ -42,7 +43,7 @@ public class Program
         builder.Services.AddScoped<RegisterService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<ApprovalService>();
-        builder.Services.AddTransient<IEmailClient, EmailSimulator>();
+        builder.Services.AddTransient<IEmailClient, MailKitClient>();
         builder.Services.AddScoped<UserSessionService>();
 
         builder.Services.AddValidatorsFromAssemblyContaining<ApprovalCodeValidator>();
@@ -54,6 +55,7 @@ public class Program
         builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<JwtConfigurationValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<UserSessionValidator>();
+        builder.Services.AddValidatorsFromAssemblyContaining<MailConfigurationValidator>();
 
         var app = builder.Build();
         #endregion
