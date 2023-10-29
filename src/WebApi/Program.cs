@@ -82,7 +82,7 @@ public class Program
         string? apiKey = context.Request.Headers.Where(e => e.Key == API_KEY).Select(e => e.Value).FirstOrDefault();
         if (string.IsNullOrWhiteSpace(apiKey) is true)
         {
-            context.Response.StatusCode = 400;
+            context.Response.StatusCode = 401;
             await context.Response.WriteAsync($"Для доступа к timetable-API требуется {API_KEY} в заголовках.");
             return;
         }
