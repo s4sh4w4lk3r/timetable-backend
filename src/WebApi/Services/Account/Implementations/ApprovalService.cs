@@ -99,7 +99,7 @@ public class ApprovalService
 
         string message = $"Код подтверждения для удаления аккаунта: {approval.Code}.";
 
-        await _emailClient.SendEmail("Подтверждение удаления аккаунта", message, userFromRepo.Email!);
+        await _emailClient.SendEmailAsync("Подтверждение удаления аккаунта", message, userFromRepo.Email!, cancellationToken);
         return ServiceResult<ApprovalCode?>.Ok("Код подтверждения должен будет отправится.", approval);
     }
 
@@ -128,7 +128,7 @@ public class ApprovalService
 
         string message =  $"Код подтверждения для регистрации: {approval.Code}";
 
-        await _emailClient.SendEmail("Подтверждение адреса электронной почты", message, userFromRepo.Email!);
+        await _emailClient.SendEmailAsync("Подтверждение адреса электронной почты", message, userFromRepo.Email!, cancellationToken);
         return ServiceResult<ApprovalCode?>.Ok("Код подтверждения должен будет отправится.", approval);
     }
 
@@ -161,7 +161,7 @@ public class ApprovalService
 
         string message = $"Код подтверждения для смены адреса почты: {approval.Code}.";
 
-        await _emailClient.SendEmail("Подтверждение адреса электронной почты", message, userEmail);
+        await _emailClient.SendEmailAsync("Подтверждение адреса электронной почты", message, userEmail, cancellationToken);
         return ServiceResult<ApprovalCode?>.Ok("Код подтверждения должен будет отправится.", approval);
     }
 }

@@ -20,7 +20,7 @@ namespace WebApi.Services.Account.Implementations
         }
 
 
-        public async Task SendEmail(string subject, string message, string emailAddress)
+        public async Task SendEmailAsync(string subject, string message, string emailAddress, CancellationToken cancellationToken = default)
         {
             using var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(_emailConfiguration.Sender));
@@ -29,10 +29,10 @@ namespace WebApi.Services.Account.Implementations
             email.Body = new TextPart(TextFormat.Plain) { Text = message };
 
             using var smtp = new SmtpClient();
-            await smtp.ConnectAsync(_emailConfiguration.Host, _emailConfiguration.Port, SecureSocketOptions.Auto);
-            await smtp.AuthenticateAsync(_emailConfiguration.Login, _emailConfiguration.Password);
-            await smtp.SendAsync(email);
-            await smtp.DisconnectAsync(true);
+            await smtp.ConnectAsync(_emailConfiguration.Host, _emailConfiguration.Port, SecureSocketOptions.Auto, cancellationToken);
+            await smtp.AuthenticateAsync(_emailConfiguration.Login, _emailConfiguration.Password, cancellationToken);
+            await smtp.SendAsync(email, cancellationToken);
+            await smtp.DisconnectAsync(true, cancellationToken);
         }
     }
 }
