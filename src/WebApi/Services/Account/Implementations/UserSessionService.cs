@@ -2,10 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
 using Repository;
+using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Services.Account.Implementations;
 
-public class UserSessionService
+public class UserSessionService : IUserSessionService
 {
     private readonly SqlDbContext _dbContext;
     private readonly DbSet<UserSession> _userSessions;
@@ -21,7 +22,7 @@ public class UserSessionService
     }
 
 
-    public async Task<ServiceResult> AddUserSessionAsync(UserSession userSession, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> AddAsync(UserSession userSession, CancellationToken cancellationToken = default)
     {
         var validationResult = _userSessionValidator.Validate(userSession);
         if (validationResult.IsValid is false)
@@ -34,7 +35,7 @@ public class UserSessionService
         return new ServiceResult(true, "Сессия пользователя добавлена в бд.");
     }
 
-    public async Task<ServiceResult> UpdateUserSessionAsync(UserSession userSession, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> UpdateAsync(UserSession userSession, CancellationToken cancellationToken = default)
     {
         var validationResult = _userSessionValidator.Validate(userSession);
         if (validationResult.IsValid is false)
@@ -47,7 +48,7 @@ public class UserSessionService
         return new ServiceResult(true, "Сессия пользователя обновлена в бд.");
     }
 
-    public async Task<ServiceResult> DeleteSessionAsync(int userSessionId, string refreshToken, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> DeleteAsync(int userSessionId, string refreshToken, CancellationToken cancellationToken = default)
     {
         if (userSessionId == default)
         {
@@ -64,7 +65,7 @@ public class UserSessionService
         return new ServiceResult(true, "Сессия пользователя удалена из бд.");
     }
 
-    public async Task<ServiceResult> RevokeAllAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> DeleteAllAsync(int userId, CancellationToken cancellationToken = default)
     {
         if (userId == default)
         {

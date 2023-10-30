@@ -15,10 +15,10 @@ namespace WebApi.Controllers.Auth;
 [ApiController, Route("api/account")]
 public class AuthController : ControllerBase
 {
-    private readonly UserSessionService _userSessionService;
+    private readonly IUserSessionService _userSessionService;
     private readonly ITokenService _tokenService;
 
-    public AuthController(UserSessionService userSessionService, ITokenService tokenService)
+    public AuthController(IUserSessionService userSessionService, ITokenService tokenService)
     {
         _userSessionService = userSessionService;
         _tokenService = tokenService;
@@ -51,7 +51,7 @@ public class AuthController : ControllerBase
             IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty
         };
 
-        var userSessionResult = await _userSessionService.AddUserSessionAsync(userSession, cancellationToken);
+        var userSessionResult = await _userSessionService.AddAsync(userSession, cancellationToken);
         if (userSessionResult.Success is false)
         {
             return BadRequest(new ServiceResult(false, "Сессия не добавлена в бд.", userSessionResult));
@@ -71,7 +71,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet, Authorize, Route("global-logout")]
-    public async Task<IActionResult> GlobalLogout([FromServices] UserSessionService userSessionService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GlobalLogout( CancellationToken cancellationToken = default)
     {
         if (User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {
@@ -83,7 +83,7 @@ public class AuthController : ControllerBase
             return BadRequest("Id пользователя не может быть равным нулю");
         }
 
-        var revokeResult = await userSessionService.RevokeAllAsync(userId, cancellationToken);
+        var revokeResult = await _userSessionService.DeleteAllAsync(userId, cancellationToken);
         if (revokeResult.Success is false)
         {
             return BadRequest(revokeResult);
@@ -145,7 +145,7 @@ public class AuthController : ControllerBase
         userSessionFromRepo.SetNewRefreshToken(refreshToken);
         userSessionFromRepo.DeviceInfo = HttpContext.Request.Headers.UserAgent.ToString();
         userSessionFromRepo.IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
-        await _userSessionService.UpdateUserSessionAsync(userSessionFromRepo, cancellationToken);
+        await _userSessionService.UpdateAsync(userSessionFromRepo, cancellationToken);
 
         return Ok(new TokenPair(accessToken, refreshToken));
     }
@@ -165,7 +165,7 @@ public class AuthController : ControllerBase
             return BadRequest("Не получилось вытащить id из claimов.");
         }
 
-        var userSessionResult = await _userSessionService.DeleteSessionAsync(userId, refreshToken, cancellationToken);
+        var userSessionResult = await _userSessionService.DeleteAsync(userId, refreshToken, cancellationToken);
         if (userSessionResult.Success is false)
         {
             return BadRequest(userSessionResult);

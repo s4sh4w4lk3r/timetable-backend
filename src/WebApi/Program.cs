@@ -48,6 +48,8 @@ public class Program
         builder.Services.AddScoped<ApprovalService>();
         //builder.Services.AddTransient<IEmailClient, MailKitClient>();
         builder.Services.AddTransient<IEmailClient, EmailSimulator>();
+        builder.Services.AddScoped<IUserSessionService, UserSessionService>();
+        #endregion
 
         #region Валидаторы
         builder.Services.AddValidatorsFromAssemblyContaining<ApprovalCodeValidator>();
@@ -103,7 +105,7 @@ public class Program
             await context.Response.WriteAsync($"Неверный {API_KEY}.");
             return;
         }
-        
+
 
         await next.Invoke();
     }
