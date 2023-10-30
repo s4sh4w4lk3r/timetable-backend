@@ -91,7 +91,7 @@ public class Program
         string? apiKey = context.Request.Headers.Where(e => e.Key == API_KEY).Select(e => e.Value).FirstOrDefault();
         if (string.IsNullOrWhiteSpace(apiKey) is true)
         {
-            context.Response.StatusCode = 401;
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync($"Для доступа к timetable-API требуется {API_KEY} в заголовках.");
             return;
         }
@@ -101,11 +101,10 @@ public class Program
 
         if (apiKey != validApiKey)
         {
-            context.Response.StatusCode = 401;
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync($"Неверный {API_KEY}.");
             return;
         }
-
 
         await next.Invoke();
     }
