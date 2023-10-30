@@ -64,7 +64,7 @@ public class ApprovalService
         }
     }
 
-    public async Task<ServiceResult<ApprovalCode?>> SendCodeAsync(string userEmail, ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> SendCodeAsync(string userEmail, ApprovalCodeType approvalCodeType, CancellationToken cancellationToken = default)
     {
         if (StaticValidator.ValidateEmail(userEmail) is false)
         {
@@ -80,7 +80,7 @@ public class ApprovalService
         };
     }
 
-    private async Task<ServiceResult<ApprovalCode?>> SendUnregistrationCodeAsync(string userEmail, CancellationToken cancellationToken = default)
+    private async Task<ServiceResult> SendUnregistrationCodeAsync(string userEmail, CancellationToken cancellationToken = default)
     {
 
         var userFromRepo = await _dbContext.Set<User>().SingleOrDefaultAsync(e => e.Email == userEmail, cancellationToken);
@@ -103,7 +103,7 @@ public class ApprovalService
         return ServiceResult<ApprovalCode?>.Ok("Код подтверждения должен будет отправится.", approval);
     }
 
-    private async Task<ServiceResult<ApprovalCode?>> SendRegistrationCodeAsync(string userEmail, CancellationToken cancellationToken = default)
+    private async Task<ServiceResult> SendRegistrationCodeAsync(string userEmail, CancellationToken cancellationToken = default)
     {
 
         var userFromRepo = await _dbContext.Set<User>().SingleOrDefaultAsync(e => e.Email == userEmail, cancellationToken);

@@ -1,24 +1,28 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
+using Models.Validation;
 using Repository;
 using System.Net.Mail;
+using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Services.Account.Implementations;
 
-public class RegisterService
+public class RegistrationService : IRegistrationService
 {
     private readonly SqlDbContext _dbContext;
     private readonly IValidator<User> _userValidator;
     private readonly DbSet<User> _users;
+    private readonly ApprovalService _approvalService;
 
-    public RegisterService(SqlDbContext dbContext, IValidator<User> validator)
+    public RegistrationService(SqlDbContext dbContext, IValidator<User> validator, ApprovalService approvalService)
     {
         _dbContext = dbContext;
         _userValidator = validator;
         _users = _dbContext.Set<User>();
+        _approvalService = approvalService;
     }
-    public async Task<ServiceResult> RegisterAsync(User user, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> AddUserToRepoAsync(User user, CancellationToken cancellationToken = default)
     {
         var userVal = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex_matching"));
         if (userVal.IsValid is false)
@@ -42,8 +46,7 @@ public class RegisterService
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Пользователь добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
     }
-
-    public async Task<ServiceResult> ConfirmEmailAsync(string userEmail, int approvalCode, ApprovalService approvalService, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> ConfirmAsync(string userEmail, int approvalCode, CancellationToken cancellationToken = default)
     {
         if (approvalCode == default)
         {
@@ -62,7 +65,7 @@ public class RegisterService
             return new ServiceResult(false, "Пользователь для валидации не был найден в бд.");
         }
 
-        var approvalServiceResult = await approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Registration, cancellationToken: cancellationToken);
+        var approvalServiceResult = await _approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Registration, cancellationToken: cancellationToken);
         if (approvalServiceResult.Success is false)
         {
             return new ServiceResult(false, "Код подтверждения регистрации не принят.", approvalServiceResult);
@@ -73,28 +76,20 @@ public class RegisterService
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Email пользователя подтвержден.");
     }
-
-    public async Task<ServiceResult> UnregisterAsync(int userId, int approvalCode, ApprovalService approvalService, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> SendEmailAsync(string userEmail, CancellationToken cancellationToken = default)
     {
-        if (userId == default)
+        var emailOk = StaticValidator.ValidateEmail(userEmail);
+        if (emailOk is false)
         {
-            return ServiceResult.Fail("Id пользователя не должен быть равен нулю.");
+            return new ServiceResult(false, "Email имеет неправильный формат.");
         }
 
-        var validUser = await _users.SingleOrDefaultAsync(e => e.UserId == userId, cancellationToken);
-        if (validUser is null)
+        var sendApprovalResult = await _approvalService.SendCodeAsync(userEmail, ApprovalCode.ApprovalCodeType.Registration, cancellationToken);
+        if (sendApprovalResult.Success is false)
         {
-            return new ServiceResult(false, "Пользователь не найден в бд.");
+            return ServiceResult.Fail("Письмо подтверждения регистрации не было отправлено.");
         }
 
-        var approvalServiceResult = await approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Unregistration, cancellationToken: cancellationToken);
-        if (approvalServiceResult.Success is false)
-        {
-            return new ServiceResult(false, "Код подтверждения для удаления аккаунта не принят.", approvalServiceResult);
-        }
-
-        _users.Remove(validUser);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return new ServiceResult(true, "Аккаунт пользователя удален.");
+        return ServiceResult.Ok(sendApprovalResult.Description);
     }
 }

@@ -1,13 +1,11 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
 using Models.Validation;
-using Repository;
 using WebApi.Extensions;
-using WebApi.Services;
 using WebApi.Services.Account.Implementations;
+using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Controllers.Auth;
 
@@ -16,9 +14,9 @@ public class RegistrationController : ControllerBase
 {
     private readonly IValidator<User> _userValidator;
     private readonly ApprovalService _approvalService;
-    private readonly RegisterService _registerService;
+    private readonly IRegistrationService _registerService;
 
-    public RegistrationController(IValidator<User> userValidator, ApprovalService approvalService, RegisterService registerService)
+    public RegistrationController(IValidator<User> userValidator, ApprovalService approvalService, IRegistrationService registerService)
     {
         _userValidator = userValidator;
         _approvalService = approvalService;
@@ -34,7 +32,7 @@ public class RegistrationController : ControllerBase
             return BadRequest(userValidation);
         }
 
-        var regResult = await _registerService.RegisterAsync(user, cancellationToken); 
+        var regResult = await _registerService.AddUserToRepoAsync(user, cancellationToken);
         if (regResult.Success is false)
         {
             return BadRequest(regResult);
@@ -43,11 +41,11 @@ public class RegistrationController : ControllerBase
         return Ok(regResult);
     }
 
-    
+
     [HttpPost, Route("register/confirm")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userEmail, [FromQuery] int approvalCode, CancellationToken cancellationToken = default)
     {
-        var confirmResult = await _registerService.ConfirmEmailAsync(userEmail, approvalCode, _approvalService, cancellationToken);
+        var confirmResult = await _registerService.ConfirmAsync(userEmail, approvalCode, cancellationToken);
         if (confirmResult.Success is false)
         {
             return BadRequest(confirmResult);
@@ -55,7 +53,7 @@ public class RegistrationController : ControllerBase
         return Ok(confirmResult);
     }
 
-    
+
     [HttpPost, Route("register/send-email")]
     public async Task<IActionResult> SendRegisterEmail([FromQuery] string userEmail, CancellationToken cancellationToken = default)
     {
@@ -73,33 +71,27 @@ public class RegistrationController : ControllerBase
         return Ok("Письмо с кодом подтверждения отправлено на почту.");
     }
 
-    
+
     [HttpGet, Route("unregister/send-email"), Authorize]
-    public async Task<IActionResult> UnregisterSendMail([FromServices] SqlDbContext dbContext, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> UnregisterSendMail([FromServices] IUnregistrationService unregistrationService, CancellationToken cancellationToken = default)
     {
         if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {
             return BadRequest("Не получилось считать id из клеймов.");
         }
 
-        string? userEmail = await dbContext.Set<User>().Where(e => e.UserId == userId).Select(e => e.Email).FirstOrDefaultAsync(cancellationToken);
-        if (string.IsNullOrWhiteSpace(userEmail))
+        var requestUnreg = await unregistrationService.SendEmailAsync(userId, cancellationToken);
+        if (requestUnreg.Success is false)
         {
-            return BadRequest("Пользователь не найден в бд.");
+            return BadRequest(requestUnreg);
         }
 
-        var sendCodeResult = await _approvalService.SendCodeAsync(userEmail, ApprovalCode.ApprovalCodeType.Unregistration, cancellationToken);
-        if (sendCodeResult.Success is false)
-        {
-            return BadRequest(sendCodeResult);
-        }
-
-        return Ok((ServiceResult)sendCodeResult);
+        return Ok(requestUnreg);
     }
 
-    
+
     [HttpPost, Route("unregister/confirm"), Authorize]
-    public async Task<IActionResult> ConfirmUnregistration(int approvalCode, CancellationToken cancellationToken)
+    public async Task<IActionResult> ConfirmUnregistration(int approvalCode, [FromServices] IUnregistrationService unregistrationService, CancellationToken cancellationToken)
     {
         if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {
@@ -111,7 +103,7 @@ public class RegistrationController : ControllerBase
             return BadRequest("Id пользователя не может быть равным нулю.");
         }
 
-        var unregisterResult = await _registerService.UnregisterAsync(userId, approvalCode, _approvalService, cancellationToken);
+        var unregisterResult = await unregistrationService.ConfirmAsync(userId, approvalCode, cancellationToken);
         if (unregisterResult.Success is false)
         {
             return BadRequest(unregisterResult);

@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Models.Validation;
 using Repository;
@@ -31,21 +30,26 @@ public class Program
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
         .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, options => { });
 
+        #region Конфигурация
         builder.Services.Configure<DbConfiguration>(builder.Configuration.GetRequiredSection(nameof(DbConfiguration)));
         builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetRequiredSection(nameof(JwtConfiguration)));
         builder.Services.Configure<ApiSettings>(builder.Configuration.GetRequiredSection(nameof(ApiSettings)));
         builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetRequiredSection(nameof(EmailConfiguration)));
+        #endregion
 
+        #region Зависимости
         builder.Services.AddDbContext<SqlDbContext>();
         builder.Services.AddScoped<CabinetService>();
         builder.Services.AddScoped<EmailService>();
         builder.Services.AddScoped<PasswordService>();
-        builder.Services.AddScoped<RegisterService>();
+        builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+        builder.Services.AddScoped<IUnregistrationService, UnregistrationService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<ApprovalService>();
-        builder.Services.AddTransient<IEmailClient, MailKitClient>();
-        builder.Services.AddScoped<UserSessionService>();
+        //builder.Services.AddTransient<IEmailClient, MailKitClient>();
+        builder.Services.AddTransient<IEmailClient, EmailSimulator>();
 
+        #region Валидаторы
         builder.Services.AddValidatorsFromAssemblyContaining<ApprovalCodeValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<CabinetValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<LessonTimeValidator>();
@@ -56,10 +60,12 @@ public class Program
         builder.Services.AddValidatorsFromAssemblyContaining<JwtConfigurationValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<UserSessionValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<MailConfigurationValidator>();
+        #endregion
 
         var app = builder.Build();
         #endregion
 
+        #region Middlewares
         app.UseSerilogRequestLogging();
         app.UseAuthentication();
         app.UseAuthorization();
@@ -74,6 +80,7 @@ public class Program
         app.MapGet("/", () => "Hello World!");
 
         app.Run();
+        #endregion
     }
     async static Task CheckApiKey(HttpContext context, Func<Task> next)
     {
