@@ -32,7 +32,7 @@ public class SqlDbContext : DbContext
         }
     }
 
-    public DbSet<Cabinet> Cabinets => Set<Cabinet>();
+    /*public DbSet<Cabinet> Cabinets => Set<Cabinet>();
     public DbSet<LessonTime> LessonTimes => Set<LessonTime>();
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<Teacher> Teachers => Set<Teacher>();
@@ -42,7 +42,7 @@ public class SqlDbContext : DbContext
     public DbSet<Timetable> Timetables => Set<Timetable>();
     public DbSet<ApprovalCode> ApprovalCodes => Set<ApprovalCode>();
     public DbSet<UserSession> UserSessions => Set<UserSession>();
-    public DbSet<EmailUpdateEntity> EmailUpdateEntities => Set<EmailUpdateEntity>();
+    public DbSet<EmailUpdateEntity> EmailUpdateEntities => Set<EmailUpdateEntity>();*/
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
