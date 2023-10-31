@@ -53,7 +53,6 @@ public class Program
         #endregion
 
         #region Валидаторы
-        builder.Services.AddValidatorsFromAssemblyContaining<ApprovalCodeValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<CabinetValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<LessonTimeValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<TeacherValidator>();

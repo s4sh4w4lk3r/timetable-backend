@@ -19,7 +19,9 @@ public class ApprovalService : IApprovalService
     {
         var approval = await _dbContext.Set<ApprovalCode>()
             .Where(e => e.User!.UserId == userId
-            && e.Code == approvalCode && e.CodeType == approvalCodeType)
+            && e.Code == approvalCode 
+            && e.CodeType == approvalCodeType 
+            && e.IsRevoked == false)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (approval is null)
@@ -39,7 +41,6 @@ public class ApprovalService : IApprovalService
     }
     private async Task<ServiceResult> RevokeAsync(ApprovalCode approvalCode, bool deleteRequired = true, CancellationToken cancellationToken = default)
     {
-#warning сделать чтобы была проверка approvalcode сущности по свойствам или из бд
         if (approvalCode is null)
         {
             return new ServiceResult(false, "approvalCode is null.");
