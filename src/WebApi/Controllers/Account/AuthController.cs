@@ -60,7 +60,6 @@ public class AuthController : ControllerBase
         var claims = new List<Claim>
         {
             new Claim(TimetableClaimTypes.UserId, user.UserId.ToString()),
-            new Claim(TimetableClaimTypes.Email, user.Email!),
             new Claim(TimetableClaimTypes.UserSessionId, userSession.UserSessionId.ToString())
         };
 

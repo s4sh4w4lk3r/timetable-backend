@@ -46,7 +46,6 @@ namespace WebApi.Services.Account.Implementations
 
         public async Task<ServiceResult> SendEmailAsync(int userId, CancellationToken cancellationToken = default)
         {
-#warning проверить
             string? userEmail = await _users.Where(e => e.UserId == userId).Select(e => e.Email).FirstOrDefaultAsync(cancellationToken);
             if (string.IsNullOrWhiteSpace(userEmail))
             {

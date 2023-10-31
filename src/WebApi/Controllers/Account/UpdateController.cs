@@ -44,7 +44,6 @@ public class UpdateController : Controller
     [HttpPost, Route("update/email"), Authorize]
     public async Task<IActionResult> UpdateEmail([FromQuery] string newEmail, CancellationToken cancellationToken = default)
     {
-#warning проверить
         if (StaticValidator.ValidateEmail(newEmail) is false)
         {
             return BadRequest("Неверный формат почты.");
@@ -67,7 +66,6 @@ public class UpdateController : Controller
     [HttpPost, Route("update/email/confirm"), Authorize]
     public async Task<IActionResult> ConfirmUpdateEmail([FromQuery] int approvalCode, CancellationToken cancellationToken = default)
     {
-#warning проверить
         if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {
             return BadRequest("Не получилось получить id из клеймов.");

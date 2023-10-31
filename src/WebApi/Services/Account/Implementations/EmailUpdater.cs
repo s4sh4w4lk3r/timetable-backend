@@ -62,7 +62,6 @@ public class EmailUpdater
 
     public async Task<ServiceResult> SendUpdateMailAsync(int userId, string newEmail, CancellationToken cancellationToken = default)
     {
-#warning проверить
         if (userId == default)
         {
             return ServiceResult.Fail("Id пользователя не должен быть равен нулю.");
