@@ -10,9 +10,17 @@ namespace WebApi.Controllers.Account;
 [ApiController, Route("api/account")]
 public class UpdateController : Controller
 {
+    private readonly EmailUpdater _emailService;
+    private readonly PasswordService _passwordService;
+
+    public UpdateController(EmailUpdater emailService, PasswordService passwordService)
+    {;
+        _emailService = emailService;
+        _passwordService = passwordService;
+    }
 
     [HttpPost, Route("update/password"), Authorize]
-    public async Task<IActionResult> UpdatePassword([Bind("Password")] User user, [FromServices] PasswordService passwordService, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdatePassword([Bind("Password")] User user, CancellationToken cancellationToken)
     {
         if (StaticValidator.ValidatePassword(user.Password) is false)
         {
@@ -24,7 +32,7 @@ public class UpdateController : Controller
             return BadRequest("Не получилось получить id из клеймов.");
         }
 
-        var updatePasswordResult = await passwordService.UpdatePassword(userId, user.Password!, cancellationToken);
+        var updatePasswordResult = await _passwordService.UpdatePassword(userId, user.Password!, cancellationToken);
         if (updatePasswordResult.Success is false)
         {
             return BadRequest(updatePasswordResult);
@@ -34,8 +42,9 @@ public class UpdateController : Controller
     }
 
     [HttpPost, Route("update/email"), Authorize]
-    public async Task<IActionResult> UpdateEmail([FromQuery] string newEmail, [FromServices] EmailService emailService, [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> UpdateEmail([FromQuery] string newEmail, CancellationToken cancellationToken = default)
     {
+#warning проверить
         if (StaticValidator.ValidateEmail(newEmail) is false)
         {
             return BadRequest("Неверный формат почты.");
@@ -46,7 +55,7 @@ public class UpdateController : Controller
             return BadRequest("Не получилось получить id из клеймов.");
         }
 
-        var serviceResult = await emailService.SendUpdateMailAsync(userId, newEmail, approvalService, cancellationToken);
+        var serviceResult = await _emailService.SendUpdateMailAsync(userId, newEmail, cancellationToken);
         if (serviceResult.Success is false)
         {
             return BadRequest(serviceResult);
@@ -56,9 +65,9 @@ public class UpdateController : Controller
     }
 
     [HttpPost, Route("update/email/confirm"), Authorize]
-    public async Task<IActionResult> ConfirmUpdateEmail([FromQuery] int approvalCode, [FromServices] EmailService emailService, [FromServices] ApprovalService approvalService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> ConfirmUpdateEmail([FromQuery] int approvalCode, CancellationToken cancellationToken = default)
     {
-
+#warning проверить
         if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {
             return BadRequest("Не получилось получить id из клеймов.");
@@ -69,7 +78,7 @@ public class UpdateController : Controller
             return BadRequest("Approval не может быть равен нулю.");
         }
 
-        var serviceResult = await emailService.UpdateEmailAsync(userId, approvalCode, approvalService, cancellationToken);
+        var serviceResult = await _emailService.UpdateEmailAsync(userId, approvalCode, cancellationToken);
         if (serviceResult.Success is false)
         {
             return BadRequest(serviceResult);

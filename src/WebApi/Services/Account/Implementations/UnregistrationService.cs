@@ -9,13 +9,15 @@ namespace WebApi.Services.Account.Implementations
     {
         private readonly SqlDbContext _dbContext;
         private readonly DbSet<User> _users;
-        private readonly ApprovalService _approvalService;
+        private readonly IApprovalService _approvalService;
+        private readonly IApprovalSender _approvalSender;
 
-        public UnregistrationService(SqlDbContext dbContext, ApprovalService approvalService)
+        public UnregistrationService(SqlDbContext dbContext, IApprovalService approvalService, IApprovalSender approvalSender)
         {
             _dbContext = dbContext;
             _users = _dbContext.Set<User>();
             _approvalService = approvalService;
+            _approvalSender = approvalSender;
         }
 
         public async Task<ServiceResult> ConfirmAsync(int userId, int approvalCode, CancellationToken cancellationToken = default)
@@ -31,7 +33,7 @@ namespace WebApi.Services.Account.Implementations
                 return new ServiceResult(false, "Пользователь не найден в бд.");
             }
 
-            var approvalServiceResult = await _approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Unregistration, cancellationToken: cancellationToken);
+            var approvalServiceResult = await _approvalService.VerifyAndRevokeCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Unregistration, cancellationToken: cancellationToken);
             if (approvalServiceResult.Success is false)
             {
                 return new ServiceResult(false, "Код подтверждения для удаления аккаунта не принят.", approvalServiceResult);
@@ -44,13 +46,14 @@ namespace WebApi.Services.Account.Implementations
 
         public async Task<ServiceResult> SendEmailAsync(int userId, CancellationToken cancellationToken = default)
         {
+#warning проверить
             string? userEmail = await _users.Where(e => e.UserId == userId).Select(e => e.Email).FirstOrDefaultAsync(cancellationToken);
             if (string.IsNullOrWhiteSpace(userEmail))
             {
                 return ServiceResult.Fail("Пользователь не найден в бд.");
             }
 
-            var sendCodeResult = await _approvalService.SendCodeAsync(userEmail, ApprovalCode.ApprovalCodeType.Unregistration, cancellationToken);
+            var sendCodeResult = await _approvalSender.SendUnregistrationCodeAsync(userEmail, cancellationToken);
             if (sendCodeResult.Success is false)
             {
                 return ServiceResult.Fail("Код подтверждения удаления аккаунта не был отправлен.", sendCodeResult);

@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
 using Models.Validation;
 using Repository;
-using System.Net.Mail;
 using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Services.Account.Implementations;
@@ -13,14 +12,16 @@ public class RegistrationService : IRegistrationService
     private readonly SqlDbContext _dbContext;
     private readonly IValidator<User> _userValidator;
     private readonly DbSet<User> _users;
-    private readonly ApprovalService _approvalService;
+    private readonly IApprovalService _approvalService;
+    private readonly IApprovalSender _approvalSender;
 
-    public RegistrationService(SqlDbContext dbContext, IValidator<User> validator, ApprovalService approvalService)
+    public RegistrationService(SqlDbContext dbContext, IValidator<User> validator, IApprovalService approvalService, IApprovalSender approvalSender)
     {
         _dbContext = dbContext;
         _userValidator = validator;
         _users = _dbContext.Set<User>();
         _approvalService = approvalService;
+        _approvalSender = approvalSender;
     }
     public async Task<ServiceResult> AddUserToRepoAsync(User user, CancellationToken cancellationToken = default)
     {
@@ -53,7 +54,7 @@ public class RegistrationService : IRegistrationService
             return new ServiceResult(false, "Некорректный approvalCode пользователя.");
         }
 
-        var emailOk = MailAddress.TryCreate(userEmail, out _);
+        var emailOk = StaticValidator.ValidateEmail(userEmail);
         if (emailOk is false)
         {
             return new ServiceResult(false, "Email имеет неправильный формат.");
@@ -65,7 +66,7 @@ public class RegistrationService : IRegistrationService
             return new ServiceResult(false, "Пользователь для валидации не был найден в бд.");
         }
 
-        var approvalServiceResult = await _approvalService.VerifyCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Registration, cancellationToken: cancellationToken);
+        var approvalServiceResult = await _approvalService.VerifyAndRevokeCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Registration, cancellationToken: cancellationToken);
         if (approvalServiceResult.Success is false)
         {
             return new ServiceResult(false, "Код подтверждения регистрации не принят.", approvalServiceResult);
@@ -84,7 +85,7 @@ public class RegistrationService : IRegistrationService
             return new ServiceResult(false, "Email имеет неправильный формат.");
         }
 
-        var sendApprovalResult = await _approvalService.SendCodeAsync(userEmail, ApprovalCode.ApprovalCodeType.Registration, cancellationToken);
+        var sendApprovalResult = await _approvalSender.SendRegistrationCodeAsync(userEmail, cancellationToken);
         if (sendApprovalResult.Success is false)
         {
             return ServiceResult.Fail("Письмо подтверждения регистрации не было отправлено.");

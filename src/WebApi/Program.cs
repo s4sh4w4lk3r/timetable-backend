@@ -40,15 +40,16 @@ public class Program
         #region Зависимости
         builder.Services.AddDbContext<SqlDbContext>();
         builder.Services.AddScoped<CabinetService>();
-        builder.Services.AddScoped<EmailService>();
+        builder.Services.AddScoped<EmailUpdater>();
         builder.Services.AddScoped<PasswordService>();
         builder.Services.AddScoped<IRegistrationService, RegistrationService>();
         builder.Services.AddScoped<IUnregistrationService, UnregistrationService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
-        builder.Services.AddScoped<ApprovalService>();
         //builder.Services.AddTransient<IEmailClient, MailKitClient>();
         builder.Services.AddTransient<IEmailClient, EmailSimulator>();
         builder.Services.AddScoped<IUserSessionService, UserSessionService>();
+        builder.Services.AddScoped<IApprovalService, ApprovalService>();
+        builder.Services.AddScoped<IApprovalSender, ApprovalSender>();
         #endregion
 
         #region Валидаторы

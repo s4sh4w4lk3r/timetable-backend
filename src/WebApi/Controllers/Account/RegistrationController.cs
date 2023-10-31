@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Models.Entities.Users;
 using Models.Validation;
 using WebApi.Extensions;
-using WebApi.Services.Account.Implementations;
 using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Controllers.Auth;
@@ -13,14 +12,14 @@ namespace WebApi.Controllers.Auth;
 public class RegistrationController : ControllerBase
 {
     private readonly IValidator<User> _userValidator;
-    private readonly ApprovalService _approvalService;
     private readonly IRegistrationService _registerService;
+    private readonly IUnregistrationService _unregistrationService;
 
-    public RegistrationController(IValidator<User> userValidator, ApprovalService approvalService, IRegistrationService registerService)
+    public RegistrationController(IValidator<User> userValidator, IRegistrationService registerService, IUnregistrationService unregistrationService)
     {
         _userValidator = userValidator;
-        _approvalService = approvalService;
         _registerService = registerService;
+        _unregistrationService = unregistrationService;
     }
 
     [HttpPost, Route("register")]
@@ -62,7 +61,7 @@ public class RegistrationController : ControllerBase
             return BadRequest("Email адрес имеет неверный формат.");
         }
 
-        var sendApprovalResult = await _approvalService.SendCodeAsync(userEmail, ApprovalCode.ApprovalCodeType.Registration, cancellationToken);
+        var sendApprovalResult = await _registerService.SendEmailAsync(userEmail, cancellationToken);
         if (sendApprovalResult.Success is false)
         {
             return BadRequest(sendApprovalResult);
@@ -73,14 +72,14 @@ public class RegistrationController : ControllerBase
 
 
     [HttpGet, Route("unregister/send-email"), Authorize]
-    public async Task<IActionResult> UnregisterSendMail([FromServices] IUnregistrationService unregistrationService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> UnregisterSendMail(CancellationToken cancellationToken = default)
     {
         if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {
             return BadRequest("Не получилось считать id из клеймов.");
         }
 
-        var requestUnreg = await unregistrationService.SendEmailAsync(userId, cancellationToken);
+        var requestUnreg = await _unregistrationService.SendEmailAsync(userId, cancellationToken);
         if (requestUnreg.Success is false)
         {
             return BadRequest(requestUnreg);
@@ -91,7 +90,7 @@ public class RegistrationController : ControllerBase
 
 
     [HttpPost, Route("unregister/confirm"), Authorize]
-    public async Task<IActionResult> ConfirmUnregistration(int approvalCode, [FromServices] IUnregistrationService unregistrationService, CancellationToken cancellationToken)
+    public async Task<IActionResult> ConfirmUnregistration(int approvalCode, CancellationToken cancellationToken)
     {
         if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {
@@ -103,7 +102,7 @@ public class RegistrationController : ControllerBase
             return BadRequest("Id пользователя не может быть равным нулю.");
         }
 
-        var unregisterResult = await unregistrationService.ConfirmAsync(userId, approvalCode, cancellationToken);
+        var unregisterResult = await _unregistrationService.ConfirmAsync(userId, approvalCode, cancellationToken);
         if (unregisterResult.Success is false)
         {
             return BadRequest(unregisterResult);
