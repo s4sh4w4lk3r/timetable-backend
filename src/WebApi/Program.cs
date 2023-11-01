@@ -26,7 +26,7 @@ public class Program
         .ReadFrom.Configuration(ctx.Configuration));
 
         builder.Services.AddControllers();
-
+        builder.Services.AddSwaggerGen();
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
         .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, options => { });
 
@@ -72,7 +72,7 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
-        app.Use(CheckApiKey);
+        //app.Use(CheckApiKey);
 
         app.UseForwardedHeaders(new ForwardedHeadersOptions
         {
@@ -81,11 +81,19 @@ public class Program
 
         app.MapGet("/", () => "Hello World!");
 
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+#warning нормально описать сваггер.
+        }
+
         app.Run();
         #endregion
     }
     async static Task CheckApiKey(HttpContext context, Func<Task> next)
     {
+#warning не забыть вернуть apikey
         const string API_KEY = "Api-Key";
 
         string? apiKey = context.Request.Headers.Where(e => e.Key == API_KEY).Select(e => e.Value).FirstOrDefault();

@@ -70,7 +70,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet, Authorize, Route("global-logout")]
-    public async Task<IActionResult> GlobalLogout( CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GlobalLogout(CancellationToken cancellationToken = default)
     {
         if (User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {

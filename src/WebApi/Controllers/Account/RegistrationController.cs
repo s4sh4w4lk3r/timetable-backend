@@ -11,26 +11,30 @@ namespace WebApi.Controllers.Auth;
 [ApiController, Route("api/account")]
 public class RegistrationController : ControllerBase
 {
-    private readonly IValidator<User> _userValidator;
     private readonly IRegistrationService _registerService;
     private readonly IUnregistrationService _unregistrationService;
 
-    public RegistrationController(IValidator<User> userValidator, IRegistrationService registerService, IUnregistrationService unregistrationService)
+    public RegistrationController(IRegistrationService registerService, IUnregistrationService unregistrationService)
     {
-        _userValidator = userValidator;
         _registerService = registerService;
         _unregistrationService = unregistrationService;
     }
 
     [HttpPost, Route("register")]
-    public async Task<IActionResult> Register([FromBody, Bind("Email", "Password")] User user, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Register([FromBody] UserRegistrationDto userRegistrationDto, CancellationToken cancellationToken = default)
     {
-        var userValidation = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex").IncludeProperties(e => e.Email));
-        if (userValidation.IsValid is false)
+#warning проверить
+        if (StaticValidator.ValidateEmail(userRegistrationDto.Email) is false)
         {
-            return BadRequest(userValidation);
+            return BadRequest(userRegistrationDto.Email);
         }
 
+        if (StaticValidator.ValidateEmail(userRegistrationDto.Password) is false)
+        {
+            return BadRequest(userRegistrationDto.Email);
+        }
+
+        Models.Entities.Users.User user = new() { Email = userRegistrationDto.Email, Password = userRegistrationDto.Password };
         var regResult = await _registerService.AddUserToRepoAsync(user, cancellationToken);
         if (regResult.Success is false)
         {
@@ -42,9 +46,20 @@ public class RegistrationController : ControllerBase
 
 
     [HttpPost, Route("register/confirm")]
-    public async Task<IActionResult> ConfirmEmail([FromQuery] string userEmail, [FromQuery] int approvalCode, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> ConfirmEmail([FromBody]ConfirmEmailDto confirmEmailDto, CancellationToken cancellationToken = default)
     {
-        var confirmResult = await _registerService.ConfirmAsync(userEmail, approvalCode, cancellationToken);
+#warning проверить
+        if (string.IsNullOrWhiteSpace(confirmEmailDto.Email) is true)
+        {
+            return BadRequest("UserEmail не введен.");
+        }
+
+        if (confirmEmailDto.ApprovalCode == default)
+        {
+            return BadRequest("ApprovalCode не введен.");
+        }
+
+        var confirmResult = await _registerService.ConfirmAsync(confirmEmailDto.Email, confirmEmailDto.ApprovalCode, cancellationToken);
         if (confirmResult.Success is false)
         {
             return BadRequest(confirmResult);
@@ -54,14 +69,15 @@ public class RegistrationController : ControllerBase
 
 
     [HttpPost, Route("register/send-email")]
-    public async Task<IActionResult> SendRegisterEmail([FromQuery] string userEmail, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> SendRegisterEmail([FromBody] EmailAddressDto emailAddressDto, CancellationToken cancellationToken = default)
     {
-        if (StaticValidator.ValidateEmail(userEmail) is false)
+#warning проверить
+        if (StaticValidator.ValidateEmail(emailAddressDto.Email) is false)
         {
             return BadRequest("Email адрес имеет неверный формат.");
         }
 
-        var sendApprovalResult = await _registerService.SendEmailAsync(userEmail, cancellationToken);
+        var sendApprovalResult = await _registerService.SendEmailAsync(emailAddressDto.Email, cancellationToken);
         if (sendApprovalResult.Success is false)
         {
             return BadRequest(sendApprovalResult);
@@ -110,4 +126,8 @@ public class RegistrationController : ControllerBase
 
         return Ok(unregisterResult);
     }
+
+    public record ConfirmEmailDto(string Email, int ApprovalCode);
+    public record EmailAddressDto(string Email);
+    public record UserRegistrationDto(string Email, string Password);
 }

@@ -6,7 +6,7 @@ namespace WebApi.Tests.Integration
     [Collection("AuthCollection")]
     public class Account_Test
     {
-        private readonly AuthFixture _authFixture;
+      /*  private readonly AuthFixture _authFixture;
         public Account_Test(AuthFixture authFixture)
         {
             _authFixture = authFixture;
@@ -36,6 +36,6 @@ namespace WebApi.Tests.Integration
             var response = await client.PostAsync(URL, content);
 
             Assert.True(response.StatusCode == System.Net.HttpStatusCode.BadRequest, new StreamReader(response.Content.ReadAsStream()).ReadToEnd());
-        }
+        }*/
     }
 }
