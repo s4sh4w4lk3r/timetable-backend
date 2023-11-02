@@ -136,16 +136,18 @@ public class SqlDbContext : DbContext
         {
 
             entity.HasKey(t => t.TimeTableCellId).HasName("TimetableCellPRIMARY");
-            entity.HasOne(e => e.Cabinet).WithMany(e => e.TimetableCells).IsRequired();
-            entity.HasOne(e => e.Teacher).WithMany(e => e.TimetableCells).IsRequired();
-            entity.HasOne(e => e.LessonTime).WithMany(e => e.TimetableCells).IsRequired();
-            entity.HasOne(e => e.Subject).WithMany(e => e.TimetableCells).IsRequired();
+            entity.HasOne(e => e.Cabinet).WithMany(e => e.TimetableCells).HasForeignKey(e => e.CabinetId).IsRequired();
+            entity.HasOne(e => e.Teacher).WithMany(e => e.TimetableCells).HasForeignKey(e => e.TeacherId).IsRequired();
+            entity.HasOne(e => e.LessonTime).WithMany(e => e.TimetableCells).HasForeignKey(e => e.LessonTimeId).IsRequired();
+            entity.HasOne(e => e.Subject).WithMany(e => e.TimetableCells).HasForeignKey(e=>e.SubjectId).IsRequired();
         }
         );
 
         modelBuilder.Entity<Timetable>(entity =>
         {
             entity.HasKey(t => t.TimetableId).HasName("TimetablePRIMARY");
+            entity.HasOne(t=> t.Group).WithMany(t => t.Timetables).HasForeignKey(t => t.GroupId).IsRequired();
+            entity.HasData(new TestDataSet().GetTimetable());
         }
         );
 
