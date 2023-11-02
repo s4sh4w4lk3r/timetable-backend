@@ -1,4 +1,6 @@
-﻿namespace Models.Entities.Timetables;
+﻿using System.Text.Json.Serialization;
+
+namespace Models.Entities.Timetables;
 
 public class Group
 {
@@ -6,6 +8,7 @@ public class Group
     public int GroupId { get; init; }
     public string? Name { get; set; }
 
+    [JsonIgnore]
     public IList<Timetable>? Timetables { get; init; }
     private Group() { }
     public Group(int groupPk, string name)

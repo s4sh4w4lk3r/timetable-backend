@@ -1,4 +1,6 @@
-﻿namespace Models.Entities.Timetables.Cells;
+﻿using System.Text.Json.Serialization;
+
+namespace Models.Entities.Timetables.Cells;
 
 public class Teacher
 {
@@ -6,6 +8,8 @@ public class Teacher
     public string? Surname { get; set; }
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }
+
+    [JsonIgnore]
     public List<TimetableCell>? TimetableCells { get; set; }
 
     private Teacher() { }

@@ -1,4 +1,6 @@
-﻿namespace Models.Entities.Timetables.Cells;
+﻿using System.Text.Json.Serialization;
+
+namespace Models.Entities.Timetables.Cells;
 
 public class LessonTime
 {
@@ -12,6 +14,8 @@ public class LessonTime
     public bool IsWeekEven { get; init; }
     public TimeOnly From { get; init; }
     public TimeOnly To { get; init; }
+
+    [JsonIgnore]
     public List<TimetableCell>? TimetableCells { get; set; }
 
     private LessonTime() { }

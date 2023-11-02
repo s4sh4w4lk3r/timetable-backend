@@ -1,10 +1,14 @@
-﻿namespace Models.Entities.Timetables.Cells;
+﻿using System.Text.Json.Serialization;
+
+namespace Models.Entities.Timetables.Cells;
 
 public class Cabinet
 {
     public int CabinetId { get; init; }
     public string? Address { get; set; }
     public string? Number { get; set; }
+
+    [JsonIgnore]
     public List<TimetableCell>? TimetableCells { get; set; }
 
     private Cabinet() { }

@@ -1,9 +1,13 @@
-﻿namespace Models.Entities.Timetables.Cells;
+﻿using System.Text.Json.Serialization;
+
+namespace Models.Entities.Timetables.Cells;
 
 public class Subject
 {
     public int SubjectId { get; init; }
     public string? Name { get; set; }
+
+    [JsonIgnore]
     public List<TimetableCell>? TimetableCells { get; set; }
 
     private Subject() { }
