@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Repository;
 
 namespace WebApi.Controllers.Timetables
 {
@@ -7,10 +8,9 @@ namespace WebApi.Controllers.Timetables
     {
         [Route("get")]
         [HttpGet]
-        public Task<IActionResult> GetCabinetList([FromQuery] int groupId)
+        public IActionResult GetCabinetList(/*[FromQuery] int groupId*/)
         {
-            throw new NotImplementedException();
-#warning сделать тут
+            return Ok(new TestDataSet().GetTimetable());
         }
     }
 }

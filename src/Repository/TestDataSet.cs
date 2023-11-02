@@ -1,22 +1,52 @@
 ﻿using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
-using System.Net.NetworkInformation;
 
 namespace Repository
 {
-    internal class TestDataSet
+    public class TestDataSet
     {
+        public Timetable GetTimetable()
+        {
+            var group = GetGroups().First();
+            var ttc = GetTimetableCells();
+            var tt = new Timetable(1, group, ttc) { GroupId = group.GroupId };
+
+            return tt;
+        }
+
         private IList<TimetableCell> GetTimetableCells()
         {
             var teachers = GetTeachers();
             var subjects = GetSubjects();
             var lessonTimes = new Stack<LessonTime>(GetLessonsTimes());
-            var groups = GetGroups();
             var cabinets = GetCabinets();
+            var rand = new Random();
 
             var list = new List<TimetableCell>();
 
+            while (lessonTimes.TryPeek(out _))
+            {
+                var teacher = teachers.OrderBy(x => rand.Next()).Take(1).First();
+                var cabinet = cabinets.OrderBy(x => rand.Next()).Take(1).First();
+                var subject = subjects.OrderBy(x => rand.Next()).Take(1).First();
+                var lt = lessonTimes.Pop();
 
+                var tc = new TimetableCell()
+                {
+                    Cabinet = cabinet,
+                    CabinetId = cabinet.CabinetId,
+                    LessonTime = lt,
+                    LessonTimeId = lt.LessonTimeId,
+                    Subject = subject,
+                    SubjectId = subject.SubjectId,
+                    Teacher = teacher,
+                    TeacherId = teacher.TeacherId,
+                    TimeTableCellId = rand.Next()
+                };
+
+                list.Add(tc);
+            }
+            return list;
 
         }
         private IList<Teacher> GetTeachers()
@@ -157,6 +187,8 @@ namespace Repository
             list.AddRange(thursdayNotEven);
             list.AddRange(fridayEven);
             list.AddRange(fridayNotEven);
+
+            return list;
         }
 
         private IList<Group> GetGroups()
