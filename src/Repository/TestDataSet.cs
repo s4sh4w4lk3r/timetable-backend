@@ -10,14 +10,17 @@ namespace Repository
         {
             var teachers = GetTeachers();
             var subjects = GetSubjects();
-            var lessonTimes = GetLessonsTimes();
+            var lessonTimes = new Stack<LessonTime>(GetLessonsTimes());
             var groups = GetGroups();
             var cabinets = GetCabinets();
+
+            var list = new List<TimetableCell>();
+
 
 
         }
         private IList<Teacher> GetTeachers()
-        { 
+        {
             var list = new List<Teacher>()
             {
                 new Teacher(1, "Гаджиев", "Гаджи", "Дагирович"),
@@ -47,21 +50,113 @@ namespace Repository
 
         private IList<LessonTime> GetLessonsTimes()
         {
-            var list = new List<LessonTime>()
+            var mondayNotEven = new List<LessonTime>()
             {
-                new LessonTime(1, 1, false, new TimeOnly(9, 0), new TimeOnly(10,30)),
-                new LessonTime(2, 2, false, new TimeOnly(10, 50), new TimeOnly(12,20)),
-                new LessonTime(3, 3, false, new TimeOnly(12, 40), new TimeOnly(14,10)),
-                new LessonTime(4, 4, false, new TimeOnly(14,30), new TimeOnly(16, 00)),
-                new LessonTime(5, 5, false, new TimeOnly(16, 10), new TimeOnly(17,40)),
-
-                new LessonTime(11, 1, true, new TimeOnly(9, 0), new TimeOnly(10,30)),
-                new LessonTime(12, 2, true, new TimeOnly(10, 50), new TimeOnly(12,20)),
-                new LessonTime(13, 3, true, new TimeOnly(12, 40), new TimeOnly(14,10)),
-                new LessonTime(14, 4, true, new TimeOnly(14,30), new TimeOnly(16, 00)),
-                new LessonTime(15, 5, true, new TimeOnly(16, 10), new TimeOnly(17,40))
+                new LessonTime(110, 1, false, DayOfWeek.Monday, new TimeOnly(9, 0), new TimeOnly(10,30)),
+                new LessonTime(120, 2, false, DayOfWeek.Monday,new TimeOnly(10, 50), new TimeOnly(12,20)),
+                new LessonTime(130, 3, false, DayOfWeek.Monday,new TimeOnly(12, 40), new TimeOnly(14,10)),
+                new LessonTime(140, 4, false, DayOfWeek.Monday,new TimeOnly(14,30), new TimeOnly(16, 00)),
+                new LessonTime(150, 5, false, DayOfWeek.Monday,new TimeOnly(16, 10), new TimeOnly(17,40)),
             };
-            return list;
+
+
+            var mondayEven = new List<LessonTime>()
+            {
+                new LessonTime(111, 1, true,DayOfWeek.Monday, new TimeOnly(9, 0), new TimeOnly(10,30)),
+                new LessonTime(121, 2, true,DayOfWeek.Monday, new TimeOnly(10, 50), new TimeOnly(12,20)),
+                new LessonTime(131, 3, true, DayOfWeek.Monday,new TimeOnly(12, 40), new TimeOnly(14,10)),
+                new LessonTime(141, 4, true, DayOfWeek.Monday,new TimeOnly(14,30), new TimeOnly(16, 00)),
+                new LessonTime(151, 5, true, DayOfWeek.Monday,new TimeOnly(16, 10), new TimeOnly(17,40))
+            };
+
+            var tuesdayNotEven = new List<LessonTime>()
+            {
+                new LessonTime(210, 1, false, DayOfWeek.Tuesday, new TimeOnly(9, 0), new TimeOnly(10,30)),
+                new LessonTime(220, 2, false,DayOfWeek.Tuesday ,new TimeOnly(10, 50), new TimeOnly(12,20)),
+                new LessonTime(230, 3, false, DayOfWeek.Tuesday,new TimeOnly(12, 40), new TimeOnly(14,10)),
+                new LessonTime(240, 4, false,DayOfWeek.Tuesday,new TimeOnly(14,30), new TimeOnly(16, 00)),
+                new LessonTime(250, 5, false, DayOfWeek.Tuesday,new TimeOnly(16, 10), new TimeOnly(17,40)),
+            };
+
+
+            var tuesdayEven = new List<LessonTime>()
+            {
+                new LessonTime(211, 1, true,DayOfWeek.Tuesday, new TimeOnly(9, 0), new TimeOnly(10,30)),
+                new LessonTime(221, 2, true,DayOfWeek.Tuesday, new TimeOnly(10, 50), new TimeOnly(12,20)),
+                new LessonTime(231, 3, true, DayOfWeek.Tuesday,new TimeOnly(12, 40), new TimeOnly(14,10)),
+                new LessonTime(241, 4, true, DayOfWeek.Tuesday,new TimeOnly(14,30), new TimeOnly(16, 00)),
+                new LessonTime(251, 5, true, DayOfWeek.Tuesday,new TimeOnly(16, 10), new TimeOnly(17,40))
+            };
+
+
+            var wednesdayNotEven = new List<LessonTime>()
+            {
+                new LessonTime(310, 1, false, DayOfWeek.Wednesday, new TimeOnly(9, 0), new TimeOnly(10,30)),
+                new LessonTime(320, 2, false,DayOfWeek.Wednesday ,new TimeOnly(10, 50), new TimeOnly(12,20)),
+                new LessonTime(330, 3, false, DayOfWeek.Wednesday,new TimeOnly(12, 40), new TimeOnly(14,10)),
+                new LessonTime(340, 4, false,DayOfWeek.Wednesday,new TimeOnly(14,30), new TimeOnly(16, 00)),
+                new LessonTime(350, 5, false, DayOfWeek.Wednesday,new TimeOnly(16, 10), new TimeOnly(17,40)),
+            };
+
+
+            var wednesdayEven = new List<LessonTime>()
+            {
+                new LessonTime(311, 1, true,DayOfWeek.Wednesday, new TimeOnly(9, 0), new TimeOnly(10,30)),
+                new LessonTime(321, 2, true,DayOfWeek.Wednesday, new TimeOnly(10, 50), new TimeOnly(12,20)),
+                new LessonTime(331, 3, true, DayOfWeek.Wednesday,new TimeOnly(12, 40), new TimeOnly(14,10)),
+                new LessonTime(341, 4, true, DayOfWeek.Wednesday,new TimeOnly(14,30), new TimeOnly(16, 00)),
+                new LessonTime(351, 5, true, DayOfWeek.Wednesday,new TimeOnly(16, 10), new TimeOnly(17,40))
+            };
+
+            var thursdayNotEven = new List<LessonTime>()
+            {
+                new LessonTime(410, 1, false, DayOfWeek.Thursday, new TimeOnly(9, 0), new TimeOnly(10,30)),
+                new LessonTime(420, 2, false,DayOfWeek.Thursday,new TimeOnly(10, 50), new TimeOnly(12,20)),
+                new LessonTime(430, 3, false, DayOfWeek.Thursday,new TimeOnly(12, 40), new TimeOnly(14,10)),
+                new LessonTime(440, 4, false,DayOfWeek.Thursday,new TimeOnly(14,30), new TimeOnly(16, 00)),
+                new LessonTime(450, 5, false, DayOfWeek.Thursday,new TimeOnly(16, 10), new TimeOnly(17,40)),
+            };
+
+
+            var thursdayEven = new List<LessonTime>()
+            {
+                new LessonTime(411, 1, true,DayOfWeek.Thursday, new TimeOnly(9, 0), new TimeOnly(10,30)),
+                new LessonTime(421, 2, true,DayOfWeek.Thursday, new TimeOnly(10, 50), new TimeOnly(12,20)),
+                new LessonTime(431, 3, true, DayOfWeek.Thursday,new TimeOnly(12, 40), new TimeOnly(14,10)),
+                new LessonTime(441, 4, true, DayOfWeek.Thursday,new TimeOnly(14,30), new TimeOnly(16, 00)),
+                new LessonTime(451, 5, true, DayOfWeek.Thursday,new TimeOnly(16, 10), new TimeOnly(17,40))
+            };
+
+            var fridayNotEven = new List<LessonTime>()
+            {
+                new LessonTime(510, 1, false, DayOfWeek.Friday, new TimeOnly(9, 0), new TimeOnly(10,30)),
+                new LessonTime(520, 2, false,DayOfWeek.Friday,new TimeOnly(10, 50), new TimeOnly(12,20)),
+                new LessonTime(530, 3, false, DayOfWeek.Friday,new TimeOnly(12, 40), new TimeOnly(14,10)),
+                new LessonTime(540, 4, false,DayOfWeek.Friday,new TimeOnly(14,30), new TimeOnly(16, 00)),
+                new LessonTime(550, 5, false, DayOfWeek.Friday,new TimeOnly(16, 10), new TimeOnly(17,40)),
+            };
+
+
+            var fridayEven = new List<LessonTime>()
+            {
+                new LessonTime(511, 1, true,DayOfWeek.Friday, new TimeOnly(9, 0), new TimeOnly(10,30)),
+                new LessonTime(521, 2, true,DayOfWeek.Friday, new TimeOnly(10, 50), new TimeOnly(12,20)),
+                new LessonTime(531, 3, true, DayOfWeek.Friday,new TimeOnly(12, 40), new TimeOnly(14,10)),
+                new LessonTime(541, 4, true, DayOfWeek.Friday,new TimeOnly(14,30), new TimeOnly(16, 00)),
+                new LessonTime(551, 5, true, DayOfWeek.Friday,new TimeOnly(16, 10), new TimeOnly(17,40))
+            };
+
+            var list = new List<LessonTime>();
+            list.AddRange(mondayEven);
+            list.AddRange(mondayNotEven);
+            list.AddRange(tuesdayEven);
+            list.AddRange(tuesdayNotEven);
+            list.AddRange(wednesdayEven);
+            list.AddRange(wednesdayNotEven);
+            list.AddRange(thursdayEven);
+            list.AddRange(thursdayNotEven);
+            list.AddRange(fridayEven);
+            list.AddRange(fridayNotEven);
         }
 
         private IList<Group> GetGroups()

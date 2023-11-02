@@ -15,13 +15,14 @@ public class LessonTime
     public List<TimetableCell>? TimetableCells { get; set; }
 
     private LessonTime() { }
-    public LessonTime(int lessonTimePk, int lessonNumber, bool isWeekEven, TimeOnly from, TimeOnly to)
+    public LessonTime(int lessonTimePk, int lessonNumber, bool isWeekEven, DayOfWeek dayOfWeek, TimeOnly from, TimeOnly to)
     {
         LessonTimeId = lessonTimePk;
         LessonNumber = lessonNumber;
         IsWeekEven = isWeekEven;
         From = from;
         To = to;
+        DayOfWeek = dayOfWeek;
     }
 
     public override bool Equals(object? obj)
