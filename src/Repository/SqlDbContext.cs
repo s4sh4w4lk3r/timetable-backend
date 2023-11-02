@@ -147,7 +147,6 @@ public class SqlDbContext : DbContext
         {
             entity.HasKey(t => t.TimetableId).HasName("TimetablePRIMARY");
             entity.HasOne(t=> t.Group).WithMany(t => t.Timetables).HasForeignKey(t => t.GroupId).IsRequired();
-            entity.HasData(new TestDataSet().GetTimetable());
         }
         );
 
