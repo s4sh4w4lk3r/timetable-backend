@@ -92,7 +92,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet, Route("token/refresh")]
-    public async Task<IActionResult> Refresh([Bind("AccessToken", "RefreshToken")] TokenPair tokenPair, CancellationToken cancellationToken)
+    public async Task<IActionResult> Refresh([FromBody, Bind("AccessToken", "RefreshToken")] TokenPair tokenPair, CancellationToken cancellationToken)
     {
         string? accessToken = tokenPair.AccessToken;
         string? refreshToken = tokenPair.RefreshToken;

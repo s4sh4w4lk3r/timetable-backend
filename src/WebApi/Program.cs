@@ -93,7 +93,7 @@ public class Program
     }
     async static Task CheckApiKey(HttpContext context, Func<Task> next)
     {
-#warning не забыть вернуть apikey
+#warning не забыть вернуть apikey или сделать cors.
         const string API_KEY = "Api-Key";
 
         string? apiKey = context.Request.Headers.Where(e => e.Key == API_KEY).Select(e => e.Value).FirstOrDefault();
