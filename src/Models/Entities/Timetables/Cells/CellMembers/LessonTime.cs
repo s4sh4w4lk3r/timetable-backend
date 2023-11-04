@@ -12,8 +12,10 @@ namespace Models.Entities.Timetables.Cells.CellMembers
         private LessonTime() { }
 
         [SetsRequiredMembers]
-        public LessonTime(int number, TimeOnly startsAt, TimeOnly endsAt)
+        public LessonTime(int lessonTimePk, int number, TimeOnly startsAt, TimeOnly endsAt)
         {
+#warning добавить проверку
+            LessonTimeId = lessonTimePk;
             Number = number;
             StartsAt = startsAt;
             EndsAt = endsAt;

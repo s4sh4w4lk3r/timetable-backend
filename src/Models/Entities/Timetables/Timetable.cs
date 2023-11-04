@@ -20,3 +20,4 @@ namespace Models.Entities.Timetables
         }
     }
 }
+#warning может юзать прокси и попробовать избежать рефренс лупа https://www.google.com/search?q=reference+loop+proxies+efcore&oq=reference+loop+proxies+efcore&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIJCAEQIRgKGKABMgkIAhAhGAoYoAEyBggDECEYFTIHCAQQIRiPAjIHCAUQIRiPAtIBCTIzMDI0ajFqOagCALACAA&sourceid=chrome&ie=UTF-8
