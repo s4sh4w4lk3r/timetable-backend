@@ -24,7 +24,7 @@ public class RegistrationController : ControllerBase
 
         if (StaticValidator.ValidatePassword(userRegistrationDto.Password) is false)
         {
-            return BadRequest("Пароль не соответсствует тербованиям.");
+            return BadRequest("Пароль не соответствует тербованиям безопасности.");
         }
 
         Models.Entities.Users.User user = new() { Email = userRegistrationDto.Email, Password = userRegistrationDto.Password };
