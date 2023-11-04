@@ -1,39 +1,34 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Models.Entities.Users;
+﻿using Microsoft.AspNetCore.Mvc;
 using Models.Validation;
-using WebApi.Extensions;
-using WebApi.Services;
-using WebApi.Services.Account.Implementations;
+using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Controllers.Auth;
 
-[ApiController, Route("api/account")]
+[ApiController, Route("api/account/register")]
 public class RegistrationController : ControllerBase
 {
-    private readonly IValidator<User> _userValidator;
-    private readonly ApprovalService _approvalService;
-    private readonly RegisterService _registerService;
+    private readonly IRegistrationService _registerService;
 
-    public RegistrationController(IValidator<User> userValidator, ApprovalService approvalService, RegisterService registerService)
+    public RegistrationController(IRegistrationService registerService)
     {
-        _userValidator = userValidator;
-        _approvalService = approvalService;
         _registerService = registerService;
     }
 
-    [HttpPost, Route("register")]
-    public async Task<IActionResult> Register([FromBody, Bind("Email", "Password")] User user, CancellationToken cancellationToken = default)
+    [HttpPost, Route("")]
+    public async Task<IActionResult> Register([FromBody] UserRegistrationDto userRegistrationDto, CancellationToken cancellationToken = default)
     {
-        var userValidation = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex").IncludeProperties(e => e.Email));
-        if (userValidation.IsValid is false)
+        if (StaticValidator.ValidateEmail(userRegistrationDto.Email) is false)
         {
-            return BadRequest(userValidation);
+            return BadRequest("Неверный формат почты.");
         }
 
-        var regResult = await _registerService.RegisterAsync(user, cancellationToken); 
+        if (StaticValidator.ValidatePassword(userRegistrationDto.Password) is false)
+        {
+            return BadRequest("Пароль не соответсствует тербованиям.");
+        }
+
+        Models.Entities.Users.User user = new() { Email = userRegistrationDto.Email, Password = userRegistrationDto.Password };
+        var regResult = await _registerService.AddUserToRepoAsync(user, cancellationToken);
         if (regResult.Success is false)
         {
             return BadRequest(regResult);
@@ -42,28 +37,16 @@ public class RegistrationController : ControllerBase
         return Ok(regResult);
     }
 
-    
-    [HttpPost, Route("register/confirm")]
-    public async Task<IActionResult> ConfirmEmail([FromQuery] string userEmail, [FromQuery] int approvalCode, CancellationToken cancellationToken = default)
-    {
-        var confirmResult = await _registerService.ConfirmEmailAsync(userEmail, approvalCode, _approvalService, cancellationToken);
-        if (confirmResult.Success is false)
-        {
-            return BadRequest(confirmResult);
-        }
-        return Ok(confirmResult);
-    }
 
-    
-    [HttpPost, Route("register/send-email")]
-    public async Task<IActionResult> SendRegisterEmail([FromQuery] string userEmail, CancellationToken cancellationToken = default)
+    [HttpPost, Route("send-email")]
+    public async Task<IActionResult> SendRegisterEmail([FromBody] EmailAddressDto emailAddressDto, CancellationToken cancellationToken = default)
     {
-        if (StaticValidator.ValidateEmail(userEmail) is false)
+        if (StaticValidator.ValidateEmail(emailAddressDto.Email) is false)
         {
             return BadRequest("Email адрес имеет неверный формат.");
         }
 
-        var sendApprovalResult = await _approvalService.SendCodeAsync(userEmail, ApprovalCode.ApprovalCodeType.Registration, cancellationToken);
+        var sendApprovalResult = await _registerService.SendEmailAsync(emailAddressDto.Email, cancellationToken);
         if (sendApprovalResult.Success is false)
         {
             return BadRequest(sendApprovalResult);
@@ -72,50 +55,29 @@ public class RegistrationController : ControllerBase
         return Ok("Письмо с кодом подтверждения отправлено на почту.");
     }
 
-    
-    [HttpGet, Route("unregister/send-email"), Authorize]
-    public async Task<IActionResult> UnregisterSendMail([FromServices] DbContext dbContext, CancellationToken cancellationToken = default)
+
+    [HttpPost, Route("confirm")]
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto confirmEmailDto, CancellationToken cancellationToken = default)
     {
-        if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
+        if (string.IsNullOrWhiteSpace(confirmEmailDto.Email) is true)
         {
-            return BadRequest("Не получилось считать id из клеймов.");
+            return BadRequest("UserEmail не введен.");
         }
 
-        string? userEmail = await dbContext.Set<User>().Where(e => e.UserId == userId).Select(e => e.Email).FirstOrDefaultAsync(cancellationToken);
-        if (string.IsNullOrWhiteSpace(userEmail))
+        if (confirmEmailDto.ApprovalCode == default)
         {
-            return BadRequest("Пользователь не найден в бд.");
+            return BadRequest("ApprovalCode не введен.");
         }
 
-        var sendCodeResult = await _approvalService.SendCodeAsync(userEmail, ApprovalCode.ApprovalCodeType.Unregistration, cancellationToken);
-        if (sendCodeResult.Success is false)
+        var confirmResult = await _registerService.ConfirmAsync(confirmEmailDto.Email, confirmEmailDto.ApprovalCode, cancellationToken);
+        if (confirmResult.Success is false)
         {
-            return BadRequest(sendCodeResult);
+            return BadRequest(confirmResult);
         }
-
-        return Ok((ServiceResult)sendCodeResult);
+        return Ok(confirmResult);
     }
 
-    
-    [HttpPost, Route("unregister/confirm"), Authorize]
-    public async Task<IActionResult> ConfirmUnregistration(int approvalCode, CancellationToken cancellationToken)
-    {
-        if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
-        {
-            return BadRequest("Не получилось считать id из клеймов.");
-        }
-
-        if (userId == default)
-        {
-            return BadRequest("Id пользователя не может быть равным нулю.");
-        }
-
-        var unregisterResult = await _registerService.UnregisterAsync(userId, approvalCode, _approvalService, cancellationToken);
-        if (unregisterResult.Success is false)
-        {
-            return BadRequest(unregisterResult);
-        }
-
-        return Ok(unregisterResult);
-    }
+    public record ConfirmEmailDto(string Email, int ApprovalCode);
+    public record EmailAddressDto(string Email);
+    public record UserRegistrationDto(string Email, string Password);
 }

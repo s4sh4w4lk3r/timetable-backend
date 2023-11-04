@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Models.Validation;
 using Repository;
@@ -27,25 +26,33 @@ public class Program
         .ReadFrom.Configuration(ctx.Configuration));
 
         builder.Services.AddControllers();
-
+        builder.Services.AddSwaggerGen();
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
         .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, options => { });
 
+        #region Конфигурация
         builder.Services.Configure<DbConfiguration>(builder.Configuration.GetRequiredSection(nameof(DbConfiguration)));
         builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetRequiredSection(nameof(JwtConfiguration)));
         builder.Services.Configure<ApiSettings>(builder.Configuration.GetRequiredSection(nameof(ApiSettings)));
+        builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetRequiredSection(nameof(EmailConfiguration)));
+        #endregion
 
-        builder.Services.AddScoped<DbContext, SqlDbContext>();
+        #region Зависимости
+        builder.Services.AddDbContext<SqlDbContext>();
         builder.Services.AddScoped<CabinetService>();
-        builder.Services.AddScoped<EmailService>();
+        builder.Services.AddScoped<EmailUpdater>();
         builder.Services.AddScoped<PasswordService>();
-        builder.Services.AddScoped<RegisterService>();
+        builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+        builder.Services.AddScoped<IUnregistrationService, UnregistrationService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
-        builder.Services.AddScoped<ApprovalService>();
+        //builder.Services.AddTransient<IEmailClient, MailKitClient>();
         builder.Services.AddTransient<IEmailClient, EmailSimulator>();
-        builder.Services.AddScoped<UserSessionService>();
+        builder.Services.AddScoped<IUserSessionService, UserSessionService>();
+        builder.Services.AddScoped<IApprovalService, ApprovalService>();
+        builder.Services.AddScoped<IApprovalSender, ApprovalSender>();
+        #endregion
 
-        builder.Services.AddValidatorsFromAssemblyContaining<ApprovalCodeValidator>();
+        #region Валидаторы
         builder.Services.AddValidatorsFromAssemblyContaining<CabinetValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<LessonTimeValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<TeacherValidator>();
@@ -54,15 +61,18 @@ public class Program
         builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<JwtConfigurationValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<UserSessionValidator>();
+        builder.Services.AddValidatorsFromAssemblyContaining<MailConfigurationValidator>();
+        #endregion
 
         var app = builder.Build();
         #endregion
 
+        #region Middlewares
         app.UseSerilogRequestLogging();
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
-        app.Use(CheckApiKey);
+        //app.Use(CheckApiKey);
 
         app.UseForwardedHeaders(new ForwardedHeadersOptions
         {
@@ -71,16 +81,25 @@ public class Program
 
         app.MapGet("/", () => "Hello World!");
 
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+#warning нормально описать сваггер.
+        }
+
         app.Run();
+        #endregion
     }
     async static Task CheckApiKey(HttpContext context, Func<Task> next)
     {
+#warning не забыть вернуть apikey или сделать cors.
         const string API_KEY = "Api-Key";
 
         string? apiKey = context.Request.Headers.Where(e => e.Key == API_KEY).Select(e => e.Value).FirstOrDefault();
         if (string.IsNullOrWhiteSpace(apiKey) is true)
         {
-            context.Response.StatusCode = 400;
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync($"Для доступа к timetable-API требуется {API_KEY} в заголовках.");
             return;
         }
@@ -90,11 +109,10 @@ public class Program
 
         if (apiKey != validApiKey)
         {
-            context.Response.StatusCode = 401;
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync($"Неверный {API_KEY}.");
             return;
         }
-        
 
         await next.Invoke();
     }

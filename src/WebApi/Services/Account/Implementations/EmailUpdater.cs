@@ -2,21 +2,28 @@
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
 using Models.Validation;
+using Repository;
+using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Services.Account.Implementations;
 
-public class EmailService
+public class EmailUpdater
 {
-    private readonly DbContext _dbContext;
+    private readonly SqlDbContext _dbContext;
     private readonly DbSet<User> _users;
-    
-    public EmailService(DbContext dbContext)
+    private readonly IApprovalService _approvalService;
+    private readonly IApprovalSender _approvalSender;
+
+
+    public EmailUpdater(SqlDbContext dbContext, IApprovalService approvalService, IApprovalSender approvalSender)
     {
         _dbContext = dbContext;
         _users = _dbContext.Set<User>();
+        _approvalService = approvalService;
+        _approvalSender = approvalSender;
     }
 
-    public async Task<ServiceResult> UpdateEmailAsync(int userId, int approvalCode, ApprovalService approvalService, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> UpdateEmailAsync(int userId, int approvalCode, CancellationToken cancellationToken = default)
     {
         if (userId == default)
         {
@@ -34,7 +41,7 @@ public class EmailService
             return new ServiceResult(false, "Пользователь не найден в бд.");
         }
 
-        var approvalServiceResult = await approvalService.VerifyCodeAsync(userFromRepo.UserId, approvalCode, ApprovalCode.ApprovalCodeType.UpdateMail, deleteRequired: false, cancellationToken: cancellationToken);
+        var approvalServiceResult = await _approvalService.VerifyAndRevokeCodeAsync(userFromRepo.UserId, approvalCode, ApprovalCode.ApprovalCodeType.UpdateMail, deleteRequired: false, cancellationToken: cancellationToken);
         if ((approvalServiceResult.Success is false) || (approvalServiceResult.Value is null))
         {
             return new ServiceResult(false, "Код подтверждения для изменения почты не принят.", approvalServiceResult);
@@ -53,7 +60,7 @@ public class EmailService
         return ServiceResult.Ok("Email адрес обновлен.");
     }
 
-    public async Task<ServiceResult> SendUpdateMailAsync(int userId, string newEmail, ApprovalService approvalService, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult> SendUpdateMailAsync(int userId, string newEmail, CancellationToken cancellationToken = default)
     {
         if (userId == default)
         {
@@ -76,7 +83,7 @@ public class EmailService
             return ServiceResult.Fail("Пользователь с таким email уже зарегистрирован.");
         }
 
-        var approvalResult = await approvalService.SendUpdateMailCodeAsync(userId, newEmail, cancellationToken);
+        var approvalResult = await _approvalSender.SendEmailUpdateCodeAsync(userId, newEmail, cancellationToken);
         if ((approvalResult.Success is false) || (approvalResult.Value is null))
         {
             return ServiceResult.Fail("Письмо на почту для подтверждения нового Email не было отправлено.", approvalResult);

@@ -32,6 +32,18 @@ public class SqlDbContext : DbContext
         }
     }
 
+    /*public DbSet<Cabinet> Cabinets => Set<Cabinet>();
+    public DbSet<LessonTime> LessonTimes => Set<LessonTime>();
+    public DbSet<Subject> Subjects => Set<Subject>();
+    public DbSet<Teacher> Teachers => Set<Teacher>();
+    public DbSet<Group> Groups => Set<Group>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<TimetableCell> TimetableCells => Set<TimetableCell>();
+    public DbSet<Timetable> Timetables => Set<Timetable>();
+    public DbSet<ApprovalCode> ApprovalCodes => Set<ApprovalCode>();
+    public DbSet<UserSession> UserSessions => Set<UserSession>();
+    public DbSet<EmailUpdateEntity> EmailUpdateEntities => Set<EmailUpdateEntity>();*/
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseLoggerFactory(_loggerFactory);
@@ -159,4 +171,3 @@ public class SqlDbContext : DbContext
         });
     }
 }
-#warning может в будущем создавать разные дб контексты для обной бд.

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Models.Entities.Users;
-using Models.Validation;
+using Repository;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using WebApi.Extensions;
@@ -13,10 +13,10 @@ namespace WebApi.Middlewares.Auth;
 
 public class AccessTokenAuthenticationHandler : AuthenticationHandler<AccessTokenAuthenticationOptions>
 {
-    private readonly DbContext _dbContext;
+    private readonly SqlDbContext _dbContext;
     private readonly ITokenService _tokenService;
     public AccessTokenAuthenticationHandler(IOptionsMonitor<AccessTokenAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock,
-        DbContext dbContext, ITokenService tokenService) : base(options, logger, encoder, clock)
+        SqlDbContext dbContext, ITokenService tokenService) : base(options, logger, encoder, clock)
     {
         _tokenService = tokenService;
         _dbContext = dbContext;
@@ -43,11 +43,9 @@ public class AccessTokenAuthenticationHandler : AuthenticationHandler<AccessToke
         }
         var claimsPrinciapal = claimsPrinciapalResult.Value;
 
-        string? email = claimsPrinciapal.FindFirstValue(TimetableClaimTypes.Email);
         string? userSessionIdStr = claimsPrinciapal.FindFirstValue(TimetableClaimTypes.UserSessionId);
 
         bool userIdOk = claimsPrinciapal.TryGetUserIdFromClaimPrincipal(out int userId);
-        bool emailOk = StaticValidator.ValidateEmail(email);
         bool userSessionIdOk = int.TryParse(userSessionIdStr, out int userSessionId);
 
         if (userIdOk is false)
@@ -58,11 +56,6 @@ public class AccessTokenAuthenticationHandler : AuthenticationHandler<AccessToke
         if (userId == default)
         {
             return AuthenticateResult.Fail("Валидация AccessToken не прошла. Id равен нулю.");
-        }
-
-        if (emailOk is false)
-        {
-            return AuthenticateResult.Fail("Валидация AccessToken не прошла. Email имеет неверный формат.");
         }
 
         if (userSessionIdOk is false)
