@@ -6,7 +6,7 @@ namespace Models.Entities.Timetables.Cells.CellMembers;
 public class Subject
 {
     public int SubjectId { get; init; }
-    public required string? Name { get; set; }
+    public required string Name { get; set; }
     public List<TimetableCell>? TimetableCells { get; set; }
 
     private Subject() { }

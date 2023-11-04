@@ -1,14 +1,13 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Models.Entities.Timetables.Cells;
 
 namespace Models.Entities.Timetables.Cells.CellMembers;
 
 public class Teacher
 {
     public int TeacherId { get; init; }
-    public required string? Surname { get; set; }
-    public required string? FirstName { get; set; }
-    public required string? MiddleName { get; set; }
+    public required string Surname { get; set; }
+    public required string FirstName { get; set; }
+    public required string MiddleName { get; set; }
     public List<TimetableCell>? TimetableCells { get; set; }
 
     private Teacher() { }

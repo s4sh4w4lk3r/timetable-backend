@@ -6,8 +6,8 @@ namespace Models.Entities.Timetables.Cells.CellMembers;
 public class Cabinet
 {
     public int CabinetId { get; init; }
-    public required string? Address { get; set; }
-    public required string? Number { get; set; }
+    public required string Address { get; set; }
+    public required string Number { get; set; }
 
     public List<TimetableCell>? TimetableCells { get; set; }
 
