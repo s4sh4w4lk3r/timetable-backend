@@ -7,6 +7,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Validation\CabinetValidator.cs" />
+    <Compile Remove="Validation\LessonTimeValidator.cs" />
+    <Compile Remove="Validation\StaticValidator.cs" />
+    <Compile Remove="Validation\TeacherValidator.cs" />
+    <Compile Remove="Validation\TimetableCellValidator.cs" />
+    <Compile Remove="Validation\TimetableValidator.cs" />
+    <Compile Remove="Validation\UserSessionValidator.cs" />
+    <Compile Remove="Validation\UserValidator.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Validation\CabinetValidator.cs" />
+    <None Include="Validation\LessonTimeValidator.cs" />
+    <None Include="Validation\StaticValidator.cs" />
+    <None Include="Validation\TeacherValidator.cs" />
+    <None Include="Validation\TimetableCellValidator.cs" />
+    <None Include="Validation\TimetableValidator.cs" />
+    <None Include="Validation\UserSessionValidator.cs" />
+    <None Include="Validation\UserValidator.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="Throw" Version="1.4.0" />
   </ItemGroup>
