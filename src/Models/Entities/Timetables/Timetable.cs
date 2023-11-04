@@ -1,58 +1,22 @@
-﻿using Models.Entities.Timetables.Cells;
+﻿using System.Diagnostics.CodeAnalysis;
+using Models.Entities.Timetables.Cells;
 
-namespace Models.Entities.Timetables;
-
-public class Timetable
+namespace Models.Entities.Timetables
 {
-    public int TimetableId { get; set; }
-    public Group? Group { get; init; }
-    public required int GroupId { get; init; }
-
-    /// <summary>
-    /// Полный список всех занятий, в том числе с заменами. Замены идут отдельной ячейкой и имеют ссылку на занятие, которое под замену.
-    /// На клиенте надо делать выборку для формирования общего расписания.
-    /// </summary>
-    public IList<TimetableCell>? TimetableCells { get; private set; }
-
-#warning кажется бизнес-логику не продумал.
-    private Timetable() { }
-    public Timetable(int timeTablePk, Group group, IEnumerable<TimetableCell> timetableCells)
+    public abstract class Timetable
     {
-        group.ThrowIfNull();
-        timetableCells.Throw().IfEmpty();
-        TimetableId = timeTablePk;
-        Group = group;
-        TimetableCells = timetableCells.ToList();
-    }
+        public required Group Group { get; init; }
+        public required IEnumerable<TimetableCell> TimetableCells { get; init; }
 
-    /// <summary>
-    /// Проверяет, есть ли дубликаты занятий на одно и то же время.
-    /// </summary>
-    /// <returns> True если нет дубликатов, в противном случае false.</returns>
-    public bool IsTimeLessonsOk()
-    {
-        if (TimetableCells is null) {  return false; }
+        protected Timetable() { }
 
-        var lessonTimes = TimetableCells.DistinctBy(c => c.LessonTime).Select(c => c.LessonTime);
-
-        foreach (var lessonTime in lessonTimes)
+        [SetsRequiredMembers]
+        protected Timetable(Group group, IEnumerable<TimetableCell> timetableCells)
         {
-            int matches = 0;
-
-            foreach (var timeTableCell in TimetableCells)
-            {
-
-                if (timeTableCell.LessonTime == lessonTime)
-                {
-                    matches++;
-                }
-
-                if (matches > 1 && timeTableCell.IsReplaced is false)
-                {
-                    return false;
-                }
-            }
+            timetableCells.ThrowIfNull().IfEmpty().IfHasNullElements();
+            group.ThrowIfNull();
+            Group = group;
+            TimetableCells = timetableCells;
         }
-        return true;
     }
 }

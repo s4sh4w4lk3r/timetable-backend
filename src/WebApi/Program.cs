@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
+using Models.Test;
 using Models.Validation;
 using Repository;
 using Serilog;
@@ -17,7 +18,7 @@ namespace WebApi;
 public class Program
 {
     public static void Main(string[] args)
-    {
+    { 
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console()

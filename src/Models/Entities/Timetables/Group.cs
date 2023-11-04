@@ -4,7 +4,6 @@ namespace Models.Entities.Timetables;
 
 public class Group
 {
-
     public int GroupId { get; init; }
     public required string? Name { get; set; }
 
