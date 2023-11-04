@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Models.Entities.Timetables.Cells;
+using Models.Entities.Timetables.Cells.CellMembers;
 using Repository;
 
 namespace WebApi.Services.Timetables;

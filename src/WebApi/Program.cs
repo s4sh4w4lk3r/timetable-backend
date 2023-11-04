@@ -18,7 +18,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        #region Настройка билдера.
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console()
@@ -65,7 +64,6 @@ public class Program
         #endregion
 
         var app = builder.Build();
-        #endregion
 
         #region Middlewares
         app.UseSerilogRequestLogging();

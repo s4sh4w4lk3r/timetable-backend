@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Models.Entities.Timetables.Cells;
+using Models.Entities.Timetables.Cells.CellMembers;
 
 namespace Models.Validation;
 

@@ -1,18 +1,25 @@
-﻿namespace Models.Entities.Timetables.Cells;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Models.Entities.Timetables.Cells.CellMembers;
 
 public class Cabinet
 {
     public int CabinetId { get; init; }
-    public string? Address { get; set; }
-    public string? Number { get; set; }
+    public required string? Address { get; set; }
+    public required string? Number { get; set; }
+
     public List<TimetableCell>? TimetableCells { get; set; }
 
     private Cabinet() { }
-    public Cabinet(int cabinetPK, string address, string number)
+
+    [SetsRequiredMembers]
+    public Cabinet(int id, string address, string number)
     {
+        id.Throw().IfDefault();
         address.ThrowIfNull().IfWhiteSpace();
         number.ThrowIfNull().IfWhiteSpace();
-        CabinetId = cabinetPK;
+
+        CabinetId = id;
         Address = address;
         Number = number;
     }

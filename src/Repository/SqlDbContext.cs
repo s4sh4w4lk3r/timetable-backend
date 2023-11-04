@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
+using Models.Entities.Timetables.Cells.CellMembers;
 using Models.Entities.Users;
 using Throw;
 

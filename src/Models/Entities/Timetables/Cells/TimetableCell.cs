@@ -1,4 +1,6 @@
-﻿namespace Models.Entities.Timetables.Cells
+﻿using Models.Entities.Timetables.Cells.CellMembers;
+
+namespace Models.Entities.Timetables.Cells
 {
     /// <summary>
     /// Ячейка расписания
