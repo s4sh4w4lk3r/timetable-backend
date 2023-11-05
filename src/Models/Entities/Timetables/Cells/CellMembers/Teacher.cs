@@ -8,14 +8,15 @@ public class Teacher
     public required string Surname { get; set; }
     public required string FirstName { get; set; }
     public required string MiddleName { get; set; }
-    public List<TimetableCell>? TimetableCells { get; set; }
+
+    public List<ActualTimetableCell>? ActualTimetableCells { get; set; }
+    public List<StableTimetableCell>? StableTimetableCells { get; set; }
 
     private Teacher() { }
 
     [SetsRequiredMembers]
     public Teacher(int teacherPK, string surname, string firstname, string middlename)
     {
-        teacherPK.Throw().IfDefault();
         surname.ThrowIfNull().IfWhiteSpace();
         firstname.ThrowIfNull().IfWhiteSpace();
         middlename.ThrowIfNull().IfWhiteSpace();

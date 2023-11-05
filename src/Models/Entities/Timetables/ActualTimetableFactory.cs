@@ -26,7 +26,7 @@ namespace Models.Entities.Timetables
         /// <param name="datesOnly">Массив с датами, дубликаты дат будут удалены из коллекции.</param>
         /// <returns>Возвращает актульное расписание.</returns>
         /// <exception cref="ArgumentException"></exception>
-        public ActualTimetable Create(IEnumerable<DateOnly> datesOnly)
+        public ActualTimetable Create(int newTimetableId, IEnumerable<DateOnly> datesOnly)
         {
             datesOnly.ThrowIfNull().IfEmpty();
 
@@ -46,7 +46,7 @@ namespace Models.Entities.Timetables
                 AddCellsForDate(date);
             }
 
-            return new ActualTimetable(?, _group, _actualTimetableCells, weekNumber);
+            return new ActualTimetable(newTimetableId, _group, _actualTimetableCells, weekNumber);
         }
 
         /// <summary>

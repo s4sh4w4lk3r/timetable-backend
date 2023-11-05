@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Models.Entities.Timetables.Cells;
 
 namespace Models.Entities.Timetables.Cells.CellMembers;
 
@@ -9,14 +8,14 @@ public class Cabinet
     public required string Address { get; set; }
     public required string Number { get; set; }
 
-    public List<TimetableCell>? TimetableCells { get; set; }
+    public List<ActualTimetableCell>? ActualTimetableCells { get; set; }
+    public List<StableTimetableCell>? StableTimetableCells { get; set; }
 
     private Cabinet() { }
 
     [SetsRequiredMembers]
     public Cabinet(int id, string address, string number)
     {
-        id.Throw().IfDefault();
         address.ThrowIfNull().IfWhiteSpace();
         number.ThrowIfNull().IfWhiteSpace();
 

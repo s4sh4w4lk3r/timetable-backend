@@ -17,7 +17,7 @@ namespace WebApi;
 public class Program
 {
     public static void Main(string[] args)
-    { 
+    {
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console()

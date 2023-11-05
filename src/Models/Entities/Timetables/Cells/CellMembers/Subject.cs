@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Models.Entities.Timetables.Cells;
 
 namespace Models.Entities.Timetables.Cells.CellMembers;
 
@@ -7,7 +6,8 @@ public class Subject
 {
     public int SubjectId { get; init; }
     public required string Name { get; set; }
-    public List<TimetableCell>? TimetableCells { get; set; }
+    public List<ActualTimetableCell>? ActualTimetableCells { get; set; }
+    public List<StableTimetableCell>? StableTimetableCells { get; set; }
 
     private Subject() { }
 
@@ -15,7 +15,6 @@ public class Subject
     public Subject(int subjectPK, string? name)
     {
         name.ThrowIfNull().IfWhiteSpace();
-        subjectPK.Throw().IfDefault();
 
         SubjectId = subjectPK;
         Name = name;

@@ -7,7 +7,7 @@ namespace Models.Entities.Timetables
     /// </summary>
     public abstract class Timetable
     {
-        public required int TimetableId { get; init; }
+        public int TimetableId { get; init; }
         public required Group? Group { get; init; }
 
         protected Timetable() { }
@@ -23,7 +23,6 @@ namespace Models.Entities.Timetables
         [SetsRequiredMembers]
         protected Timetable(int timetableId, Group group)
         {
-            timetableId.Throw().IfDefault();
             group.ThrowIfNull();
 
             TimetableId = timetableId;

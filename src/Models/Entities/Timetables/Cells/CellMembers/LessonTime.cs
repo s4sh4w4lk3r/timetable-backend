@@ -9,6 +9,9 @@ namespace Models.Entities.Timetables.Cells.CellMembers
         public required TimeOnly StartsAt { get; init; }
         public required TimeOnly EndsAt { get; init; }
 
+        public List<ActualTimetableCell>? ActualTimetableCells { get; set; }
+        public List<StableTimetableCell>? StableTimetableCells { get; set; }
+
         private LessonTime() { }
 
         [SetsRequiredMembers]

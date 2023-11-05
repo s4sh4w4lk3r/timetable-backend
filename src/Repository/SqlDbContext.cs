@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Models.Entities.Timetables;
@@ -6,6 +6,8 @@ using Models.Entities.Timetables.Cells;
 using Models.Entities.Timetables.Cells.CellMembers;
 using Models.Entities.Users;
 using Throw;
+using static Repository.TimetableEntityBuilderMethods;
+using static Repository.UserEntityBuilderMethods;
 
 namespace Repository;
 
@@ -37,11 +39,14 @@ public class SqlDbContext : DbContext
     public DbSet<Teacher> Teachers => Set<Teacher>();
     public DbSet<Group> Groups => Set<Group>();
     public DbSet<User> Users => Set<User>();
-    public DbSet<TimetableCell> TimetableCells => Set<TimetableCell>();
     public DbSet<Timetable> Timetables => Set<Timetable>();
     public DbSet<ApprovalCode> ApprovalCodes => Set<ApprovalCode>();
     public DbSet<UserSession> UserSessions => Set<UserSession>();
-    public DbSet<EmailUpdateEntity> EmailUpdateEntities => Set<EmailUpdateEntity>();*/
+    public DbSet<EmailUpdateEntity> EmailUpdateEntities => Set<EmailUpdateEntity>();
+    public DbSet<ActualTimetableCell> ActualTimetableCells => Set<ActualTimetableCell>();
+    public DbSet<StableTimetableCell> StableTimetableCells => Set<StableTimetableCell>();
+    public DbSet<StableTimetable> StableTimetables => Set<StableTimetable>();
+    public DbSet<ActualTimetable> ActualTimetables => Set<ActualTimetable>();*/
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -49,7 +54,7 @@ public class SqlDbContext : DbContext
 
         try
         {
-                    optionsBuilder.UseNpgsql(_configuration.ConnectionString,
+            optionsBuilder.UseNpgsql(_configuration.ConnectionString,
                     options => options.UseAdminDatabase(_configuration.PostgresAdminDbName));
         }
         catch (Exception ex)
@@ -69,84 +74,34 @@ public class SqlDbContext : DbContext
             modelBuilder.UseCollation(_configuration.Collation);
         }
 
+        modelBuilder.Entity<User>(ConfigureUser);
 
-        modelBuilder.Entity<Cabinet>(entity =>
-        {
-            entity.HasKey(c => c.CabinetId).HasName("CabinetPRIMARY");
-            entity.Property(c => c.Address).HasMaxLength(255);
-            entity.Property(c => c.Number).HasMaxLength(255);
-        });
+        modelBuilder.Entity<ApprovalCode>(ConfigureApprovalCode);
 
-        modelBuilder.Entity<LessonTime>(entity =>
-        {
-            entity.HasKey(lt => lt.LessonTimeId).HasName("LessonTimePRIMARY");
-            entity.Property(lt => lt.DayOfWeek).HasComment("Enum с днями недель.");
-        });
+        modelBuilder.Entity<UserSession>(ConfigureUserSession);
 
-        modelBuilder.Entity<Subject>(entity =>
-        {
-            entity.HasKey(s => s.SubjectId).HasName("SubjectPRIMARY");
-            entity.Property(s => s.Name).HasMaxLength(255);
-        });
+        modelBuilder.Entity<EmailUpdateEntity>(ConfigureEmailUpdateEntity);
 
-        modelBuilder.Entity<Teacher>(entity =>
-        {
-            entity.HasKey(t => t.TeacherId).HasName("TeacherPRIMARY");
-            entity.Property(t => t.FirstName).HasMaxLength(255);
-            entity.Property(t => t.MiddleName).HasMaxLength(255);
-            entity.Property(t => t.Surname).HasMaxLength(255);
-        });
+        modelBuilder.Entity<Timetable>(ConfigureTimetable);
 
-        modelBuilder.Entity<Group>(entity =>
-        {
-            entity.HasKey(g => g.GroupId).HasName("GroupPRIMARY");
-            entity.Property(g => g.Name).HasMaxLength(255);
-        });
+        modelBuilder.Entity<StableTimetable>(ConfigureStableTimetable);
 
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasKey(u => u.UserId).HasName("UserPRIMARY");
-            entity.HasIndex(u => u.Email, "email-unique").IsUnique();
-            entity.Property(u => u.Email).HasMaxLength(255).IsRequired();
-            entity.Property(u => u.Password).HasMaxLength(72).IsRequired();
-        });
+        modelBuilder.Entity<ActualTimetable>(ConfigureActualTimetable);
 
-        modelBuilder.Entity<TimetableCell>(entity =>
-        {
+        modelBuilder.Entity<TimetableCell>(ConfigureTimetableCell);
 
-            entity.HasKey(t => t.TimeTableCellId).HasName("TimetableCellPRIMARY");
-            entity.HasOne(e => e.Cabinet).WithMany(e => e.TimetableCells).IsRequired();
-            entity.HasOne(e => e.Teacher).WithMany(e => e.TimetableCells).IsRequired();
-            entity.HasOne(e => e.LessonTime).WithMany(e => e.TimetableCells).IsRequired();
-            entity.HasOne(e => e.Subject).WithMany(e => e.TimetableCells).IsRequired();
-        }
-        );
+        modelBuilder.Entity<StableTimetableCell>(ConfigureStableTimetableCell);
 
-        modelBuilder.Entity<Timetable>(entity =>
-        {
-            entity.HasKey(t => t.TimetableId).HasName("TimetablePRIMARY");
-        }
-        );
+        modelBuilder.Entity<ActualTimetableCell>(ConfigureActualTimetableCell);
 
-        modelBuilder.Entity<ApprovalCode>(entity =>
-        {
-            entity.HasKey(e => e.AprrovalCodeId).HasName("ApprovalCodePRIMARY");
-            entity.HasOne(e => e.User).WithMany(e => e.ApprovalCodes).HasForeignKey(e=>e.UserId).IsRequired();
-        });
+        modelBuilder.Entity<LessonTime>(ConfigureLessonTime);
 
-        modelBuilder.Entity<UserSession>(entity =>
-        {
-            entity.HasKey(e => e.UserSessionId).HasName("UserSessionPRIMARY");
-            entity.HasOne(e => e.User).WithMany(e => e.UserSessions).HasForeignKey(e=>e.UserId).IsRequired();
-        });
+        modelBuilder.Entity<Cabinet>(ConfigureCabinet);
 
-        modelBuilder.Entity<EmailUpdateEntity>(entity =>
-        {
-            entity.HasKey(e => e.EmailUpdateEntityId).HasName("EmailUpdateEntityPRIMARY");
-            entity.HasOne(e=>e.User).WithMany(e=>e.EmailUpdateEntities).HasForeignKey(e=>e.UserId).IsRequired();
-            entity.HasOne(e => e.Approval).WithOne(e => e.EmailUpdateEntity).IsRequired();
-            entity.Property(e => e.OldEmail).IsRequired().HasMaxLength(255);
-            entity.Property(e => e.NewEmail).IsRequired().HasMaxLength(255);
-        });
+        modelBuilder.Entity<Subject>(ConfigureSubject);
+
+        modelBuilder.Entity<Teacher>(ConfigureTeacher);
+
+        modelBuilder.Entity<Group>(ConfigureGroup);
     }
 }

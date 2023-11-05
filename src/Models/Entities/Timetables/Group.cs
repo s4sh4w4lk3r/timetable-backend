@@ -13,7 +13,6 @@ public class Group
     public Group(int groupPk, string name)
     {
         name.ThrowIfNull().IfWhiteSpace();
-        groupPk.Throw().IfDefault();
 
         GroupId = groupPk;
         Name = name;

@@ -5,7 +5,7 @@ namespace Models.Entities.Timetables.Cells
 {
     public abstract class TimetableCell
     {
-        public required int TimetableCellId { get; init; }
+        public int TimetableCellId { get; init; }
         public required Teacher? Teacher { get; set; }
         public required Subject? Subject { get; init; }
         public required Cabinet? Cabinet { get; set; }
@@ -32,7 +32,6 @@ namespace Models.Entities.Timetables.Cells
             CabinetId = cabinet.CabinetId;
             LessonTimeId = lessonTime.LessonTimeId;
 
-            TimetableCellId.Throw().IfDefault();
             Teacher.ThrowIfNull();
             Subject.ThrowIfNull();
             Cabinet.ThrowIfNull();
