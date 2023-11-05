@@ -27,11 +27,9 @@ namespace Models.Entities.Timetables
 
             TimetableId = timetableId;
             Group = group;
-
-            EnsureNoDuplicates();
         }
 
-        private void EnsureNoDuplicates()
+        public void EnsureNoDuplicates()
         {
             if (CheckNoDuplicates() is false)
             {

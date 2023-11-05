@@ -31,7 +31,7 @@ namespace Models.Entities.Timetables.Cells
             SubjectId = subject.SubjectId;
             CabinetId = cabinet.CabinetId;
             LessonTimeId = lessonTime.LessonTimeId;
-
+/*
             Teacher.ThrowIfNull();
             Subject.ThrowIfNull();
             Cabinet.ThrowIfNull();
@@ -40,7 +40,7 @@ namespace Models.Entities.Timetables.Cells
             TeacherId.Throw().IfDefault();
             SubjectId.Throw().IfDefault();
             CabinetId.Throw().IfDefault();
-            LessonTimeId.Throw().IfDefault();
+            LessonTimeId.Throw().IfDefault();*/
         }
     }
 }
