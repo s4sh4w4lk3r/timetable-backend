@@ -17,6 +17,23 @@ namespace Models.Entities.Timetables
             weekNumber.Throw().IfDefault();
             ActualTimetableCells = actualTimetableCells;
             WeekNumber = weekNumber;
+            EnsureNoDuplicates();
+        }
+
+        public override bool CheckNoDuplicates()
+        {
+            ActualTimetableCells.ThrowIfNull().IfHasNullElements().IfEmpty();
+
+            foreach (var item in ActualTimetableCells)
+            {
+                int count = ActualTimetableCells.Count(x => x.LessonTime == item.LessonTime && x.Date == item.Date);
+                if (count > 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

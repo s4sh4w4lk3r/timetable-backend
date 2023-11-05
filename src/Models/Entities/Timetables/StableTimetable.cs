@@ -14,6 +14,23 @@ namespace Models.Entities.Timetables
         {
             stableTimetableCells.ThrowIfNull().IfEmpty().IfHasNullElements();
             StableTimetableCells = stableTimetableCells;
+            EnsureNoDuplicates();
+        }
+
+        public override bool CheckNoDuplicates()
+        {
+            StableTimetableCells.ThrowIfNull().IfHasNullElements().IfEmpty();
+
+            foreach (var item in StableTimetableCells)
+            {
+                int count = StableTimetableCells.Count(x => x.LessonTime == item.LessonTime && x.IsWeekEven == item.IsWeekEven && x.DayOfWeek == item.DayOfWeek);
+                if (count > 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
