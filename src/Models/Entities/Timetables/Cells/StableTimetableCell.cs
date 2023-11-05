@@ -19,5 +19,16 @@ namespace Models.Entities.Timetables.Cells
             IsWeekEven = isWeekEven;
             DayOfWeek = dayOfWeek;
         }
+
+        public ActualTimetableCell CastToActualCell(DateOnly dateOnly)
+        {
+            this.Teacher.ThrowIfNull();
+            this.Subject.ThrowIfNull();
+            this.Cabinet.ThrowIfNull();
+            this.LessonTime.ThrowIfNull();
+
+            return new ActualTimetableCell(this.TimetableCellId, this.Teacher, this.Subject, this.Cabinet, this.LessonTime, 
+                dateOnly, isReplaced: false, isCanceled: false);
+        }
     }
 }

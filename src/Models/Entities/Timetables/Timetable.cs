@@ -25,6 +25,7 @@ namespace Models.Entities.Timetables
             {
                 throw new InvalidOperationException("В коллекции ячеек расписания есть ячейки, которые стоят на одном времени.");
             }
+#warning написать юнит тест для проверки проверки на дубли
         }
         public abstract bool CheckNoDuplicates();
     }
