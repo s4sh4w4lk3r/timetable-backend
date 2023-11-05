@@ -46,7 +46,7 @@ namespace Models.Entities.Timetables
                 AddCellsForDate(date);
             }
 
-            return new ActualTimetable(default, _group, _actualTimetableCells, weekNumber);
+            return new ActualTimetable(?, _group, _actualTimetableCells, weekNumber);
         }
 
         /// <summary>

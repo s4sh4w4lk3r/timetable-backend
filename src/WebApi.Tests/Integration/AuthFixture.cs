@@ -29,3 +29,4 @@ public class AuthCollection : ICollectionFixture<AuthFixture>
     // to be the place to apply [CollectionDefinition] and all the
     // ICollectionFixture<> interfaces.
 }
+#warning написать юнит тест для проверки проверки таймтейблов на дубли

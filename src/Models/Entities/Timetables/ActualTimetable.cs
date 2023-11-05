@@ -18,10 +18,9 @@ namespace Models.Entities.Timetables
         public ActualTimetable(int actualTimetableId, Group group, IEnumerable<ActualTimetableCell> actualTimetableCells, int weekNumber) : base(actualTimetableId, group)
         {
             actualTimetableCells.ThrowIfNull().IfEmpty().IfHasNullElements();
-            weekNumber.Throw().IfDefault();
+            weekNumber.Throw().IfLessThan(1).IfGreaterThan(53);
             ActualTimetableCells = actualTimetableCells;
             WeekNumber = weekNumber;
-            EnsureNoDuplicates();
         }
 
         public override bool CheckNoDuplicates()

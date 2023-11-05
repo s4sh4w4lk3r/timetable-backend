@@ -1,8 +1,6 @@
 ﻿using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Timetables.Cells.CellMembers;
-using Models.Extenstions;
-using System.Globalization;
 
 namespace ConsoleApp1
 {
@@ -10,8 +8,17 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
+            var datesOnly = new List<DateOnly>()
+            {
+                DateOnly.Parse("06.11.2023"),
+                DateOnly.Parse("07.11.2023"),
+                DateOnly.Parse("08.11.2023"),
+                DateOnly.Parse("09.11.2023"),
+                DateOnly.Parse("10.11.2023"),
+            };
+
             var atf = new ActualTimetableFactory(new StableTimetable(1, new Group(1, "4ИП2202"), GetListCells()));
-            var tt = atf.Create();
+            var tt = atf.Create(datesOnly);
 
             var a = tt.ActualTimetableCells.Where(e => e.Date == DateOnly.Parse("06.11.2023")).ToList();
         }
@@ -109,11 +116,11 @@ namespace ConsoleApp1
         }
     }
 
-    public class ActualTimetableFactory
+    /*public class ActualTimetableFactory
     {
-        List<StableTimetableCell> _stableTimetableCells;
-        List<ActualTimetableCell> _actualTimetableCells;
-        Group _group;
+        private readonly List<StableTimetableCell> _stableTimetableCells;
+        private readonly List<ActualTimetableCell> _actualTimetableCells;
+        private readonly Group _group;
 
         public ActualTimetableFactory(StableTimetable stableTimetable)
         {
@@ -129,13 +136,15 @@ namespace ConsoleApp1
             CreateForDayOfWeek(DayOfWeek.Wednesday);
             CreateForDayOfWeek(DayOfWeek.Thursday);
             CreateForDayOfWeek(DayOfWeek.Friday);
+
+#warning подумать над этой строчкой.
             return new ActualTimetable(5, _group, _actualTimetableCells, ISOWeek.GetWeekOfYear(DateTime.Now));
         }
 
         private void CreateForDayOfWeek(DayOfWeek dayOfWeek)
         {
-            var mondayDate = DateOnly.FromDateTime(DateTime.Now).GetDateOfNextDayOfWeek(dayOfWeek);
-            bool isEven = mondayDate.IsWeekEven();
+            var date = DateOnly.FromDateTime(DateTime.Now).GetDateOfNextDayOfWeek(dayOfWeek);
+            bool isEven = date.IsWeekEven();
 
 #warning надо как следует продебажить все по всем датам.
             isEven = true;
@@ -146,11 +155,14 @@ namespace ConsoleApp1
 
             foreach (var item in stableListForThisDay)
             {
-                var a = new ActualTimetableCell(random.Next(), item.Teacher!, item.Subject!, item.Cabinet!, item.LessonTime!, mondayDate);
+                var a = item.CastToActualCell(date);
                 _actualTimetableCells.Add(a);
-            }
 
-#warning в цикле делаем из константных ячеек актуальные и добавляем в лист актульного расписания.
+                *//*if (item.Teacher.Surname == "Танченко")
+                {
+                    _actualTimetableCells.Add(a);
+                }*//*
+            }
         }
-    }
+    }*/
 }
