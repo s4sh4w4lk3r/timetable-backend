@@ -19,7 +19,6 @@ public class SqlDbContext : DbContext
 
     public SqlDbContext(IOptions<DbConfiguration> options, ILoggerFactory loggerFactory)
     {
-        new DbConfigurationValidator().ValidateAndThrow(options.Value);
         loggerFactory.ThrowIfNull();
 
         _loggerFactory = loggerFactory;
@@ -51,23 +50,8 @@ public class SqlDbContext : DbContext
 
         try
         {
-            switch (_configuration.DatabaseEngine)
-            {
-                case DatabaseEngine.MySql:
-                    var serverVer = ServerVersion.AutoDetect(_configuration.ConnectionString);
-                    optionsBuilder.UseMySql(_configuration.ConnectionString, serverVer);
-                    break;
-
-                case DatabaseEngine.PostgreSql:
-                    _configuration.PostgresAdminDbName.ThrowIfNull().IfWhiteSpace();
-
                     optionsBuilder.UseNpgsql(_configuration.ConnectionString,
                     options => options.UseAdminDatabase(_configuration.PostgresAdminDbName));
-                    break;
-
-                default:
-                    throw new ArgumentException($"В контексте не реализована работа с типом БД {_configuration.DatabaseEngine}.");
-            }
         }
         catch (Exception ex)
         {
@@ -76,11 +60,6 @@ public class SqlDbContext : DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        if (string.IsNullOrWhiteSpace(_configuration.CharSet) is false)
-        {
-            modelBuilder.HasCharSet(_configuration.CharSet);
-        }
-
         if (string.IsNullOrWhiteSpace(_configuration.DefaultSchema) is false)
         {
             modelBuilder.HasDefaultSchema(_configuration.DefaultSchema);
