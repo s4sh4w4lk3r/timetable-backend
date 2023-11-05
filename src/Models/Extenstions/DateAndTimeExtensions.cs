@@ -27,7 +27,7 @@ namespace Models.Extenstions
             return week % 2 == 0;
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Получить дату ближайшего дня недели, переданного в параметры метода.
         /// </summary>
         /// <param name="dateOnly"></param>
@@ -45,7 +45,7 @@ namespace Models.Extenstions
                 dateOnly = dateOnly.AddDays(1);
             }
             throw new ArgumentException("Получен несуществующий день недели.");
-        }
+        }*/
     }
 }
 #warning написать юнит тесты к этому
