@@ -2,6 +2,9 @@
 
 namespace Models.Entities.Timetables
 {
+    /// <summary>
+    /// Абстрактный класс расписания.
+    /// </summary>
     public abstract class Timetable
     {
         public required int TimetableId { get; init; }
@@ -9,6 +12,14 @@ namespace Models.Entities.Timetables
 
         protected Timetable() { }
 
+
+        /// <summary>
+        /// Используется наследниками для создания объекта класса. Конструктор при создании проверяет 
+        /// наличие дубликатов ячеек на одно и то же время в расписании реализацией абстрактного метода CheckNoDuplicates(), который при их наличии выкидывает исключение.
+        /// </summary>
+        /// <param name="timetableId"></param>
+        /// <param name="group"></param>
+        /// <exception cref="InvalidOperationException"></exception>
         [SetsRequiredMembers]
         protected Timetable(int timetableId, Group group)
         {
@@ -17,17 +28,22 @@ namespace Models.Entities.Timetables
 
             TimetableId = timetableId;
             Group = group;
+
+            EnsureNoDuplicates();
         }
 
-        public void EnsureNoDuplicates()
+        private void EnsureNoDuplicates()
         {
             if (CheckNoDuplicates() is false)
             {
                 throw new InvalidOperationException("В коллекции ячеек расписания есть ячейки, которые стоят на одном времени.");
             }
-#warning написать юнит тест для проверки проверки на дубли
         }
+
+        /// <summary>
+        /// Должен проверять наличие ячеек-дубликатов, которые ссылаются на одно и то же время занятий.
+        /// </summary>
+        /// <returns></returns>
         public abstract bool CheckNoDuplicates();
     }
 }
-#warning может юзать прокси и попробовать избежать рефренс лупа https://www.google.com/search?q=reference+loop+proxies+efcore&oq=reference+loop+proxies+efcore&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIJCAEQIRgKGKABMgkIAhAhGAoYoAEyBggDECEYFTIHCAQQIRiPAjIHCAUQIRiPAtIBCTIzMDI0ajFqOagCALACAA&sourceid=chrome&ie=UTF-8

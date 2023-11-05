@@ -19,9 +19,17 @@ namespace Models.Entities.Timetables
             _stableTimetableCells = stableTimetable.StableTimetableCells.ToList();
         }
 
+        /// <summary>
+        /// Создает актульное расписание, принимая массив с датами, на которое надо наложить расписание из константного расписания.
+        /// Вызывает исключение, если будет передан массив дат, которые указывают на разные недели.
+        /// </summary>
+        /// <param name="datesOnly">Массив с датами, дубликаты дат будут удалены из коллекции.</param>
+        /// <returns>Возвращает актульное расписание.</returns>
+        /// <exception cref="ArgumentException"></exception>
         public ActualTimetable Create(IEnumerable<DateOnly> datesOnly)
         {
             datesOnly.ThrowIfNull().IfEmpty();
+
             // Пропускаем одинаковые даты.
             datesOnly = datesOnly.Distinct();
 
@@ -41,6 +49,10 @@ namespace Models.Entities.Timetables
             return new ActualTimetable(default, _group, _actualTimetableCells, weekNumber);
         }
 
+        /// <summary>
+        /// Добавляет ячейки из константного расписания в актульное.
+        /// </summary>
+        /// <param name="dateOnly"></param>
         private void AddCellsForDate(DateOnly dateOnly)
         {
             DayOfWeek dayOfWeek = dateOnly.DayOfWeek;

@@ -3,6 +3,10 @@ using Models.Entities.Timetables.Cells;
 
 namespace Models.Entities.Timetables
 {
+    /// <summary>
+    /// Класс расписания, который должен заполняться из константного расписания фабрикой ActualTimetableFactory. 
+    /// Этот тип используется для показа текущего расписания на неделю и для отправки на фронтенд.
+    /// </summary>
     public class ActualTimetable : Timetable
     {
         public required int WeekNumber { get; init; }
@@ -26,6 +30,7 @@ namespace Models.Entities.Timetables
 
             foreach (var item in ActualTimetableCells)
             {
+                // Проверяем на дубликаты по времени занятия и по дате.
                 int count = ActualTimetableCells.Count(x => x.LessonTime == item.LessonTime && x.Date == item.Date);
                 if (count > 1)
                 {

@@ -20,6 +20,11 @@ namespace Models.Entities.Timetables.Cells
             DayOfWeek = dayOfWeek;
         }
 
+        /// <summary>
+        /// Преобразовывает ячейку константного расписания в актульное, без замен и отмен.
+        /// </summary>
+        /// <param name="dateOnly"></param>
+        /// <returns></returns>
         public ActualTimetableCell CastToActualCell(DateOnly dateOnly)
         {
             this.Teacher.ThrowIfNull();
