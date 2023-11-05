@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
-using Models.Validation;
+using Validation;
 using Repository;
 
 namespace WebApi.Services.Account.Implementations;

@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
-using Models.Test;
-using Models.Validation;
 using Repository;
 using Serilog;
 using Throw;
+using Validation;
 using WebApi.Middlewares.Auth;
 using WebApi.Services.Account.Implementations;
 using WebApi.Services.Account.Interfaces;
@@ -54,10 +53,7 @@ public class Program
 
         #region Валидаторы
         builder.Services.AddValidatorsFromAssemblyContaining<CabinetValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<LessonTimeValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<TeacherValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<TimetableCellValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<TimetableValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<JwtConfigurationValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<UserSessionValidator>();

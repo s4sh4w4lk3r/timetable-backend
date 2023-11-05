@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Entities.Users;
-using Models.Validation;
+using Validation;
 using WebApi.Extensions;
 using WebApi.Services.Account.Implementations;
 
