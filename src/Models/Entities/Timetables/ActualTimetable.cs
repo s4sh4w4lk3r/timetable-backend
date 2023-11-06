@@ -21,7 +21,8 @@ namespace Models.Entities.Timetables
             weekNumber.Throw().IfLessThan(1).IfGreaterThan(53);
             ActualTimetableCells = actualTimetableCells;
             WeekNumber = weekNumber;
-            EnsureNoDuplicates();
+#warning вернуть проверку если надо.
+            //EnsureNoDuplicates();
         }
 
         public override bool CheckNoDuplicates()

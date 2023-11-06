@@ -49,6 +49,7 @@ public class Program
         builder.Services.AddScoped<IUserSessionService, UserSessionService>();
         builder.Services.AddScoped<IApprovalService, ApprovalService>();
         builder.Services.AddScoped<IApprovalSender, ApprovalSender>();
+        builder.Services.AddScoped<ActualTimetableService>();
         #endregion
 
         #region Валидаторы

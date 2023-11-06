@@ -6,10 +6,10 @@ namespace Models.Entities.Timetables.Cells
     public abstract class TimetableCell
     {
         public int TimetableCellId { get; init; }
-        public required Teacher? Teacher { get; set; }
-        public required Subject? Subject { get; init; }
-        public required Cabinet? Cabinet { get; set; }
-        public required LessonTime? LessonTime { get; init; }
+        public Teacher? Teacher { get; set; }
+        public Subject? Subject { get; init; }
+        public Cabinet? Cabinet { get; set; }
+        public LessonTime? LessonTime { get; init; }
 
         public required int TeacherId { get; set; }
         public required int SubjectId { get; init; }

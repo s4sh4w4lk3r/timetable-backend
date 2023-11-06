@@ -9,7 +9,7 @@ namespace Models.Entities.Timetables.Cells
         public required bool IsReplaced { get; set; }
         public required bool IsCanceled { get; set; }
 
-        private ActualTimetableCell() : base() { }
+        public ActualTimetableCell() : base() { }
 
         [SetsRequiredMembers]
         public ActualTimetableCell(int actualTimetableCellId, Teacher teacher, Subject subject, Cabinet cabinet, LessonTime lessonTime, DateOnly date, bool isReplaced = false, bool isCanceled = false)
