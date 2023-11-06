@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Models.Entities.Timetables.Cells.CellMembers;
 
@@ -9,7 +10,10 @@ public class Teacher
     public required string FirstName { get; set; }
     public required string MiddleName { get; set; }
 
+    [JsonIgnore]
     public List<ActualTimetableCell>? ActualTimetableCells { get; set; }
+
+    [JsonIgnore]
     public List<StableTimetableCell>? StableTimetableCells { get; set; }
 
     private Teacher() { }

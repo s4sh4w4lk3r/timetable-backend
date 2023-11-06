@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Models.Entities.Timetables.Cells.CellMembers
 {
@@ -9,7 +10,11 @@ namespace Models.Entities.Timetables.Cells.CellMembers
         public required TimeOnly StartsAt { get; init; }
         public required TimeOnly EndsAt { get; init; }
 
+
+        [JsonIgnore]
         public List<ActualTimetableCell>? ActualTimetableCells { get; set; }
+
+        [JsonIgnore]
         public List<StableTimetableCell>? StableTimetableCells { get; set; }
 
         private LessonTime() { }

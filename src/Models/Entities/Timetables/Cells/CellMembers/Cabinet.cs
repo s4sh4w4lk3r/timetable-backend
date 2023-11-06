@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Models.Entities.Timetables.Cells.CellMembers;
 
@@ -8,7 +9,11 @@ public class Cabinet
     public required string Address { get; set; }
     public required string Number { get; set; }
 
+
+    [JsonIgnore]
     public List<ActualTimetableCell>? ActualTimetableCells { get; set; }
+
+    [JsonIgnore]
     public List<StableTimetableCell>? StableTimetableCells { get; set; }
 
     private Cabinet() { }
