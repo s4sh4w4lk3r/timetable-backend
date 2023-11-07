@@ -14,7 +14,6 @@ namespace Models.Entities.Timetables
         {
             stableTimetableCells.ThrowIfNull().IfEmpty().IfHasNullElements();
             StableTimetableCells = stableTimetableCells;
-            EnsureNoDuplicates();
         }
 
         public override bool CheckNoDuplicates()

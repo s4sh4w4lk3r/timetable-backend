@@ -29,14 +29,6 @@ namespace Models.Entities.Timetables
             Group = group;
         }
 
-        public void EnsureNoDuplicates()
-        {
-            if (CheckNoDuplicates() is false)
-            {
-                throw new InvalidOperationException("В коллекции ячеек расписания есть ячейки, которые стоят на одном времени.");
-            }
-        }
-
         /// <summary>
         /// Должен проверять наличие ячеек-дубликатов, которые ссылаются на одно и то же время занятий.
         /// </summary>

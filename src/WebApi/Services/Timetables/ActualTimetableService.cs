@@ -13,38 +13,65 @@ namespace WebApi.Services.Timetables
             _dbContext = dbContext;
         }
 
-        public ActualTimetable InsertActualTimetable()
+        public async Task<ServiceResult> CreateAndSaveActualTimetable(int stableTimetableId, IEnumerable<DateOnly> datesOnly, CancellationToken cancellationToken = default)
         {
-            /*var datesOnly = new List<DateOnly>()
+#warning проверить
+            if (stableTimetableId == default)
             {
-                DateOnly.Parse("06.11.2023"),
-                DateOnly.Parse("07.11.2023"),
-                DateOnly.Parse("08.11.2023"),
-                DateOnly.Parse("09.11.2023"),
-                DateOnly.Parse("10.11.2023"),
-            };
+                return ServiceResult.Fail("stableTimetableId не может быть равным нулю.");
+            }
 
-            var a = _dbContext.Set<StableTimetable>()
-                .Include(e => e.Group)
-                .Include(e => e.StableTimetableCells)!.ThenInclude(e => e.Teacher)
-                .Include(e => e.StableTimetableCells)!.ThenInclude(e => e.Subject)
-                .Include(e => e.StableTimetableCells)!.ThenInclude(e => e.LessonTime)
-                .Include(e => e.StableTimetableCells)!.ThenInclude(e => e.Cabinet).Where(e => e.Group!.Name == "4ИП-2-20").First();
+#warning здесь у ячеек только айдишники, по ним и будет создаваться актульное расписание, надо бы будет проверить потом.
+            var stableTimetable = _dbContext.Set<StableTimetable>()
+                .Include(e=>e.Group)
+                .Include(e=>e.StableTimetableCells)
+                .SingleOrDefault(e=>e.TimetableId == stableTimetableId);
+            if (stableTimetable is null)
+            {
+                return ServiceResult.Fail("Стабильное расписание с таким id не найдено в бд.");
+            }
 
+            if (stableTimetable.CheckNoDuplicates() is false)
+            {
+                return ServiceResult.Fail("В стабильном расписании присутствуют дубликаты.");
+            }
 
-            var b = new ActualTimetableFactory(a).Create(0, datesOnly);
+            try
+            {
+                var actualTimetable = new ActualTimetableFactory(stableTimetable).Create(0, datesOnly, idOnly: true);
+                await _dbContext.Set<ActualTimetable>().AddAsync(actualTimetable, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                return ServiceResult.Ok("Актуальное расписание создано и сохранено в БД.");
+            }
+            catch (ArgumentException ex)
+            {
+                return ServiceResult.Fail(ex.Message);
+            }
+        }
+#warning написать методы сервиса для внесения замен.
 
-            _dbContext.Set<ActualTimetable>().Add(b);
-            _dbContext.SaveChanges();*/
+        public async Task<ServiceResult<ActualTimetable?>> GetActualTimetable(int groupId, int weekNumber, CancellationToken cancellationToken = default)
+        {
+#warning проверить
+            if (groupId == default)
+            {
+                return ServiceResult<ActualTimetable?>.Fail("Введен groupId равный нулю.", null);
+            }
 
-            var a = _dbContext.Set<ActualTimetable>().Where(e => e.Group.Name == "4ИП-2-20")
+            var actualTimetable = await _dbContext.Set<ActualTimetable>().Where(e => e.Group!.GroupId == groupId && e.WeekNumber == weekNumber)
                 .Include(e => e.Group)
                 .Include(e => e.ActualTimetableCells)!.ThenInclude(e => e.Teacher)
                 .Include(e => e.ActualTimetableCells)!.ThenInclude(e => e.Subject)
                 .Include(e => e.ActualTimetableCells)!.ThenInclude(e => e.LessonTime)
-                .Include(e => e.ActualTimetableCells)!.ThenInclude(e => e.Cabinet).Where(e => e.Group!.Name == "4ИП-2-20").First();
-            return a;
-#warning написать методы сервиса для создания актульного расписания, получения групп, внесения замен.
+                .Include(e => e.ActualTimetableCells)!.ThenInclude(e => e.Cabinet).FirstOrDefaultAsync(cancellationToken);
+            if (actualTimetable is null)
+            {
+                return ServiceResult<ActualTimetable?>.Fail("Атуальное расписание не найдено", null);
+            }
+
+            return ServiceResult<ActualTimetable?>.Ok("Атуальное расписание не найдено", actualTimetable);
         }
+
+
     }
 }

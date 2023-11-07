@@ -25,9 +25,10 @@ namespace Models.Entities.Timetables
         /// Принимает параметр idOnly, который означает, что при создании актульного расписания, в ячейках будут только айдишники, без ссылок на класс учителей, предметов и тд, иначе траблы с бд.
         /// </summary>
         /// <param name="datesOnly">Массив с датами, дубликаты дат будут удалены из коллекции.</param>
+        /// <param name="idOnly">Если True, то при создании актульного расписания, в ячейках будут только айдишники, без ссылок на класс учителей, предметов и тд.</param>
         /// <returns>Возвращает актульное расписание.</returns>
         /// <exception cref="ArgumentException"></exception>
-        public ActualTimetable Create(int newTimetableId, IEnumerable<DateOnly> datesOnly, bool idOnly = true)
+        public ActualTimetable Create(int newTimetableId, IEnumerable<DateOnly> datesOnly, bool idOnly)
         {
             datesOnly.ThrowIfNull().IfEmpty();
 
