@@ -97,7 +97,8 @@ namespace Models.Entities.Timetables
                     Date = dateOnly,
                     CabinetId = item.CabinetId,
                     IsCanceled = false,
-                    IsReplaced = false,
+                    IsModified = false,
+                    IsMoved = false,
                     LessonTimeId = item.LessonTimeId,
                     SubjectId = item.SubjectId,
                     TeacherId = item.TeacherId

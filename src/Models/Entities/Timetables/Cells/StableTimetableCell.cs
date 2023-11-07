@@ -32,8 +32,8 @@ namespace Models.Entities.Timetables.Cells
             this.Cabinet.ThrowIfNull();
             this.LessonTime.ThrowIfNull();
 
-            return new ActualTimetableCell(this.TimetableCellId, this.Teacher, this.Subject, this.Cabinet, this.LessonTime, 
-                dateOnly, isReplaced: false, isCanceled: false);
+            return new ActualTimetableCell(this.TimetableCellId, this.Teacher, this.Subject, this.Cabinet, this.LessonTime,
+                dateOnly, isModified: false, isCanceled: false, isMoved: false);
         }
     }
 }

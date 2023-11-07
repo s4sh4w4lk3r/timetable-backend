@@ -14,7 +14,7 @@ namespace Models.Entities.Timetables.Cells
         public required int TeacherId { get; set; }
         public required int SubjectId { get; init; }
         public required int CabinetId { get; set; }
-        public required int LessonTimeId { get; init; }
+        public required int LessonTimeId { get; set; }
 
         protected TimetableCell() { }
 
