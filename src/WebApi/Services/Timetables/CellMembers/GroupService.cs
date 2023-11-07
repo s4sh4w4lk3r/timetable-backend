@@ -1,7 +1,7 @@
 ﻿using Models.Entities.Timetables;
 using Repository;
 
-namespace WebApi.Services.Timetables;
+namespace WebApi.Services.Timetables.CellMembers;
 
 public class GroupService
 {

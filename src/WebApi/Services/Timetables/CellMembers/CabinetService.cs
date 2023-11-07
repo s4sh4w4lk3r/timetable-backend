@@ -2,7 +2,7 @@
 using Models.Entities.Timetables.Cells.CellMembers;
 using Repository;
 
-namespace WebApi.Services.Timetables;
+namespace WebApi.Services.Timetables.CellMembers;
 
 public class CabinetService
 {

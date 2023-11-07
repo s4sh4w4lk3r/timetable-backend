@@ -23,9 +23,9 @@ namespace WebApi.Services.Timetables
 
 #warning здесь у ячеек только айдишники, по ним и будет создаваться актульное расписание, надо бы будет проверить потом.
             var stableTimetable = _dbContext.Set<StableTimetable>()
-                .Include(e=>e.Group)
-                .Include(e=>e.StableTimetableCells)
-                .SingleOrDefault(e=>e.TimetableId == stableTimetableId);
+                .Include(e => e.Group)
+                .Include(e => e.StableTimetableCells)
+                .SingleOrDefault(e => e.TimetableId == stableTimetableId);
             if (stableTimetable is null)
             {
                 return ServiceResult.Fail("Стабильное расписание с таким id не найдено в бд.");
@@ -38,7 +38,7 @@ namespace WebApi.Services.Timetables
 
             try
             {
-                var actualTimetable = new ActualTimetableFactory(stableTimetable).Create(0, datesOnly, idOnly: true);
+                var actualTimetable = new ActualTimetableFactory(stableTimetable).Create(default, datesOnly, idOnly: true);
                 await _dbContext.Set<ActualTimetable>().AddAsync(actualTimetable, cancellationToken);
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 return ServiceResult.Ok("Актуальное расписание создано и сохранено в БД.");
@@ -66,10 +66,10 @@ namespace WebApi.Services.Timetables
                 .Include(e => e.ActualTimetableCells)!.ThenInclude(e => e.Cabinet).FirstOrDefaultAsync(cancellationToken);
             if (actualTimetable is null)
             {
-                return ServiceResult<ActualTimetable?>.Fail("Атуальное расписание не найдено", null);
+                return ServiceResult<ActualTimetable?>.Fail("Аrтуальное расписание не найдено.", null);
             }
 
-            return ServiceResult<ActualTimetable?>.Ok("Атуальное расписание не найдено", actualTimetable);
+            return ServiceResult<ActualTimetable?>.Ok("Атуальное расписание было найдено.", actualTimetable);
         }
 
 

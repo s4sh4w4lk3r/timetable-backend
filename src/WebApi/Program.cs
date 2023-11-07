@@ -9,6 +9,7 @@ using WebApi.Middlewares.Auth;
 using WebApi.Services.Account.Implementations;
 using WebApi.Services.Account.Interfaces;
 using WebApi.Services.Timetables;
+using WebApi.Services.Timetables.CellMembers;
 using WebApi.Types.Configuration;
 using WebApi.Types.Validation;
 
