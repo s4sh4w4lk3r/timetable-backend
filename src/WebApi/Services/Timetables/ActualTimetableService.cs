@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Models.Entities.Timetables;
+using Models.Entities.Timetables.Cells;
 using Repository;
 
 namespace WebApi.Services.Timetables
@@ -13,7 +14,7 @@ namespace WebApi.Services.Timetables
             _dbContext = dbContext;
         }
 
-        public async Task<ServiceResult> CreateAndSaveActualTimetable(int stableTimetableId, IEnumerable<DateOnly> datesOnly, CancellationToken cancellationToken = default)
+        public async Task<ServiceResult> CreateAndSaveAsync(int stableTimetableId, IEnumerable<DateOnly> datesOnly, CancellationToken cancellationToken = default)
         {
 #warning проверить
             if (stableTimetableId == default)
@@ -50,7 +51,7 @@ namespace WebApi.Services.Timetables
         }
 #warning написать методы сервиса для внесения замен.
 
-        public async Task<ServiceResult<ActualTimetable?>> GetActualTimetable(int groupId, int weekNumber, CancellationToken cancellationToken = default)
+        public async Task<ServiceResult<ActualTimetable?>> GetTimetableAsync(int groupId, int weekNumber, CancellationToken cancellationToken = default)
         {
 #warning проверить
             if (groupId == default)
@@ -66,12 +67,43 @@ namespace WebApi.Services.Timetables
                 .Include(e => e.ActualTimetableCells)!.ThenInclude(e => e.Cabinet).FirstOrDefaultAsync(cancellationToken);
             if (actualTimetable is null)
             {
-                return ServiceResult<ActualTimetable?>.Fail("Аrтуальное расписание не найдено.", null);
+                return ServiceResult<ActualTimetable?>.Fail("Актуальное расписание не найдено.", null);
             }
 
-            return ServiceResult<ActualTimetable?>.Ok("Атуальное расписание было найдено.", actualTimetable);
+            return ServiceResult<ActualTimetable?>.Ok("Актуальное расписание было найдено.", actualTimetable);
+        }
+    
+        public async Task<ServiceResult> DeleteCell(int actualCellId, CancellationToken cancellationToken = default)
+        {
+#warning проверить
+            if (actualCellId == default)
+            {
+                return ServiceResult.Fail("actualCellId не может быть равным нулю.");
+            }
+
+            int rowsDeleted = await _dbContext.Set<ActualTimetableCell>().Where(e=>e.TimetableCellId ==  actualCellId).ExecuteDeleteAsync(cancellationToken);
+            if (rowsDeleted == 0)
+            {
+                return ServiceResult.Fail("Актуальной ячейки с таким id нет в бд.");
+            }
+
+            return ServiceResult.Ok("Актуальная ячейка удалена из бд.");
         }
 
+        public async Task<ServiceResult> DeleteTimetable(int actualTimetableId, CancellationToken cancellationToken = default)
+        {
+            if (actualTimetableId == default)
+            {
+                return ServiceResult.Fail("actualTimetableId не может быть равным нулю.");
+            }
 
+            int rowsDeleted = await _dbContext.Set<ActualTimetable>().Where(e => e.TimetableId == actualTimetableId).ExecuteDeleteAsync(cancellationToken);
+            if (rowsDeleted == 0)
+            {
+                return ServiceResult.Fail("Актуального расписания с таким id нет в бд.");
+            }
+
+            return ServiceResult.Ok("Актуальное расписание удалено из бд.");
+        }
     }
 }
