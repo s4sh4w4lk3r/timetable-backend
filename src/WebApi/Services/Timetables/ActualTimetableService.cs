@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
+using Models.Entities.Timetables.Cells.CellMembers;
 using Repository;
+using Validation.IdValidators;
 
 namespace WebApi.Services.Timetables
 {
@@ -103,6 +105,56 @@ namespace WebApi.Services.Timetables
             }
 
             return ServiceResult.Ok("Актуальное расписание удалено из бд.");
+        }
+    
+        public async Task<ServiceResult> CreateAndSaveCell(ActualTimetableCell actualTimetableCell, CancellationToken cancellationToken = default)
+        {
+#warning проверить
+            if (actualTimetableCell.TimetableCellId != default)
+            {
+                return ServiceResult.Fail("TimetableCellId должен быть равен нулю.");
+            }
+
+            var validateResult = new TimetableCellIdValidator().Validate(actualTimetableCell);
+            if (validateResult.IsValid is false) 
+            {
+                return ServiceResult.Fail(validateResult.ToString());
+            }
+
+            var lessonTimeExists = await _dbContext.Set<LessonTime>().AnyAsync(e => e.LessonTimeId == actualTimetableCell.LessonTimeId, cancellationToken);
+            if (lessonTimeExists is false)
+            {
+                return ServiceResult.Fail("Lessontime с таким id нет в бд.");
+            }
+
+            bool dateAndLessontimeOccupied = await _dbContext.Set<ActualTimetableCell>().AnyAsync(e => e.Date == actualTimetableCell.Date && e.LessonTimeId == actualTimetableCell.LessonTimeId, cancellationToken);
+            if (dateAndLessontimeOccupied is true)
+            {
+                return ServiceResult.Fail("На эту дату и lessontime уже есть ячейка расписания.");
+            }
+
+
+            bool teacherExists = await _dbContext.Set<Teacher>().AnyAsync(e=>e.TeacherId ==  actualTimetableCell.TeacherId, cancellationToken);
+            if (teacherExists is false)
+            {
+                return ServiceResult.Fail("Учителя с таким id нет в бд.");
+            }
+
+            bool cabinetExists = await _dbContext.Set<Cabinet>().AnyAsync(e => e.CabinetId == actualTimetableCell.CabinetId, cancellationToken);
+            if (cabinetExists is false)
+            {
+                return ServiceResult.Fail("Кабинета с таким id нет в бд.");
+            }    
+
+            bool subjectExists = await _dbContext.Set<Subject>().AnyAsync(e => e.SubjectId == actualTimetableCell.SubjectId, cancellationToken);
+            if (subjectExists is false)
+            {
+                return ServiceResult.Fail("Предмета с таким id нет в бд.");
+            }
+
+            await _dbContext.Set<ActualTimetableCell>().AddAsync(actualTimetableCell, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return ServiceResult.Ok("Актульная ячейка добавлена в бд.");
         }
     }
 }
