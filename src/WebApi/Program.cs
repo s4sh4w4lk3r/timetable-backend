@@ -1,9 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Options;
 using Repository;
 using Serilog;
-using Throw;
 using Validation;
 using WebApi.Middlewares.Auth;
 using WebApi.Services.Account.Implementations;
@@ -69,7 +67,6 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
-        //app.Use(CheckApiKey);
 
         app.UseForwardedHeaders(new ForwardedHeadersOptions
         {
@@ -87,30 +84,5 @@ public class Program
 
         app.Run();
         #endregion
-    }
-    async static Task CheckApiKey(HttpContext context, Func<Task> next)
-    {
-#warning не забыть вернуть apikey или сделать cors.
-        const string API_KEY = "Api-Key";
-
-        string? apiKey = context.Request.Headers.Where(e => e.Key == API_KEY).Select(e => e.Value).FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(apiKey) is true)
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync($"Для доступа к timetable-API требуется {API_KEY} в заголовках.");
-            return;
-        }
-
-        string validApiKey = context.RequestServices.GetRequiredService<IOptions<ApiSettings>>().Value.ApiKey;
-        validApiKey.ThrowIfNull().IfWhiteSpace();
-
-        if (apiKey != validApiKey)
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync($"Неверный {API_KEY}.");
-            return;
-        }
-
-        await next.Invoke();
     }
 }
