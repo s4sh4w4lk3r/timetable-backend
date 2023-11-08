@@ -49,7 +49,6 @@ namespace WebApi.Services.Timetables
                 return ServiceResult.Fail(ex.Message);
             }
         }
-#warning написать методы сервиса для внесения замен.
 
         public async Task<ServiceResult<ActualTimetable?>> GetTimetableAsync(int groupId, int weekNumber, CancellationToken cancellationToken = default)
         {

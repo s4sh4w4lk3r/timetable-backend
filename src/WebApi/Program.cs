@@ -51,15 +51,6 @@ public class Program
         builder.Services.AddScoped<ActualTimetableService>();
         #endregion
 
-        #region Валидаторы
-        builder.Services.AddValidatorsFromAssemblyContaining<CabinetValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<TeacherValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<JwtConfigurationValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<UserSessionValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<MailConfigurationValidator>();
-        #endregion
-
         var app = builder.Build();
 
         #region Middlewares
