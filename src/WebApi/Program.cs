@@ -24,6 +24,20 @@ public class Program
         .WriteTo.File($"./logs/log.log", rollingInterval: RollingInterval.Day)
         .ReadFrom.Configuration(ctx.Configuration));
 
+        ConfigureServices(builder);
+        ConfigureDependencies(builder);
+        ConfigureIOptions(builder);
+        ConfigureValidators(builder);
+
+        var app = builder.Build();
+        ConfigureMiddlewares(app);
+        app.MapGet("/", () => "Hello World!");
+
+        app.Run();
+    }
+
+    private static void ConfigureServices(WebApplicationBuilder builder)
+    {
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen();
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
@@ -33,15 +47,9 @@ public class Program
             .AddProjections()
             .AddFiltering()
             .AddSorting();
-
-        #region Конфигурация
-        builder.Services.Configure<DbConfiguration>(builder.Configuration.GetRequiredSection(nameof(DbConfiguration)));
-        builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetRequiredSection(nameof(JwtConfiguration)));
-        builder.Services.Configure<ApiSettings>(builder.Configuration.GetRequiredSection(nameof(ApiSettings)));
-        builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetRequiredSection(nameof(EmailConfiguration)));
-        #endregion
-
-        #region Зависимости
+    }
+    private static void ConfigureDependencies(WebApplicationBuilder builder)
+    {
         builder.Services.AddDbContext<TimetableContext>();
         builder.Services.AddScoped<CabinetService>();
         builder.Services.AddScoped<EmailUpdater>();
@@ -49,24 +57,40 @@ public class Program
         builder.Services.AddScoped<IRegistrationService, RegistrationService>();
         builder.Services.AddScoped<IUnregistrationService, UnregistrationService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
-        //builder.Services.AddTransient<IEmailClient, MailKitClient>();
-        builder.Services.AddTransient<IEmailClient, EmailSimulator>();
         builder.Services.AddScoped<IUserSessionService, UserSessionService>();
         builder.Services.AddScoped<IApprovalService, ApprovalService>();
         builder.Services.AddScoped<IApprovalSender, ApprovalSender>();
         builder.Services.AddScoped<ActualTimetableService>();
-        #endregion
 
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddTransient<IEmailClient, EmailSimulator>();
+        }
+        else
+        {
+            builder.Services.AddTransient<IEmailClient, MailKitClient>();
+        }
+    }
+    private static void ConfigureValidators(WebApplicationBuilder builder)
+    {
         builder.Services.AddValidatorsFromAssemblyContaining<CabinetValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<TeacherValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<JwtConfigurationValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<UserSessionValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<MailConfigurationValidator>();
+    }
+    private static void ConfigureIOptions(WebApplicationBuilder builder)
+    {
+        builder.Services.Configure<DbConfiguration>(builder.Configuration.GetRequiredSection(nameof(DbConfiguration)));
+        builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetRequiredSection(nameof(JwtConfiguration)));
+        builder.Services.Configure<ApiSettings>(builder.Configuration.GetRequiredSection(nameof(ApiSettings)));
+        builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetRequiredSection(nameof(EmailConfiguration)));
+    }
 
-        var app = builder.Build();
+    private static void ConfigureMiddlewares(WebApplication app)
+    {
 
-        #region Middlewares
         app.UseSerilogRequestLogging();
         app.UseAuthentication();
         app.UseAuthorization();
@@ -78,16 +102,11 @@ public class Program
             ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
         });
 
-        app.MapGet("/", () => "Hello World!");
-
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
 #warning нормально описать сваггер.
         }
-
-        app.Run();
-        #endregion
     }
 }
