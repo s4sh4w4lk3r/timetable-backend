@@ -1,4 +1,5 @@
-﻿using Models.Entities.Timetables.Cells.CellMembers;
+﻿using HotChocolate.Authorization;
+using Models.Entities.Timetables.Cells.CellMembers;
 using Repository;
 
 namespace WebApi.GraphQL
@@ -8,6 +9,7 @@ namespace WebApi.GraphQL
         [UseProjection]
         [UseFiltering]
         [UseSorting]
+        [Authorize]
         public IQueryable<Teacher> GetTeachers([Service] TimetableContext dbContext)
         {
             return dbContext.Set<Teacher>().AsQueryable();

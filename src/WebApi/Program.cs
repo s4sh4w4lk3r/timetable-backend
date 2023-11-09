@@ -8,7 +8,6 @@ using WebApi.Middlewares.Auth;
 using WebApi.Services.Account.Implementations;
 using WebApi.Services.Account.Interfaces;
 using WebApi.Services.Timetables;
-using WebApi.Services.Timetables.CellMembers;
 using WebApi.Types.Configuration;
 using WebApi.Types.Validation;
 
@@ -40,18 +39,21 @@ public class Program
     {
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen();
+
+        
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
         .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, options => { });
+        builder.Services.AddAuthorization();
         builder.Services.AddGraphQLServer()
             .AddQueryType<Queries>()
             .AddProjections()
             .AddFiltering()
-            .AddSorting();
+            .AddSorting()
+            .AddAuthorization();
     }
     private static void ConfigureDependencies(WebApplicationBuilder builder)
     {
         builder.Services.AddDbContext<TimetableContext>();
-        builder.Services.AddScoped<CabinetService>();
         builder.Services.AddScoped<EmailUpdater>();
         builder.Services.AddScoped<PasswordService>();
         builder.Services.AddScoped<IRegistrationService, RegistrationService>();
