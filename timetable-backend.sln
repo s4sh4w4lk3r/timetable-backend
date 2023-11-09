@@ -8,8 +8,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "src\Models\Models.csproj", "{80EA4527-8423-4452-A09C-FDE363622CD3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "src\WebApi\WebApi.csproj", "{C087AC0D-2579-4D79-B66B-A2F28A07EAD9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{829BD3F3-58E7-4A33-AEDB-273446447C8E} = {829BD3F3-58E7-4A33-AEDB-273446447C8E}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Validation", "src\Validation\Validation.csproj", "{D136A3FA-EE7B-44E7-B137-27E8110D4F22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Validation", "src\Validation\Validation.csproj", "{D136A3FA-EE7B-44E7-B137-27E8110D4F22}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.Tests", "test\WebApi.Tests\WebApi.Tests.csproj", "{337AB360-7606-4F35-B2EC-495BFC31BBBF}"
 EndProject

@@ -1,7 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Models.Entities.Users;
-using Validation;
+﻿using Microsoft.EntityFrameworkCore;
 using Repository;
 using WebApi.Services.Account.Interfaces;
 
