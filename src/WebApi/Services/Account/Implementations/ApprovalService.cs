@@ -8,9 +8,9 @@ namespace WebApi.Services.Account.Implementations;
 
 public class ApprovalService : IApprovalService
 {
-    private readonly SqlDbContext _dbContext;
+    private readonly TimetableContext _dbContext;
 
-    public ApprovalService(SqlDbContext dbContext)
+    public ApprovalService(TimetableContext dbContext)
     {
         _dbContext = dbContext;
     }

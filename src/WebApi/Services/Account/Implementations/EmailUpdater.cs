@@ -9,13 +9,13 @@ namespace WebApi.Services.Account.Implementations;
 
 public class EmailUpdater
 {
-    private readonly SqlDbContext _dbContext;
+    private readonly TimetableContext _dbContext;
     private readonly DbSet<User> _users;
     private readonly IApprovalService _approvalService;
     private readonly IApprovalSender _approvalSender;
 
 
-    public EmailUpdater(SqlDbContext dbContext, IApprovalService approvalService, IApprovalSender approvalSender)
+    public EmailUpdater(TimetableContext dbContext, IApprovalService approvalService, IApprovalSender approvalSender)
     {
         _dbContext = dbContext;
         _users = _dbContext.Set<User>();

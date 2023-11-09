@@ -8,7 +8,7 @@ namespace WebApi.GraphQL
         [UseProjection]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Teacher> GetTeachers([Service] SqlDbContext dbContext)
+        public IQueryable<Teacher> GetTeachers([Service] TimetableContext dbContext)
         {
             return dbContext.Set<Teacher>().AsQueryable();
         }

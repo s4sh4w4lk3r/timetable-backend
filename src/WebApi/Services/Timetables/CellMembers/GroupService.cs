@@ -5,9 +5,9 @@ namespace WebApi.Services.Timetables.CellMembers;
 
 public class GroupService
 {
-    private readonly SqlDbContext _dbContext;
+    private readonly TimetableContext _dbContext;
 
-    public GroupService(SqlDbContext dbContext)
+    public GroupService(TimetableContext dbContext)
     {
         _dbContext = dbContext;
     }

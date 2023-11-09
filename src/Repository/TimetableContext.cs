@@ -11,14 +11,14 @@ using static Repository.UserEntityBuilderMethods;
 
 namespace Repository;
 
-public class SqlDbContext : DbContext
+public class TimetableContext : DbContext
 {
 
     private readonly DbConfiguration _configuration;
     private readonly ILoggerFactory _loggerFactory;
     private static bool IsEnsureCreated = false;
 
-    public SqlDbContext(IOptions<DbConfiguration> options, ILoggerFactory loggerFactory)
+    public TimetableContext(IOptions<DbConfiguration> options, ILoggerFactory loggerFactory)
     {
         loggerFactory.ThrowIfNull();
 
@@ -51,16 +51,8 @@ public class SqlDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseLoggerFactory(_loggerFactory);
-
-        try
-        {
-            optionsBuilder.UseNpgsql(_configuration.ConnectionString,
-                    options => options.UseAdminDatabase(_configuration.PostgresAdminDbName));
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Не получилось открыть соединение с СУБД.", ex);
-        }
+        optionsBuilder.UseNpgsql(_configuration.ConnectionString,
+                   options => options.UseAdminDatabase(_configuration.PostgresAdminDbName));
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

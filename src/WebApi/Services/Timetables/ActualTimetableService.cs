@@ -9,9 +9,9 @@ namespace WebApi.Services.Timetables
 {
     public class ActualTimetableService
     {
-        private readonly SqlDbContext _dbContext;
+        private readonly TimetableContext _dbContext;
 
-        public ActualTimetableService(SqlDbContext dbContext)
+        public ActualTimetableService(TimetableContext dbContext)
         {
             _dbContext = dbContext;
         }

@@ -8,9 +8,9 @@ namespace WebApi.Services.Timetables
 {
     public class ChangesService
     {
-        private readonly SqlDbContext _dbContext;
+        private readonly TimetableContext _dbContext;
 
-        public ChangesService(SqlDbContext dbContext)
+        public ChangesService(TimetableContext dbContext)
         {
             _dbContext = dbContext;
         }

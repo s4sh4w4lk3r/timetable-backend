@@ -9,13 +9,13 @@ namespace WebApi.Services.Account.Implementations;
 
 public class RegistrationService : IRegistrationService
 {
-    private readonly SqlDbContext _dbContext;
+    private readonly TimetableContext _dbContext;
     private readonly IValidator<User> _userValidator;
     private readonly DbSet<User> _users;
     private readonly IApprovalService _approvalService;
     private readonly IApprovalSender _approvalSender;
 
-    public RegistrationService(SqlDbContext dbContext, IValidator<User> validator, IApprovalService approvalService, IApprovalSender approvalSender)
+    public RegistrationService(TimetableContext dbContext, IValidator<User> validator, IApprovalService approvalService, IApprovalSender approvalSender)
     {
         _dbContext = dbContext;
         _userValidator = validator;

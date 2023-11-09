@@ -42,7 +42,7 @@ public class Program
         #endregion
 
         #region Зависимости
-        builder.Services.AddDbContext<SqlDbContext>();
+        builder.Services.AddDbContext<TimetableContext>();
         builder.Services.AddScoped<CabinetService>();
         builder.Services.AddScoped<EmailUpdater>();
         builder.Services.AddScoped<PasswordService>();

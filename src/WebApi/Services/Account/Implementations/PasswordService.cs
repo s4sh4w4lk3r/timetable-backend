@@ -8,11 +8,11 @@ namespace WebApi.Services.Account.Implementations;
 
 public class PasswordService
 {
-    private readonly SqlDbContext _dbContext;
+    private readonly TimetableContext _dbContext;
     private readonly IValidator<User> _userValidator;
     private readonly DbSet<User> _users;
 
-    public PasswordService(SqlDbContext dbContext, IValidator<User> validator)
+    public PasswordService(TimetableContext dbContext, IValidator<User> validator)
     {
         _dbContext = dbContext;
         _userValidator = validator;

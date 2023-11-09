@@ -6,11 +6,11 @@ namespace WebApi.Services.Timetables.CellMembers;
 
 public class CabinetService
 {
-    private readonly SqlDbContext _dbContext;
+    private readonly TimetableContext _dbContext;
     private readonly IValidator<Cabinet> _validator;
     public IQueryable<Cabinet> Cabinets => _dbContext.Set<Cabinet>();
 
-    public CabinetService(SqlDbContext dbContext, IValidator<Cabinet> validator)
+    public CabinetService(TimetableContext dbContext, IValidator<Cabinet> validator)
     {
         _dbContext = dbContext;
         _validator = validator;
