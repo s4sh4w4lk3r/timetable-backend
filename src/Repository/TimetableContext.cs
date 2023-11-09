@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Timetables.Cells.CellMembers;
-using Models.Entities.Users;
 using Throw;
 using static Repository.TimetableEntityBuilderMethods;
 using static Repository.UserEntityBuilderMethods;
@@ -13,7 +12,7 @@ namespace Repository;
 
 public class TimetableContext : DbContext
 {
-
+#error попробовать уйти от наследования в дб контексте расписания и ячеек
     private readonly DbConfiguration _configuration;
     private readonly ILoggerFactory _loggerFactory;
     private static bool IsEnsureCreated = false;
@@ -74,13 +73,13 @@ public class TimetableContext : DbContext
 
         modelBuilder.Entity<EmailUpdateEntity>(ConfigureEmailUpdateEntity);
 
-        modelBuilder.Entity<Timetable>(ConfigureTimetable);
+        modelBuilder.Entity<ITimetable>(ConfigureTimetable);
 
         modelBuilder.Entity<StableTimetable>(ConfigureStableTimetable);
 
         modelBuilder.Entity<ActualTimetable>(ConfigureActualTimetable);
 
-        modelBuilder.Entity<TimetableCell>(ConfigureTimetableCell);
+        modelBuilder.Entity<ITimetableCell>(ConfigureTimetableCell);
 
         modelBuilder.Entity<StableTimetableCell>(ConfigureStableTimetableCell);
 

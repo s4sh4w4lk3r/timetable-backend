@@ -6,7 +6,7 @@ namespace Validation.IdValidators
     /// <summary>
     /// Проверяет все внешние ключи TimetableCell на неравенство нулю.
     /// </summary>
-    public class TimetableCellIdValidator : AbstractValidator<TimetableCell>
+    public class TimetableCellIdValidator : AbstractValidator<ITimetableCell>
     {
         public TimetableCellIdValidator()
         {

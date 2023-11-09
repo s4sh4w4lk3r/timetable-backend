@@ -7,7 +7,7 @@ namespace Models.Entities.Timetables
     /// Класс расписания, который должен заполняться из константного расписания фабрикой ActualTimetableFactory. 
     /// Этот тип используется для показа текущего расписания на неделю и для отправки на фронтенд.
     /// </summary>
-    public class ActualTimetable : Timetable
+    public class ActualTimetable : ITimetable
     {
         public required int WeekNumber { get; init; }
         public required IEnumerable<ActualTimetableCell>? ActualTimetableCells { get; init; }

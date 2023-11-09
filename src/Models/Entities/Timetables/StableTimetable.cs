@@ -3,7 +3,7 @@ using Models.Entities.Timetables.Cells;
 
 namespace Models.Entities.Timetables
 {
-    public class StableTimetable : Timetable
+    public class StableTimetable : ITimetable
     {
         public required IEnumerable<StableTimetableCell>? StableTimetableCells { get; init; }
 

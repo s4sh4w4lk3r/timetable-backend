@@ -15,7 +15,7 @@ namespace Repository
 
         public static void ConfigureActualTimetableCell(EntityTypeBuilder<ActualTimetableCell> entity)
         {
-            entity.HasBaseType<TimetableCell>();
+            entity.HasBaseType<ITimetableCell>();
             entity.HasOne(e => e.Cabinet).WithMany(e => e.ActualTimetableCells);
             entity.HasOne(e => e.Subject).WithMany(e => e.ActualTimetableCells);
             entity.HasOne(e => e.Teacher).WithMany(e => e.ActualTimetableCells);
@@ -24,14 +24,14 @@ namespace Repository
 
         public static void ConfigureStableTimetableCell(EntityTypeBuilder<StableTimetableCell> entity)
         {
-            entity.HasBaseType<TimetableCell>();
+            entity.HasBaseType<ITimetableCell>();
             entity.HasOne(e => e.Cabinet).WithMany(e => e.StableTimetableCells);
             entity.HasOne(e => e.Subject).WithMany(e => e.StableTimetableCells);
             entity.HasOne(e => e.Teacher).WithMany(e => e.StableTimetableCells);
             entity.HasOne(e => e.LessonTime).WithMany(e => e.StableTimetableCells);
         }
 
-        public static void ConfigureTimetableCell(EntityTypeBuilder<TimetableCell> entity)
+        public static void ConfigureTimetableCell(EntityTypeBuilder<ITimetableCell> entity)
         {
             entity.HasKey(e => e.TimetableCellId).HasName("TimetableCellPRIMARY");
             entity.UseTphMappingStrategy();
@@ -39,15 +39,15 @@ namespace Repository
 
         public static void ConfigureActualTimetable(EntityTypeBuilder<ActualTimetable> entity)
         {
-            entity.HasBaseType<Timetable>();
+            entity.HasBaseType<ITimetable>();
         }
 
         public static void ConfigureStableTimetable(EntityTypeBuilder<StableTimetable> entity)
         {
-            entity.HasBaseType<Timetable>();
+            entity.HasBaseType<ITimetable>();
         }
 
-        public static void ConfigureTimetable(EntityTypeBuilder<Timetable> entity)
+        public static void ConfigureTimetable(EntityTypeBuilder<ITimetable> entity)
         {
             entity.HasKey(e => e.TimetableId).HasName("TimetablePRIMARY");
             entity.UseTphMappingStrategy();
