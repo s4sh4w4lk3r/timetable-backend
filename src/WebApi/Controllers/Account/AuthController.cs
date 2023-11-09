@@ -23,7 +23,7 @@ public class AuthController : ControllerBase
         _userSessionService = userSessionService;
         _tokenService = tokenService;
     }
-
+#warning в работе с аккаунтами, принимать везде dto, выпилить Ivalidatorы
     [HttpPost, Route("login")]
     public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] User user, [FromServices] IValidator<User> userValidator, [FromServices] PasswordService passwordService, CancellationToken cancellationToken = default)
     {

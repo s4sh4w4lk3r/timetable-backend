@@ -7,20 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="CabinetValidator.cs" />
-    <Compile Remove="TeacherValidator.cs" />
-    <Compile Remove="UserSessionValidator.cs" />
-    <Compile Remove="UserValidator.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="CabinetValidator.cs" />
-    <None Include="TeacherValidator.cs" />
-    <None Include="UserSessionValidator.cs" />
-    <None Include="UserValidator.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
   </ItemGroup>
 
