@@ -13,10 +13,10 @@ namespace WebApi.Middlewares.Auth;
 
 public class AccessTokenAuthenticationHandler : AuthenticationHandler<AccessTokenAuthenticationOptions>
 {
-    private readonly SqlDbContext _dbContext;
+    private readonly TimetableContext _dbContext;
     private readonly ITokenService _tokenService;
     public AccessTokenAuthenticationHandler(IOptionsMonitor<AccessTokenAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock,
-        SqlDbContext dbContext, ITokenService tokenService) : base(options, logger, encoder, clock)
+        TimetableContext dbContext, ITokenService tokenService) : base(options, logger, encoder, clock)
     {
         _tokenService = tokenService;
         _dbContext = dbContext;

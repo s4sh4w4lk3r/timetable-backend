@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Models.Entities.Users;
 
-namespace Models.Validation;
+namespace Validation;
 
 public class UserSessionValidator : AbstractValidator<UserSession>
 {

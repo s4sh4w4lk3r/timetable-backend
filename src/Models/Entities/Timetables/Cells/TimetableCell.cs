@@ -1,50 +1,46 @@
-﻿namespace Models.Entities.Timetables.Cells
-{
-    /// <summary>
-    /// Ячейка расписания
-    /// </summary>
-    public class TimetableCell
-    {
-        public int TimeTableCellId { get; init; }
+﻿using Models.Entities.Timetables.Cells.CellMembers;
+using System.Diagnostics.CodeAnalysis;
 
-        public LessonTime? LessonTime { get; set; }
+namespace Models.Entities.Timetables.Cells
+{
+    public abstract class TimetableCell
+    {
+        public int TimetableCellId { get; init; }
+        public Teacher? Teacher { get; set; }
+        public Subject? Subject { get; init; }
+        public Cabinet? Cabinet { get; set; }
+        public LessonTime? LessonTime { get; init; }
+
+        public required int TeacherId { get; set; }
+        public required int SubjectId { get; init; }
+        public required int CabinetId { get; set; }
         public required int LessonTimeId { get; set; }
 
-        public Cabinet? Cabinet { get; set; }
-        public required int CabinetId { get; set; }
+        protected TimetableCell() { }
 
-        public Teacher? Teacher { get; set; }
-        public required int TeacherId { get; set; }
-
-        public Subject? Subject { get; set; }
-        public required int SubjectId { get; set; }
-
-        public bool IsReplaced { get; private set; }
-
-
-        private TimetableCell? _replacingTimeTableCell;
-        /// <summary>
-        /// Ссылка на пару, которую заменяют. Когда используется сеттер, то свойство IsReplaced становится true.
-        /// </summary>
-        public TimetableCell? ReplacingTimeTableCell
+        [SetsRequiredMembers]
+        protected TimetableCell(int timetableCellId, Teacher teacher, Subject subject, Cabinet cabinet, LessonTime lessonTime)
         {
-            get => _replacingTimeTableCell;
-            set
-            {
-                value.ThrowIfNull();
-                _replacingTimeTableCell = value;
-                IsReplaced = true;
-            }
-        }
+            TimetableCellId = timetableCellId;
+            Teacher = teacher;
+            Subject = subject;
+            Cabinet = cabinet;
+            LessonTime = lessonTime;
 
-        /// <summary>
-        /// Убирает замену из свойства ReplacingTimeTableCell и IsReplaced становится обратно false.
-        /// </summary>
-        public void CancelReplace()
-        {
-            IsReplaced = false;
-            ReplacingTimeTableCell = null;
+            TeacherId = teacher.TeacherId;
+            SubjectId = subject.SubjectId;
+            CabinetId = cabinet.CabinetId;
+            LessonTimeId = lessonTime.LessonTimeId;
+/*
+            Teacher.ThrowIfNull();
+            Subject.ThrowIfNull();
+            Cabinet.ThrowIfNull();
+            LessonTime.ThrowIfNull();
+
+            TeacherId.Throw().IfDefault();
+            SubjectId.Throw().IfDefault();
+            CabinetId.Throw().IfDefault();
+            LessonTimeId.Throw().IfDefault();*/
         }
-        public TimetableCell() { }
     }
 }

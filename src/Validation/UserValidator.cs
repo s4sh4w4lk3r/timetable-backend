@@ -2,7 +2,7 @@
 using Models.Entities.Users;
 using System.Text.RegularExpressions;
 
-namespace Models.Validation;
+namespace Validation;
 
 public class UserValidator : AbstractValidator<User>
 {

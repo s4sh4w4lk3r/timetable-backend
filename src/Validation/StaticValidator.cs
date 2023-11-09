@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Models.Validation;
+namespace Validation;
 
 public static partial class StaticValidator
 {

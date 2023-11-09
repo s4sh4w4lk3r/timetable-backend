@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Models.Entities.Users;
-using Models.Validation;
+using Validation;
 using Repository;
 using WebApi.Services.Account.Interfaces;
 using static Models.Entities.Users.ApprovalCode;
@@ -9,10 +9,10 @@ namespace WebApi.Services.Account.Implementations
 {
     public class ApprovalSender : IApprovalSender
     {
-        private readonly SqlDbContext _dbContext;
+        private readonly TimetableContext _dbContext;
         private readonly IEmailClient _emailClient;
 
-        public ApprovalSender(SqlDbContext dbContext, IEmailClient emailClient)
+        public ApprovalSender(TimetableContext dbContext, IEmailClient emailClient)
         {
             _dbContext = dbContext;
             _emailClient = emailClient;

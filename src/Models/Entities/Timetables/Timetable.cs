@@ -1,58 +1,38 @@
-﻿using Models.Entities.Timetables.Cells;
+﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Models.Entities.Timetables;
-
-public class Timetable
+namespace Models.Entities.Timetables
 {
-    public int TimetableId { get; set; }
-    public Group? Group { get; init; }
-    public required int GroupId { get; init; }
-
     /// <summary>
-    /// Полный список всех занятий, в том числе с заменами. Замены идут отдельной ячейкой и имеют ссылку на занятие, которое под замену.
-    /// На клиенте надо делать выборку для формирования общего расписания.
+    /// Абстрактный класс расписания.
     /// </summary>
-    public IList<TimetableCell>? TimetableCells { get; private set; }
-
-#warning кажется бизнес-логику не продумал.
-    private Timetable() { }
-    public Timetable(int timeTablePk, Group group, IEnumerable<TimetableCell> timetableCells)
+    public abstract class Timetable
     {
-        group.ThrowIfNull();
-        timetableCells.Throw().IfEmpty();
-        TimetableId = timeTablePk;
-        Group = group;
-        TimetableCells = timetableCells.ToList();
-    }
+        public int TimetableId { get; init; }
+        public required Group? Group { get; init; }
 
-    /// <summary>
-    /// Проверяет, есть ли дубликаты занятий на одно и то же время.
-    /// </summary>
-    /// <returns> True если нет дубликатов, в противном случае false.</returns>
-    public bool IsTimeLessonsOk()
-    {
-        if (TimetableCells is null) {  return false; }
+        protected Timetable() { }
 
-        var lessonTimes = TimetableCells.DistinctBy(c => c.LessonTime).Select(c => c.LessonTime);
 
-        foreach (var lessonTime in lessonTimes)
+        /// <summary>
+        /// Используется наследниками для создания объекта класса. Конструктор при создании проверяет 
+        /// наличие дубликатов ячеек на одно и то же время в расписании реализацией абстрактного метода CheckNoDuplicates(), который при их наличии выкидывает исключение.
+        /// </summary>
+        /// <param name="timetableId"></param>
+        /// <param name="group"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        [SetsRequiredMembers]
+        protected Timetable(int timetableId, Group group)
         {
-            int matches = 0;
+            group.ThrowIfNull();
 
-            foreach (var timeTableCell in TimetableCells)
-            {
-
-                if (timeTableCell.LessonTime == lessonTime)
-                {
-                    matches++;
-                }
-
-                if (matches > 1 && timeTableCell.IsReplaced is false)
-                {
-                    return false;
-                }
-            }
+            TimetableId = timetableId;
+            Group = group;
         }
-        return true;
+
+        /// <summary>
+        /// Должен проверять наличие ячеек-дубликатов, которые ссылаются на одно и то же время занятий.
+        /// </summary>
+        /// <returns></returns>
+        public abstract bool CheckNoDuplicates();
     }
 }

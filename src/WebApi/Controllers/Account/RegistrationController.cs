@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Models.Validation;
+using Validation;
 using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Controllers.Auth;
