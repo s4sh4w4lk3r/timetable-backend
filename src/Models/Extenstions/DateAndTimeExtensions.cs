@@ -48,4 +48,3 @@ namespace Models.Extenstions
         }*/
     }
 }
-#warning написать юнит тесты к этому

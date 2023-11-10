@@ -5,36 +5,18 @@ namespace Models.Entities.Timetables.Cells
 {
     public class StableTimetableCell : ITimetableCell
     {
-        public bool IsWeekEven { get; init; }
-        public DayOfWeek DayOfWeek { get; init; }
-        public int TimetableCellId { get; init; }
-        public Teacher? Teacher { get; init; }
-        public Subject? Subject { get; init; }
-        public Cabinet? Cabinet { get; init; }
-        public LessonTime? LessonTime { get; init; }
-        public int TeacherId { get; init; }
-        public int SubjectId { get; init; }
-        public int CabinetId { get; init; }
-        public int LessonTimeId { get; init; }
+        public int TimetableCellId { get; internal set; }
+        public Teacher? Teacher { get; internal set; }
+        public Subject? Subject { get; internal set; }
+        public Cabinet? Cabinet { get; internal set; }
+        public LessonTime? LessonTime { get; internal set; }
+        public int TeacherId { get; internal set; }
+        public int SubjectId { get; internal set; }
+        public int CabinetId { get; internal set; }
+        public int LessonTimeId { get; internal set; }
+        public bool IsWeekEven { get; internal set; }
+        public DayOfWeek DayOfWeek { get; internal set; }
 
-        public StableTimetableCell() { }
-
-
-
-        /// <summary>
-        /// Преобразовывает ячейку константного расписания в актульное, без замен и отмен.
-        /// </summary>
-        /// <param name="dateOnly"></param>
-        /// <returns></returns>
-        public ActualTimetableCell CastToActualCell(DateOnly dateOnly)
-        {
-            this.Teacher.ThrowIfNull();
-            this.Subject.ThrowIfNull();
-            this.Cabinet.ThrowIfNull();
-            this.LessonTime.ThrowIfNull();
-
-            return new ActualTimetableCell(this.TimetableCellId, this.Teacher, this.Subject, this.Cabinet, this.LessonTime,
-                dateOnly, isModified: false, isCanceled: false, isMoved: false);
-        }
+        internal StableTimetableCell() { }
     }
 }

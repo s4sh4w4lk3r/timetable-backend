@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Models.Entities.Timetables.Cells;
+﻿using Models.Entities.Timetables.Cells;
 
 namespace Models.Entities.Timetables
 {
@@ -9,23 +8,27 @@ namespace Models.Entities.Timetables
     /// </summary>
     public class ActualTimetable : ITimetable
     {
-        public required int WeekNumber { get; init; }
-        public required IEnumerable<ActualTimetableCell>? ActualTimetableCells { get; init; }
+        public int TimetableId { get; internal set; }
+        public Group? Group { get; internal set; }
+        public int GroupId { get; internal set; }
+        public int WeekNumber { get; internal set; }
+        public ICollection<ActualTimetableCell>? ActualTimetableCells { get; init; }
 
-        private ActualTimetable() : base() { }
+        private ActualTimetable() { }
 
-        [SetsRequiredMembers]
-        public ActualTimetable(int actualTimetableId, Group group, IEnumerable<ActualTimetableCell> actualTimetableCells, int weekNumber) : base(actualTimetableId, group)
+        public ActualTimetable(int actualTimetableId, Group group, IEnumerable<ActualTimetableCell> actualTimetableCells, int weekNumber)
         {
             actualTimetableCells.ThrowIfNull().IfEmpty().IfHasNullElements();
             weekNumber.Throw().IfLessThan(1).IfGreaterThan(53);
-            ActualTimetableCells = actualTimetableCells;
+            group.ThrowIfNull();
+
+            Group = group;
+            TimetableId = actualTimetableId;
+            ActualTimetableCells = actualTimetableCells.ToList();
             WeekNumber = weekNumber;
-#warning вернуть проверку если надо.
-            //EnsureNoDuplicates();
         }
 
-        public override bool CheckNoDuplicates()
+        public bool CheckNoDuplicates()
         {
             ActualTimetableCells.ThrowIfNull().IfHasNullElements().IfEmpty();
 

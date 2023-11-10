@@ -1,22 +1,27 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Models.Entities.Timetables.Cells;
+﻿using Models.Entities.Timetables.Cells;
 
 namespace Models.Entities.Timetables
 {
     public class StableTimetable : ITimetable
     {
-        public required IEnumerable<StableTimetableCell>? StableTimetableCells { get; init; }
+        public int TimetableId { get; internal set; }
+        public Group? Group { get; internal set; }
+        public int GroupId { get; internal set; }
+        public ICollection<StableTimetableCell>? StableTimetableCells { get; init; }
 
-        private StableTimetable() : base() { } 
+        private StableTimetable() { }
 
-        [SetsRequiredMembers]
-        public StableTimetable(int stableTimetableId, Group group, IEnumerable<StableTimetableCell> stableTimetableCells) : base(stableTimetableId, group)
+        public StableTimetable(int stableTimetableId, Group group, IEnumerable<StableTimetableCell> stableTimetableCells)
         {
             stableTimetableCells.ThrowIfNull().IfEmpty().IfHasNullElements();
-            StableTimetableCells = stableTimetableCells;
+            group.ThrowIfNull();
+
+            StableTimetableCells = stableTimetableCells.ToList();
+            TimetableId = stableTimetableId;
+            Group = group;
         }
 
-        public override bool CheckNoDuplicates()
+        public bool CheckNoDuplicates()
         {
             StableTimetableCells.ThrowIfNull().IfHasNullElements().IfEmpty();
 

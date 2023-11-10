@@ -1,12 +1,13 @@
 ﻿namespace Models.Entities.Timetables
 {
     /// <summary>
-    /// Абстрактный класс расписания.
+    /// Интерфейс расписания.
     /// </summary>
     public interface ITimetable
     {
-        public int TimetableId { get; set; }
-        public Group? Group { get; init; }
+        public int TimetableId { get; }
+        public Group? Group { get; }
+        public int GroupId { get; }
 
 
         /// <summary>

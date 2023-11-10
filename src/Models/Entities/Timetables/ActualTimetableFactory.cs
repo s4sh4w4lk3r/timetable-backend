@@ -74,7 +74,13 @@ namespace Models.Entities.Timetables
 
             foreach (var item in stableListForThisDay)
             {
-                var actualCell = item.CastToActualCell(dateOnly);
+                var actualCell = new ActualTimetableCell(timetableCellId: default, 
+                    teacher: item.Teacher, 
+                    subject: item.Subject, 
+                    cabinet: item.Cabinet, 
+                    lessonTime: item.LessonTime, 
+                    dateOnly: dateOnly);
+
                 _actualTimetableCells.Add(actualCell);
             }
         }
@@ -92,20 +98,16 @@ namespace Models.Entities.Timetables
 
             foreach (var item in stableListForThisDay)
             {
-                var actualCell = new ActualTimetableCell()
-                {
-                    Date = dateOnly,
-                    CabinetId = item.CabinetId,
-                    IsCanceled = false,
-                    IsModified = false,
-                    IsMoved = false,
-                    LessonTimeId = item.LessonTimeId,
-                    SubjectId = item.SubjectId,
-                    TeacherId = item.TeacherId
-                };
+                var actualCell = new ActualTimetableCell(
+                    timetableCellId: default,
+                    teacherId: item.TeacherId,
+                    subjectId: item.SubjectId,
+                    cabinetId: item.CabinetId,
+                    lessonTimeId: item.LessonTimeId,
+                    dateOnly: dateOnly);
+
                 _actualTimetableCells.Add(actualCell);
             }
         }
-#warning надо как следует продебажить все по всем датам.
     }
 }

@@ -9,10 +9,10 @@ public class Subject
     public required string Name { get; set; }
 
     [JsonIgnore]
-    public List<ActualTimetableCell>? ActualTimetableCells { get; set; }
+    public ICollection<ActualTimetableCell>? ActualTimetableCells { get; set; }
 
     [JsonIgnore]
-    public List<StableTimetableCell>? StableTimetableCells { get; set; }
+    public ICollection<StableTimetableCell>? StableTimetableCells { get; set; }
 
     private Subject() { }
 
