@@ -6,16 +6,18 @@ using Models.Entities.Timetables.Cells.CellMembers;
 
 namespace Repository
 {
-    internal static class TimetableEntityBuilderMethods
+    internal static class TimetableSchemaMethods
     {
         public static void ConfigureLessonTime(EntityTypeBuilder<LessonTime> entity)
         {
-            entity.HasKey(e => e.LessonTimeId).HasName("LessonTimePRIMARY");
+            entity.ToTable("LessonTime", "timetable");
+            entity.HasKey(e => e.LessonTimeId);
         }
 
         public static void ConfigureActualTimetableCell(EntityTypeBuilder<ActualTimetableCell> entity)
         {
-            entity.HasBaseType<ITimetableCell>();
+            entity.ToTable("ActualTimetableCell", "timetable");
+            entity.HasKey(e => e.TimetableCellId);
             entity.HasOne(e => e.Cabinet).WithMany(e => e.ActualTimetableCells);
             entity.HasOne(e => e.Subject).WithMany(e => e.ActualTimetableCells);
             entity.HasOne(e => e.Teacher).WithMany(e => e.ActualTimetableCells);
@@ -24,60 +26,55 @@ namespace Repository
 
         public static void ConfigureStableTimetableCell(EntityTypeBuilder<StableTimetableCell> entity)
         {
-            entity.HasBaseType<ITimetableCell>();
+            entity.ToTable("StableTimetableCell", "timetable");
+            entity.HasKey(e => e.TimetableCellId);
             entity.HasOne(e => e.Cabinet).WithMany(e => e.StableTimetableCells);
             entity.HasOne(e => e.Subject).WithMany(e => e.StableTimetableCells);
             entity.HasOne(e => e.Teacher).WithMany(e => e.StableTimetableCells);
             entity.HasOne(e => e.LessonTime).WithMany(e => e.StableTimetableCells);
         }
 
-        public static void ConfigureTimetableCell(EntityTypeBuilder<ITimetableCell> entity)
-        {
-            entity.HasKey(e => e.TimetableCellId).HasName("TimetableCellPRIMARY");
-            entity.UseTphMappingStrategy();
-        }
-
         public static void ConfigureActualTimetable(EntityTypeBuilder<ActualTimetable> entity)
         {
-            entity.HasBaseType<ITimetable>();
+            entity.ToTable("ActualTimetable", "timetable");
+            entity.HasKey(e => e.TimetableId);
         }
 
         public static void ConfigureStableTimetable(EntityTypeBuilder<StableTimetable> entity)
         {
-            entity.HasBaseType<ITimetable>();
-        }
-
-        public static void ConfigureTimetable(EntityTypeBuilder<ITimetable> entity)
-        {
-            entity.HasKey(e => e.TimetableId).HasName("TimetablePRIMARY");
-            entity.UseTphMappingStrategy();
+            entity.ToTable("StableTimetable", "timetable");
+            entity.HasKey(e => e.TimetableId);
         }
 
         public static void ConfigureCabinet(EntityTypeBuilder<Cabinet> entity)
         {
-            entity.HasKey(c => c.CabinetId).HasName("CabinetPRIMARY");
-            entity.Property(c => c.Address).HasMaxLength(255);
-            entity.Property(c => c.Number).HasMaxLength(255);
+            entity.ToTable("Cabinet", "timetable");
+            entity.HasKey(c => c.CabinetId);
+            entity.Property(c => c.Address);
+            entity.Property(c => c.Number);
         }
 
         public static void ConfigureSubject(EntityTypeBuilder<Subject> entity)
         {
-            entity.HasKey(s => s.SubjectId).HasName("SubjectPRIMARY");
-            entity.Property(s => s.Name).HasMaxLength(255);
+            entity.ToTable("Subject", "timetable");
+            entity.HasKey(s => s.SubjectId);
+            entity.Property(s => s.Name);
         }
 
         public static void ConfigureTeacher(EntityTypeBuilder<Teacher> entity)
         {
-            entity.HasKey(t => t.TeacherId).HasName("TeacherPRIMARY");
-            entity.Property(t => t.FirstName).HasMaxLength(255);
-            entity.Property(t => t.MiddleName).HasMaxLength(255);
-            entity.Property(t => t.Surname).HasMaxLength(255);
+            entity.ToTable("Teacher", "timetable");
+            entity.HasKey(t => t.TeacherId);
+            entity.Property(t => t.FirstName);
+            entity.Property(t => t.MiddleName);
+            entity.Property(t => t.Surname);
         }
 
         public static void ConfigureGroup(EntityTypeBuilder<Group> entity)
         {
-            entity.HasKey(g => g.GroupId).HasName("GroupPRIMARY");
-            entity.Property(g => g.Name).HasMaxLength(255);
+            entity.ToTable("Group", "timetable");
+            entity.HasKey(g => g.GroupId);
+            entity.Property(g => g.Name);
         }
     }
 }

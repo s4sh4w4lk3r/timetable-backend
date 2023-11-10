@@ -5,14 +5,13 @@ using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Timetables.Cells.CellMembers;
 using Throw;
-using static Repository.TimetableEntityBuilderMethods;
-using static Repository.UserEntityBuilderMethods;
+using static Repository.TimetableSchemaMethods;
+using static Repository.AccountingSchemaMethods;
 
 namespace Repository;
 
 public class TimetableContext : DbContext
 {
-#error попробовать уйти от наследования в дб контексте расписания и ячеек
     private readonly DbConfiguration _configuration;
     private readonly ILoggerFactory _loggerFactory;
     private static bool IsEnsureCreated = false;
@@ -32,21 +31,6 @@ public class TimetableContext : DbContext
         }
     }
 
-    /*public DbSet<Cabinet> Cabinets => Set<Cabinet>();
-    public DbSet<LessonTime> LessonTimes => Set<LessonTime>();
-    public DbSet<Subject> Subjects => Set<Subject>();
-    public DbSet<Teacher> Teachers => Set<Teacher>();
-    public DbSet<Group> Groups => Set<Group>();
-    public DbSet<User> Users => Set<User>();
-    public DbSet<Timetable> Timetables => Set<Timetable>();
-    public DbSet<ApprovalCode> ApprovalCodes => Set<ApprovalCode>();
-    public DbSet<UserSession> UserSessions => Set<UserSession>();
-    public DbSet<EmailUpdateEntity> EmailUpdateEntities => Set<EmailUpdateEntity>();
-    public DbSet<ActualTimetableCell> ActualTimetableCells => Set<ActualTimetableCell>();
-    public DbSet<StableTimetableCell> StableTimetableCells => Set<StableTimetableCell>();
-    public DbSet<StableTimetable> StableTimetables => Set<StableTimetable>();
-    public DbSet<ActualTimetable> ActualTimetables => Set<ActualTimetable>();*/
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseLoggerFactory(_loggerFactory);
@@ -64,22 +48,22 @@ public class TimetableContext : DbContext
         {
             modelBuilder.UseCollation(_configuration.Collation);
         }
+        #region Настройка схема accounting
 
-        modelBuilder.Entity<User>(ConfigureUser);
+        /*        modelBuilder.Entity<User>(ConfigureUser);
 
-        modelBuilder.Entity<ApprovalCode>(ConfigureApprovalCode);
+                modelBuilder.Entity<ApprovalCode>(ConfigureApprovalCode);
 
-        modelBuilder.Entity<UserSession>(ConfigureUserSession);
+                modelBuilder.Entity<UserSession>(ConfigureUserSession);
 
-        modelBuilder.Entity<EmailUpdateEntity>(ConfigureEmailUpdateEntity);
+                modelBuilder.Entity<EmailUpdateEntity>(ConfigureEmailUpdateEntity);*/
+        #endregion
 
-        modelBuilder.Entity<ITimetable>(ConfigureTimetable);
 
+        #region Настройка схемы timetable
         modelBuilder.Entity<StableTimetable>(ConfigureStableTimetable);
 
         modelBuilder.Entity<ActualTimetable>(ConfigureActualTimetable);
-
-        modelBuilder.Entity<ITimetableCell>(ConfigureTimetableCell);
 
         modelBuilder.Entity<StableTimetableCell>(ConfigureStableTimetableCell);
 
@@ -94,5 +78,6 @@ public class TimetableContext : DbContext
         modelBuilder.Entity<Teacher>(ConfigureTeacher);
 
         modelBuilder.Entity<Group>(ConfigureGroup);
+        #endregion
     }
 }
