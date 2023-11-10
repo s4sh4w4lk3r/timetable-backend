@@ -1,5 +1,4 @@
 ﻿using Models.Entities.Timetables.Cells.CellMembers;
-using Models.Users;
 
 namespace Models.Entities.Timetables.Cells
 {
