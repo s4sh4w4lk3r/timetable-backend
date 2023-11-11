@@ -12,6 +12,7 @@ namespace Repository
             entity.ToTable("User", "identity");
             entity.HasKey(u => u.UserId);
             entity.UseTphMappingStrategy();
+            entity.HasIndex(e=>e.Email).IsUnique();
         }
 
         public static void ConfigureAdmin(EntityTypeBuilder<Admin> entity)

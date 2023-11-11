@@ -17,6 +17,7 @@ public class RegistrationController : ControllerBase
     [HttpPost, Route("")]
     public async Task<IActionResult> Register([FromBody] UserRegistrationDto userRegistrationDto, CancellationToken cancellationToken = default)
     {
+#warning сделать ендпоинты для регистрации разных типов юезров.
         if (StaticValidator.ValidateEmail(userRegistrationDto.Email) is false)
         {
             return BadRequest("Неверный формат почты.");
@@ -24,7 +25,7 @@ public class RegistrationController : ControllerBase
 
         if (StaticValidator.ValidatePassword(userRegistrationDto.Password) is false)
         {
-            return BadRequest("Пароль не соответсствует тербованиям.");
+            return BadRequest("Пароль не соответствует тербованиям.");
         }
 
         Models.Entities.Users.User user = new() { Email = userRegistrationDto.Email, Password = userRegistrationDto.Password };

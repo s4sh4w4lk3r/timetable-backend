@@ -8,12 +8,10 @@ namespace WebApi.Services.Account.Implementations;
 public class PasswordService
 {
     private readonly TimetableContext _dbContext;
-    private readonly DbSet<User> _users;
 
     public PasswordService(TimetableContext dbContext)
     {
         _dbContext = dbContext;
-        _users = _dbContext.Set<User>();
     }
     public async Task<ServiceResult> UpdatePassword(int userId, string newPassword, CancellationToken cancellationToken = default)
     {
@@ -28,30 +26,42 @@ public class PasswordService
             return new ServiceResult(false, "В пароле должно быть не менее 8 символов, большие и маленькие латинские буквы, цифры и спецсимволы #?!@$%^&*-");
         }
 
-        var userFromRepo = await _users.SingleOrDefaultAsync(e => e.UserId == userId, cancellationToken);
+        var userFromRepo = await _dbContext.Set<User>().SingleOrDefaultAsync(e => e.UserId == userId, cancellationToken);
         if (userFromRepo is null)
         {
             return new ServiceResult(false, "Пользователь с таким Id не найден.");
         }
 
         userFromRepo.Password = HashPassword(newPassword);
-        _users.Update(userFromRepo);
+        _dbContext.Set<User>().Update(userFromRepo);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new ServiceResult(true, "Пароль пользователя обновлен.");
     }
-    public async Task<ServiceResult<User>> CheckLoginDataAsync(User user, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult<User>> CheckLoginDataAsync(string email, string password, CancellationToken cancellationToken = default)
     {
-        if (StaticValidator.ValidateEmail(user.Email) is false)
+        if (StaticValidator.ValidateEmail(email) is false)
         {
             return ServiceResult<User>.Fail("Email имеет неверный формат.", null);
         }
 
-        if (StaticValidator.ValidatePassword(user.Password) is false)
+        if (StaticValidator.ValidatePassword(password) is false)
         {
             return ServiceResult<User>.Fail("Пароль не соответствует минимальным требованиям безопасности.", null);
         }
 
-        var userFromRepo = await _users.SingleOrDefaultAsync(e => e.Email == user.Email, cancellationToken);
+
+        // Ищем какому типу User принадлжеит имейл.
+        User? userFromRepo = await _dbContext.Set<Student>().SingleOrDefaultAsync(e => e.Email == email, cancellationToken);
+        if (userFromRepo is null)
+        {
+            userFromRepo = await _dbContext.Set<Teacher>().SingleOrDefaultAsync(e => e.Email == email, cancellationToken);
+            if (userFromRepo is null)
+            {
+                userFromRepo = await _dbContext.Set<Admin>().SingleOrDefaultAsync(e => e.Email == email, cancellationToken);
+            }
+        }
+        
+
         if (userFromRepo is null)
         {
             return new ServiceResult<User>(false, "Пользователя нет в бд.", null);
@@ -68,7 +78,7 @@ public class PasswordService
             return new ServiceResult<User>(false, "Пользователь найден, но его пароль почему-то пуст.", null);
         }
 
-        if (ValidatePassword(hashFromRepo, user.Password!) is true)
+        if (ValidatePassword(hashFromRepo, password!) is true)
         {
             return new ServiceResult<User>(true, "Пароль подтвержден.", userFromRepo);
         }

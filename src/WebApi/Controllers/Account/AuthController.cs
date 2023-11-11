@@ -1,9 +1,10 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Models.Entities.Users;
+using Models.Entities.Identity;
+using Models.Entities.Identity.Users;
 using System.Security.Claims;
+using Validation;
 using WebApi.Extensions;
 using WebApi.Services;
 using WebApi.Services.Account.Implementations;
@@ -17,28 +18,34 @@ public class AuthController : ControllerBase
 {
     private readonly IUserSessionService _userSessionService;
     private readonly ITokenService _tokenService;
+    private readonly ILogger _logger;
 
-    public AuthController(IUserSessionService userSessionService, ITokenService tokenService)
+    public AuthController(IUserSessionService userSessionService, ITokenService tokenService, ILoggerFactory loggerFactory)
     {
         _userSessionService = userSessionService;
         _tokenService = tokenService;
+        _logger = loggerFactory.CreateLogger<AuthController>();
     }
-#warning в работе с аккаунтами, принимать везде dto, выпилить Ivalidatorы
+
     [HttpPost, Route("login")]
-    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] User user, [FromServices] IValidator<User> userValidator, [FromServices] PasswordService passwordService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] EmailPasswordPair emailPasswordPair, [FromServices] PasswordService passwordService, CancellationToken cancellationToken = default)
     {
-        var userValidation = userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex").IncludeProperties(e => e.Email));
-        if (userValidation.IsValid is false)
+        if (StaticValidator.ValidateEmail(emailPasswordPair.Email) is false)
         {
-            return BadRequest(userValidation);
+            return BadRequest("Email имеет неверный формат.");
         }
 
-        var checkLoginDataResult = await passwordService.CheckLoginDataAsync(user, cancellationToken);
+        if (StaticValidator.ValidatePassword(emailPasswordPair.Password) is false)
+        {
+            return BadRequest("Пароль не соответствует минимальным требованиям безопасности.");
+        }
+
+        var checkLoginDataResult = await passwordService.CheckLoginDataAsync(emailPasswordPair.Email!, emailPasswordPair.Password!, cancellationToken);
         if (checkLoginDataResult.Success is false || checkLoginDataResult.Value is null)
         {
             return BadRequest(new ServiceResult(false, "Неудачная попытка входа.", checkLoginDataResult));
         }
-        user = checkLoginDataResult.Value;
+        var userFromRepo = checkLoginDataResult.Value;
 
         string refreshToken = _tokenService.GenerateRefreshToken();
 
@@ -46,9 +53,9 @@ public class AuthController : ControllerBase
         {
             RefreshToken = refreshToken,
             DeviceInfo = HttpContext.Request.Headers.UserAgent.ToString(),
-            UserId = user.UserId,
+            UserId = userFromRepo.UserId,
             RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30),
-            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "0.0.0.0"
         };
 
         var userSessionResult = await _userSessionService.AddAsync(userSession, cancellationToken);
@@ -59,18 +66,37 @@ public class AuthController : ControllerBase
 
         var claims = new List<Claim>
         {
-            new Claim(TimetableClaimTypes.UserId, user.UserId.ToString()),
-            new Claim(TimetableClaimTypes.UserSessionId, userSession.UserSessionId.ToString())
+            new Claim(TimetableClaimTypes.UserId, userFromRepo.UserId.ToString()),
+            new Claim(TimetableClaimTypes.UserSessionId, userSession.UserSessionId.ToString()),
         };
 
-        string accessToken = _tokenService.GenerateAccessToken(claims);
+        switch (userFromRepo)
+        {
+            case Student:
+                claims.Add(new Claim(TimetableClaimTypes.UserRole, TimetableRoles.Student));
+                break;
 
+            case Teacher:
+                claims.Add(new Claim(TimetableClaimTypes.UserRole, TimetableRoles.Teacher));
+                break;
+
+            case Admin:
+                claims.Add(new Claim(TimetableClaimTypes.UserRole, TimetableRoles.Admin));
+                break;
+
+            default:
+                string errorMessage = "[AuthController, Login] Не получилось задаункастить тип юзера, полученного из бд.";
+                _logger.LogCritical(errorMessage);
+                return StatusCode(500, errorMessage);
+        }
+
+        string accessToken = _tokenService.GenerateAccessToken(claims);
 
         return Ok(new TokenPair(accessToken, refreshToken));
     }
 
-    [HttpGet, Authorize, Route("global-logout")]
-    public async Task<IActionResult> GlobalLogout(CancellationToken cancellationToken = default)
+    [HttpGet, Authorize, Route("terminate-all-sessions")]
+    public async Task<IActionResult> TermainateAllSessions(CancellationToken cancellationToken = default)
     {
         if (User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
         {
@@ -92,7 +118,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet, Route("token/refresh")]
-    public async Task<IActionResult> Refresh([FromBody, Bind("AccessToken", "RefreshToken")] TokenPair tokenPair, CancellationToken cancellationToken)
+    public async Task<IActionResult> RefreshToken([FromBody, Bind("AccessToken", "RefreshToken")] TokenPair tokenPair, CancellationToken cancellationToken)
     {
         string? accessToken = tokenPair.AccessToken;
         string? refreshToken = tokenPair.RefreshToken;
@@ -101,7 +127,7 @@ public class AuthController : ControllerBase
         {
             return BadRequest("Отсутствует RefreshToken в теле запроса.");
         }
-        
+
         if (string.IsNullOrWhiteSpace(accessToken))
         {
             return BadRequest("Отсутствует AccessToken в заголовке Authorization.");
@@ -150,7 +176,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost, Authorize, Route("token/revoke")]
-    public async Task<IActionResult> Revoke([FromBody] TokenPair tokenPair, CancellationToken cancellationToken)
+    public async Task<IActionResult> TermainateSession([FromBody, Bind("AccessToken", "RefreshToken")] TokenPair tokenPair, CancellationToken cancellationToken)
     {
         string? refreshToken = tokenPair.RefreshToken;
         if (string.IsNullOrWhiteSpace(refreshToken))
@@ -173,5 +199,7 @@ public class AuthController : ControllerBase
         return Ok(userSessionResult);
     }
 
+
     public record class TokenPair(string? AccessToken, string? RefreshToken);
+    public record class EmailPasswordPair(string? Email, string? Password);
 }
