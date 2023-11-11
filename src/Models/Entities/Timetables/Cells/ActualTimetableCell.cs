@@ -5,7 +5,7 @@ namespace Models.Entities.Timetables.Cells
     public class ActualTimetableCell : ITimetableCell
     {
         public int TimetableCellId { get; init; }
-        public Teacher? Teacher { get; init; }
+        public TeacherCM? Teacher { get; init; }
         public Subject? Subject { get; init; }
         public Cabinet? Cabinet { get; init; }
         public LessonTime? LessonTime { get; init; }
@@ -20,7 +20,7 @@ namespace Models.Entities.Timetables.Cells
 
         private ActualTimetableCell() { }
 
-        public ActualTimetableCell(int timetableCellId, Teacher? teacher, Subject? subject, Cabinet? cabinet, LessonTime? lessonTime, DateOnly dateOnly)
+        public ActualTimetableCell(int timetableCellId, TeacherCM? teacher, Subject? subject, Cabinet? cabinet, LessonTime? lessonTime, DateOnly dateOnly)
         {
             TimetableCellId = timetableCellId;
             Teacher = teacher;

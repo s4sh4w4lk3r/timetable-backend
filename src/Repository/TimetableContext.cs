@@ -6,7 +6,9 @@ using Models.Entities.Timetables.Cells;
 using Models.Entities.Timetables.Cells.CellMembers;
 using Throw;
 using static Repository.TimetableSchemaMethods;
-using static Repository.AccountingSchemaMethods;
+using static Repository.IdentitySchemaMethods;
+using Models.Entities.Identity.Users;
+using Models.Entities.Identity;
 
 namespace Repository;
 
@@ -48,13 +50,16 @@ public class TimetableContext : DbContext
         {
             modelBuilder.UseCollation(_configuration.Collation);
         }
-        #region Настройка схема accounting
+        #region Настройка схемы identity
 
-        /*        modelBuilder.Entity<User>(ConfigureUser);
-
-                modelBuilder.Entity<ApprovalCode>(ConfigureApprovalCode);
+        modelBuilder.Entity<User>(ConfigureUser);
+        modelBuilder.Entity<Teacher>(ConfigureTeacher);
+        modelBuilder.Entity<Admin>(ConfigureAdmin);
+        modelBuilder.Entity<Student>(ConfigureStudent);
 
                 modelBuilder.Entity<UserSession>(ConfigureUserSession);
+        /*modelBuilder.Entity<ApprovalCode>(ConfigureApprovalCode);
+
 
                 modelBuilder.Entity<EmailUpdateEntity>(ConfigureEmailUpdateEntity);*/
         #endregion
@@ -75,7 +80,7 @@ public class TimetableContext : DbContext
 
         modelBuilder.Entity<Subject>(ConfigureSubject);
 
-        modelBuilder.Entity<Teacher>(ConfigureTeacher);
+        modelBuilder.Entity<TeacherCM>(ConfigureTeacher);
 
         modelBuilder.Entity<Group>(ConfigureGroup);
         #endregion

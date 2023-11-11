@@ -61,9 +61,9 @@ namespace Repository
             entity.Property(s => s.Name);
         }
 
-        public static void ConfigureTeacher(EntityTypeBuilder<Teacher> entity)
+        public static void ConfigureTeacher(EntityTypeBuilder<TeacherCM> entity)
         {
-            entity.ToTable("Teacher", "timetable");
+            entity.ToTable("TeacherCM", "timetable");
             entity.HasKey(t => t.TeacherId);
             entity.Property(t => t.FirstName);
             entity.Property(t => t.MiddleName);

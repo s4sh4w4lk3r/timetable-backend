@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace Models.Entities.Timetables
 {
-    public class ActualTimetableFactory
+    internal class ActualTimetableFactory
     {
         private readonly List<StableTimetableCell> _stableTimetableCells;
         private readonly List<ActualTimetableCell> _actualTimetableCells = new();

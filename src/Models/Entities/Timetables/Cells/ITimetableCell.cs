@@ -5,7 +5,7 @@ namespace Models.Entities.Timetables.Cells
     public interface ITimetableCell
     {
         public int TimetableCellId { get; }
-        public Teacher? Teacher { get; }
+        public TeacherCM? Teacher { get; }
         public Subject? Subject { get; }
         public Cabinet? Cabinet { get; }
         public LessonTime? LessonTime { get; }

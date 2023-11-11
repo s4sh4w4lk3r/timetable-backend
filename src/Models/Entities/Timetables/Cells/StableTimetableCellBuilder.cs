@@ -25,7 +25,7 @@ namespace Models.Entities.Timetables.Cells
             return this;
         }
 
-        public StableTimetableCellBuilder AddTeacher(Teacher teacher)
+        public StableTimetableCellBuilder AddTeacher(TeacherCM teacher)
         {
             teacher.ThrowIfNull();
             _stableTimetableCell.Teacher = teacher;

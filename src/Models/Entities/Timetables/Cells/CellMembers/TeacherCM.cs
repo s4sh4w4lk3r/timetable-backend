@@ -6,7 +6,7 @@ namespace Models.Entities.Timetables.Cells.CellMembers;
 /// <summary>
 /// Сущность учителя для расписания (не имя для входа).
 /// </summary>
-public class Teacher
+public class TeacherCM
 {
     public int TeacherId { get; init; }
     public required string Surname { get; set; }
@@ -19,10 +19,10 @@ public class Teacher
     [JsonIgnore]
     public ICollection<StableTimetableCell>? StableTimetableCells { get; set; }
 
-    private Teacher() { }
+    private TeacherCM() { }
 
     [SetsRequiredMembers]
-    public Teacher(int teacherPK, string surname, string firstname, string middlename)
+    public TeacherCM(int teacherPK, string surname, string firstname, string middlename)
     {
         surname.ThrowIfNull().IfWhiteSpace();
         firstname.ThrowIfNull().IfWhiteSpace();

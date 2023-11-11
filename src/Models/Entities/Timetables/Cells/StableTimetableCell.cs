@@ -5,7 +5,7 @@ namespace Models.Entities.Timetables.Cells
     public class StableTimetableCell : ITimetableCell
     {
         public int TimetableCellId { get; internal set; }
-        public Teacher? Teacher { get; internal set; }
+        public TeacherCM? Teacher { get; internal set; }
         public Subject? Subject { get; internal set; }
         public Cabinet? Cabinet { get; internal set; }
         public LessonTime? LessonTime { get; internal set; }
