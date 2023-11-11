@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models.Entities.Users;
+using Models.Entities.Identity.Users;
 using Validation;
 using WebApi.Extensions;
 using WebApi.Services.Account.Implementations;
@@ -14,7 +14,7 @@ public class UpdateController : Controller
     private readonly PasswordService _passwordService;
 
     public UpdateController(EmailUpdater emailService, PasswordService passwordService)
-    {;
+    {
         _emailService = emailService;
         _passwordService = passwordService;
     }
@@ -59,7 +59,7 @@ public class UpdateController : Controller
         {
             return BadRequest(serviceResult);
         }
-        
+
         return Ok(serviceResult);
     }
 

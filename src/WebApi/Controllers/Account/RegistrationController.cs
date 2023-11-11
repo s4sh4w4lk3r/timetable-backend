@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Models.Entities.Identity.Users;
 using Validation;
 using WebApi.Services.Account.Interfaces;
 
@@ -15,7 +16,7 @@ public class RegistrationController : ControllerBase
     }
 
     [HttpPost, Route("")]
-    public async Task<IActionResult> Register([FromBody] UserRegistrationDto userRegistrationDto, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> RegisterAdmin([FromBody] UserRegistrationDto userRegistrationDto, CancellationToken cancellationToken = default)
     {
 #warning сделать ендпоинты для регистрации разных типов юезров.
         if (StaticValidator.ValidateEmail(userRegistrationDto.Email) is false)
@@ -28,7 +29,7 @@ public class RegistrationController : ControllerBase
             return BadRequest("Пароль не соответствует тербованиям.");
         }
 
-        Models.Entities.Users.User user = new() { Email = userRegistrationDto.Email, Password = userRegistrationDto.Password };
+        Admin user = new() { Email = userRegistrationDto.Email, Password = userRegistrationDto.Password, Firstname = "d", Lastname = "d", Middlename = "d" };
         var regResult = await _registerService.AddUserToRepoAsync(user, cancellationToken);
         if (regResult.Success is false)
         {

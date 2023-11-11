@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.HttpOverrides;
+﻿using Microsoft.AspNetCore.HttpOverrides;
 using Repository;
 using Serilog;
-using Validation;
-using WebApi.GraphQL;
-using WebApi.Middlewares.Auth;
+using WebApi.Middlewares.Authentication;
 using WebApi.Services.Account.Implementations;
 using WebApi.Services.Account.Interfaces;
 using WebApi.Types.Configuration;
@@ -27,8 +25,15 @@ public class Program
         var app = builder.Build();
         ConfigureMiddlewares(app);
 
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<TimetableContext>();
+            //db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+            db.Dispose();
+        }
 
-        app.Run();
+         app.Run();
     }
 
     private static void ConfigureServices(WebApplicationBuilder builder)
@@ -36,16 +41,16 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen();
 
-        
+
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
-        .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, options => { });
+         .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, options => { });
         builder.Services.AddAuthorization();
-        builder.Services.AddGraphQLServer()
+        /* builder.Services.AddGraphQLServer()
             .AddQueryType<Queries>()
             .AddProjections()
             .AddFiltering()
             .AddSorting()
-            .AddAuthorization();
+            .AddAuthorization();*/
     }
     private static void ConfigureDependencies(WebApplicationBuilder builder)
     {
@@ -58,7 +63,6 @@ public class Program
         builder.Services.AddScoped<IUserSessionService, UserSessionService>();
         builder.Services.AddScoped<IApprovalService, ApprovalService>();
         builder.Services.AddScoped<IApprovalSender, ApprovalSender>();
-        builder.Services.AddScoped<ActualTimetableService>();
 
         if (builder.Environment.IsDevelopment())
         {
@@ -83,7 +87,7 @@ public class Program
         app.UseSerilogRequestLogging();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.MapGraphQL();
+        //app.MapGraphQL();
         app.MapControllers();
 
         app.UseForwardedHeaders(new ForwardedHeadersOptions

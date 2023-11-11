@@ -13,13 +13,15 @@ namespace WebApi.Services.Account.Implementations;
 public class TokenService : ITokenService
 {
     private readonly JwtConfiguration _jwtConfiguration;
-    public TokenService(IOptions<JwtConfiguration> options)
+    private readonly ILogger _logger;
+    public TokenService(IOptions<JwtConfiguration> options, ILoggerFactory loggerFactory)
     {
         _jwtConfiguration = options.Value;
 
         _jwtConfiguration.ThrowIfNull();
         _jwtConfiguration.Issuer.ThrowIfNull().IfWhiteSpace();
         _jwtConfiguration.SecurityKey.ThrowIfNull().IfWhiteSpace();
+        _logger = loggerFactory.CreateLogger<TokenService>();
     }
     public string GenerateAccessToken(IEnumerable<Claim> claims)
     {
@@ -75,9 +77,21 @@ public class TokenService : ITokenService
 
             return ServiceResult<ClaimsPrincipal?>.Ok("Валидация токена прошла успешно", principal);
         }
+
+        catch (SecurityTokenSignatureKeyNotFoundException)
+        {
+            return ServiceResult<ClaimsPrincipal?>.Fail("TokenSignatureKeyNotFound.", null);
+        }
+
+        catch (SecurityTokenExpiredException)
+        {
+            return ServiceResult<ClaimsPrincipal?>.Fail("SecurityTokenExpired.", null);
+        }
+
         catch (Exception ex)
         {
-            return ServiceResult<ClaimsPrincipal?>.Fail(ex.Message, null);
+            _logger.LogError(ex, "Что-то пошло не так");
+            return ServiceResult<ClaimsPrincipal?>.Fail("Что-то пошло не так, см. логи.", null);
         }
     }
 }

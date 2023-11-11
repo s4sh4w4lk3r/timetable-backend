@@ -117,7 +117,7 @@ public class AuthController : ControllerBase
         return Ok(revokeResult);
     }
 
-    [HttpGet, Route("token/refresh")]
+    [HttpPost, Route("token/refresh")]
     public async Task<IActionResult> RefreshToken([FromBody, Bind("AccessToken", "RefreshToken")] TokenPair tokenPair, CancellationToken cancellationToken)
     {
         string? accessToken = tokenPair.AccessToken;
