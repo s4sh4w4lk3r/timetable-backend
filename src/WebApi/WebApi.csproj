@@ -27,8 +27,4 @@
     <ProjectReference Include="..\Validation\Validation.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\Timetables\" />
-  </ItemGroup>
-
 </Project>

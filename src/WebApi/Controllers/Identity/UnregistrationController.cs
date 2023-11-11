@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Extensions;
-using WebApi.Services.Account.Interfaces;
+using WebApi.Services.Identity.Interfaces;
 
 namespace WebApi.Controllers.Account
 {

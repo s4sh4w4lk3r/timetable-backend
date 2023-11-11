@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Models.Entities.Identity.Users;
 using Validation;
-using WebApi.Services.Account.Interfaces;
+using WebApi.Services.Identity.Interfaces;
 
-namespace WebApi.Controllers.Auth;
+namespace WebApi.Controllers.Identity;
 
 [ApiController, Route("api/account/register")]
 public class RegistrationController : ControllerBase

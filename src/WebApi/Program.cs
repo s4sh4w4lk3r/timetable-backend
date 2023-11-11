@@ -2,8 +2,8 @@
 using Repository;
 using Serilog;
 using WebApi.Middlewares.Authentication;
-using WebApi.Services.Account.Implementations;
-using WebApi.Services.Account.Interfaces;
+using WebApi.Services.Identity.Implementations;
+using WebApi.Services.Identity.Interfaces;
 using WebApi.Types.Configuration;
 
 namespace WebApi;

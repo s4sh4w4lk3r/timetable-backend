@@ -1,6 +1,6 @@
 ﻿using Models.Entities.Identity.Users;
 
-namespace WebApi.Services.Account.Interfaces
+namespace WebApi.Services.Identity.Interfaces
 {
     public interface IRegistrationService
     {

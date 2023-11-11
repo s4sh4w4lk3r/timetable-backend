@@ -3,9 +3,9 @@ using Models.Entities.Identity;
 using Models.Entities.Identity.Users;
 using Repository;
 using Validation;
-using WebApi.Services.Account.Interfaces;
+using WebApi.Services.Identity.Interfaces;
 
-namespace WebApi.Services.Account.Implementations;
+namespace WebApi.Services.Identity.Implementations;
 
 public class EmailUpdater
 {

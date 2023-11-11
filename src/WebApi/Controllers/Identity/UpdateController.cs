@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models.Entities.Identity.Users;
 using Validation;
 using WebApi.Extensions;
-using WebApi.Services.Account.Implementations;
+using WebApi.Services.Identity.Implementations;
 
 namespace WebApi.Controllers.Account;
 

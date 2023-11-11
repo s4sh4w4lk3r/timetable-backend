@@ -7,11 +7,11 @@ using System.Security.Claims;
 using Validation;
 using WebApi.Extensions;
 using WebApi.Services;
-using WebApi.Services.Account.Implementations;
-using WebApi.Services.Account.Interfaces;
+using WebApi.Services.Identity.Implementations;
+using WebApi.Services.Identity.Interfaces;
 using WebApi.Types.Account;
 
-namespace WebApi.Controllers.Auth;
+namespace WebApi.Controllers.Identity;
 
 [ApiController, Route("api/account")]
 public class AuthController : ControllerBase

@@ -6,7 +6,7 @@ using Repository;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using WebApi.Extensions;
-using WebApi.Services.Account.Interfaces;
+using WebApi.Services.Identity.Interfaces;
 using WebApi.Types.Account;
 
 namespace WebApi.Middlewares.Authentication;

@@ -1,7 +1,7 @@
 ﻿using Models.Entities.Identity;
 using static Models.Entities.Identity.Approval;
 
-namespace WebApi.Services.Account.Interfaces
+namespace WebApi.Services.Identity.Interfaces
 {
     public interface IApprovalService
     {

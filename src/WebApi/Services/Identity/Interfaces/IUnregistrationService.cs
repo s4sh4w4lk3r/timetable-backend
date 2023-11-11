@@ -1,4 +1,4 @@
-﻿namespace WebApi.Services.Account.Interfaces
+﻿namespace WebApi.Services.Identity.Interfaces
 {
     public interface IUnregistrationService
     {

@@ -5,10 +5,10 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Throw;
-using WebApi.Services.Account.Interfaces;
+using WebApi.Services.Identity.Interfaces;
 using WebApi.Types.Configuration;
 
-namespace WebApi.Services.Account.Implementations;
+namespace WebApi.Services.Identity.Implementations;
 
 public class TokenService : ITokenService
 {
