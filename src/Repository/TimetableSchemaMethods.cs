@@ -18,20 +18,20 @@ namespace Repository
         {
             entity.ToTable("ActualTimetableCell", "timetable");
             entity.HasKey(e => e.TimetableCellId);
-            entity.HasOne(e => e.Cabinet).WithMany(e => e.ActualTimetableCells);
-            entity.HasOne(e => e.Subject).WithMany(e => e.ActualTimetableCells);
-            entity.HasOne(e => e.Teacher).WithMany(e => e.ActualTimetableCells);
-            entity.HasOne(e => e.LessonTime).WithMany(e => e.ActualTimetableCells);
+            entity.HasOne(e => e.Cabinet).WithMany(e => e.ActualTimetableCells).IsRequired();
+            entity.HasOne(e => e.Subject).WithMany(e => e.ActualTimetableCells).IsRequired();
+            entity.HasOne(e => e.Teacher).WithMany(e => e.ActualTimetableCells).IsRequired();
+            entity.HasOne(e => e.LessonTime).WithMany(e => e.ActualTimetableCells).IsRequired();
         }
 
         public static void ConfigureStableTimetableCell(EntityTypeBuilder<StableTimetableCell> entity)
         {
             entity.ToTable("StableTimetableCell", "timetable");
             entity.HasKey(e => e.TimetableCellId);
-            entity.HasOne(e => e.Cabinet).WithMany(e => e.StableTimetableCells);
-            entity.HasOne(e => e.Subject).WithMany(e => e.StableTimetableCells);
-            entity.HasOne(e => e.Teacher).WithMany(e => e.StableTimetableCells);
-            entity.HasOne(e => e.LessonTime).WithMany(e => e.StableTimetableCells);
+            entity.HasOne(e => e.Cabinet).WithMany(e => e.StableTimetableCells).IsRequired();
+            entity.HasOne(e => e.Subject).WithMany(e => e.StableTimetableCells).IsRequired();
+            entity.HasOne(e => e.Teacher).WithMany(e => e.StableTimetableCells).IsRequired();
+            entity.HasOne(e => e.LessonTime).WithMany(e => e.StableTimetableCells).IsRequired();
         }
 
         public static void ConfigureActualTimetable(EntityTypeBuilder<ActualTimetable> entity)

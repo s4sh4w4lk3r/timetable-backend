@@ -27,7 +27,7 @@ public class TimetableContext : DbContext
 
         if (IsEnsureCreated is false)
         {
-            //Database.EnsureDeleted();
+            Database.EnsureDeleted();
             Database.EnsureCreated();
             IsEnsureCreated = true;
         }
@@ -56,12 +56,9 @@ public class TimetableContext : DbContext
         modelBuilder.Entity<Teacher>(ConfigureTeacher);
         modelBuilder.Entity<Admin>(ConfigureAdmin);
         modelBuilder.Entity<Student>(ConfigureStudent);
-
-                modelBuilder.Entity<UserSession>(ConfigureUserSession);
-        /*modelBuilder.Entity<ApprovalCode>(ConfigureApprovalCode);
-
-
-                modelBuilder.Entity<EmailUpdateEntity>(ConfigureEmailUpdateEntity);*/
+        modelBuilder.Entity<UserSession>(ConfigureUserSession);
+        modelBuilder.Entity<Approval>(ConfigureApproval);
+        modelBuilder.Entity<EmailUpdateEntity>(ConfigureEmailUpdateEntity);
         #endregion
 
 

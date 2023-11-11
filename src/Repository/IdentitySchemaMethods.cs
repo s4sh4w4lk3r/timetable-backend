@@ -27,30 +27,32 @@ namespace Repository
         public static void ConfigureStudent(EntityTypeBuilder<Student> entity)
         {
             entity.HasBaseType<User>();
+            entity.HasOne(e => e.Group).WithMany(e => e.Students).HasForeignKey(e => e.GroupId);
+            entity.Property(e => e.GroupId).HasColumnName("StudentGroupId");
         }
-
 
         public static void ConfigureUserSession(EntityTypeBuilder<UserSession> entity)
         {
             entity.ToTable("UserSession", "identity");
             entity.HasKey(e => e.UserSessionId);
-            entity.HasOne(e=>e.User).WithMany(e=>e.UserSessions).HasForeignKey(e=>e.UserId);
+            entity.HasOne(e => e.User).WithMany(e => e.UserSessions).HasForeignKey(e => e.UserId).IsRequired();
         }
 
-        /*public static void ConfigureApprovalCode(EntityTypeBuilder<ApprovalCode> entity)
+        public static void ConfigureApproval(EntityTypeBuilder<Approval> entity)
         {
-            entity.HasKey(e => e.AprrovalCodeId);
-            entity.HasOne(e => e.User).WithMany(e => e.ApprovalCodes).HasForeignKey(e => e.UserId).IsRequired();
+            entity.ToTable("Approval", "identity");
+            entity.HasKey(e => e.AprrovalId);
+            entity.HasOne(e => e.User).WithMany(e => e.Approvals).HasForeignKey(e => e.UserId).IsRequired();
         }
-
 
         public static void ConfigureEmailUpdateEntity(EntityTypeBuilder<EmailUpdateEntity> entity)
         {
+            entity.ToTable("EmailUpdateEntity", "identity");
             entity.HasKey(e => e.EmailUpdateEntityId);
             entity.HasOne(e => e.User).WithMany(e => e.EmailUpdateEntities).HasForeignKey(e => e.UserId).IsRequired();
             entity.HasOne(e => e.Approval).WithOne(e => e.EmailUpdateEntity).IsRequired();
-            entity.Property(e => e.OldEmail).IsRequired().HasMaxLength(255);
-            entity.Property(e => e.NewEmail).IsRequired().HasMaxLength(255);
-        }*/
+            entity.Property(e => e.OldEmail).IsRequired();
+            entity.Property(e => e.NewEmail).IsRequired();
+        }
     }
 }
