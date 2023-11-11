@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Models.Entities.Identity;
+using Models.Entities.Identity.Users;
 using Repository;
+using Validation;
 using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Services.Account.Implementations;
@@ -7,25 +10,27 @@ namespace WebApi.Services.Account.Implementations;
 public class RegistrationService : IRegistrationService
 {
     private readonly TimetableContext _dbContext;
-    private readonly IValidator<User> _userValidator;
     private readonly DbSet<User> _users;
     private readonly IApprovalService _approvalService;
     private readonly IApprovalSender _approvalSender;
 
-    public RegistrationService(TimetableContext dbContext, IValidator<User> validator, IApprovalService approvalService, IApprovalSender approvalSender)
+    public RegistrationService(TimetableContext dbContext, IApprovalService approvalService, IApprovalSender approvalSender)
     {
         _dbContext = dbContext;
-        _userValidator = validator;
         _users = _dbContext.Set<User>();
         _approvalService = approvalService;
         _approvalSender = approvalSender;
     }
     public async Task<ServiceResult> AddUserToRepoAsync(User user, CancellationToken cancellationToken = default)
     {
-        var userVal = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex_matching"));
-        if (userVal.IsValid is false)
+        if (StaticValidator.ValidateEmail(user.Email) is false)
         {
-            return new ServiceResult(false, userVal.ToString());
+            return ServiceResult.Fail("Email имеет неверный формат.");
+        }
+
+        if (StaticValidator.ValidatePassword(user.Password) is false)
+        {
+            return ServiceResult.Fail("Пароль не соответствует минимальным требованиям безопасности.");
         }
 
         if (await _users.AnyAsync(x => x.Email == user.Email && x.IsEmailConfirmed == true, cancellationToken) is true)
@@ -63,7 +68,7 @@ public class RegistrationService : IRegistrationService
             return new ServiceResult(false, "Пользователь для валидации не был найден в бд.");
         }
 
-        var approvalServiceResult = await _approvalService.VerifyAndRevokeCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Registration, cancellationToken: cancellationToken);
+        var approvalServiceResult = await _approvalService.VerifyAndRevokeCodeAsync(validUser.UserId, approvalCode, Approval.ApprovalCodeType.Registration, cancellationToken: cancellationToken);
         if (approvalServiceResult.Success is false)
         {
             return new ServiceResult(false, "Код подтверждения регистрации не принят.", approvalServiceResult);

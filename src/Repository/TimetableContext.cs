@@ -16,7 +16,6 @@ public class TimetableContext : DbContext
 {
     private readonly DbConfiguration _configuration;
     private readonly ILoggerFactory _loggerFactory;
-    private static bool IsEnsureCreated = false;
 
     public TimetableContext(IOptions<DbConfiguration> options, ILoggerFactory loggerFactory)
     {
@@ -24,13 +23,6 @@ public class TimetableContext : DbContext
 
         _loggerFactory = loggerFactory;
         _configuration = options.Value;
-
-        if (IsEnsureCreated is false)
-        {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
-            IsEnsureCreated = true;
-        }
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

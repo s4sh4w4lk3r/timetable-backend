@@ -1,10 +1,10 @@
-﻿using FluentValidation;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Throw;
 using WebApi.Services.Account.Interfaces;
 using WebApi.Types.Configuration;
 
@@ -13,10 +13,13 @@ namespace WebApi.Services.Account.Implementations;
 public class TokenService : ITokenService
 {
     private readonly JwtConfiguration _jwtConfiguration;
-    public TokenService(IOptions<JwtConfiguration> options, IValidator<JwtConfiguration> validator)
+    public TokenService(IOptions<JwtConfiguration> options)
     {
         _jwtConfiguration = options.Value;
-        validator.ValidateAndThrow(_jwtConfiguration);
+
+        _jwtConfiguration.ThrowIfNull();
+        _jwtConfiguration.Issuer.ThrowIfNull().IfWhiteSpace();
+        _jwtConfiguration.SecurityKey.ThrowIfNull().IfWhiteSpace();
     }
     public string GenerateAccessToken(IEnumerable<Claim> claims)
     {
@@ -36,11 +39,9 @@ public class TokenService : ITokenService
     public string GenerateRefreshToken()
     {
         var randomNumber = new byte[32];
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
-        }
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
     }
 
     public ServiceResult<ClaimsPrincipal?> GetPrincipalFromAccessToken(string token, bool isLifetimeValidationRequired = true)

@@ -1,4 +1,3 @@
-﻿using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
 using Repository;
 using Serilog;
@@ -7,9 +6,7 @@ using WebApi.GraphQL;
 using WebApi.Middlewares.Auth;
 using WebApi.Services.Account.Implementations;
 using WebApi.Services.Account.Interfaces;
-using WebApi.Services.Timetables;
 using WebApi.Types.Configuration;
-using WebApi.Types.Validation;
 
 namespace WebApi;
 
@@ -26,11 +23,10 @@ public class Program
         ConfigureServices(builder);
         ConfigureDependencies(builder);
         ConfigureIOptions(builder);
-        ConfigureValidators(builder);
 
         var app = builder.Build();
         ConfigureMiddlewares(app);
-        app.MapGet("/", () => "Hello World!");
+
 
         app.Run();
     }
@@ -73,15 +69,6 @@ public class Program
             builder.Services.AddTransient<IEmailClient, MailKitClient>();
         }
     }
-    private static void ConfigureValidators(WebApplicationBuilder builder)
-    {
-        builder.Services.AddValidatorsFromAssemblyContaining<CabinetValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<TeacherValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<JwtConfigurationValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<UserSessionValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<MailConfigurationValidator>();
-    }
     private static void ConfigureIOptions(WebApplicationBuilder builder)
     {
         builder.Services.Configure<DbConfiguration>(builder.Configuration.GetRequiredSection(nameof(DbConfiguration)));
@@ -108,7 +95,6 @@ public class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
-#warning нормально описать сваггер.
         }
     }
 }

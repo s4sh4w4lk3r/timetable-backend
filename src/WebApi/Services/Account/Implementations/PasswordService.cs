@@ -1,21 +1,18 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Models.Entities.Users;
-using Validation;
+﻿using Microsoft.EntityFrameworkCore;
+using Models.Entities.Identity.Users;
 using Repository;
+using Validation;
 
 namespace WebApi.Services.Account.Implementations;
 
 public class PasswordService
 {
     private readonly TimetableContext _dbContext;
-    private readonly IValidator<User> _userValidator;
     private readonly DbSet<User> _users;
 
-    public PasswordService(TimetableContext dbContext, IValidator<User> validator)
+    public PasswordService(TimetableContext dbContext)
     {
         _dbContext = dbContext;
-        _userValidator = validator;
         _users = _dbContext.Set<User>();
     }
     public async Task<ServiceResult> UpdatePassword(int userId, string newPassword, CancellationToken cancellationToken = default)
@@ -44,10 +41,14 @@ public class PasswordService
     }
     public async Task<ServiceResult<User>> CheckLoginDataAsync(User user, CancellationToken cancellationToken = default)
     {
-        var valResult = _userValidator.Validate(user, o => o.IncludeRuleSets("default", "password_regex_matching"));
-        if (valResult.IsValid is false)
+        if (StaticValidator.ValidateEmail(user.Email) is false)
         {
-            return new ServiceResult<User>(false, valResult.ToString(), null);
+            return ServiceResult<User>.Fail("Email имеет неверный формат.", null);
+        }
+
+        if (StaticValidator.ValidatePassword(user.Password) is false)
+        {
+            return ServiceResult<User>.Fail("Пароль не соответствует минимальным требованиям безопасности.", null);
         }
 
         var userFromRepo = await _users.SingleOrDefaultAsync(e => e.Email == user.Email, cancellationToken);
@@ -84,5 +85,5 @@ public class PasswordService
     {
         return BCrypt.Net.BCrypt.EnhancedVerify(password, hash);
     }
-        
+
 }

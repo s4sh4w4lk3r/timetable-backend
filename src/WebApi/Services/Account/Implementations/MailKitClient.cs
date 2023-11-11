@@ -1,9 +1,9 @@
-﻿using FluentValidation;
-using MailKit.Net.Smtp;
+﻿using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
+using Throw;
 using WebApi.Services.Account.Interfaces;
 using WebApi.Types.Configuration;
 
@@ -13,12 +13,15 @@ namespace WebApi.Services.Account.Implementations
     {
         private readonly EmailConfiguration _emailConfiguration;
 
-        public MailKitClient(IOptions<EmailConfiguration> options, IValidator<EmailConfiguration> validator)
+        public MailKitClient(IOptions<EmailConfiguration> options)
         {
             _emailConfiguration = options.Value;
-            validator.ValidateAndThrow(_emailConfiguration);
+            _emailConfiguration.Login.ThrowIfNull().IfEmpty();
+            _emailConfiguration.Host.ThrowIfNull().IfEmpty();
+            _emailConfiguration.Password.ThrowIfNull().IfEmpty();
+            _emailConfiguration.Port.ThrowIfNull().IfDefault();
+            _emailConfiguration.Sender.ThrowIfNull().IfEmpty();
         }
-
 
         public async Task SendEmailAsync(string subject, string message, string emailAddress, CancellationToken cancellationToken = default)
         {

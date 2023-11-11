@@ -1,8 +1,8 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Models.Entities.Users;
-using Validation;
+﻿using Microsoft.EntityFrameworkCore;
+using Models.Entities.Identity;
+using Models.Entities.Identity.Users;
 using Repository;
+using Validation;
 using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Services.Account.Implementations;
@@ -41,13 +41,13 @@ public class EmailUpdater
             return new ServiceResult(false, "Пользователь не найден в бд.");
         }
 
-        var approvalServiceResult = await _approvalService.VerifyAndRevokeCodeAsync(userFromRepo.UserId, approvalCode, ApprovalCode.ApprovalCodeType.UpdateMail, deleteRequired: false, cancellationToken: cancellationToken);
+        var approvalServiceResult = await _approvalService.VerifyAndRevokeCodeAsync(userFromRepo.UserId, approvalCode, Approval.ApprovalCodeType.UpdateMail, deleteRequired: false, cancellationToken: cancellationToken);
         if ((approvalServiceResult.Success is false) || (approvalServiceResult.Value is null))
         {
             return new ServiceResult(false, "Код подтверждения для изменения почты не принят.", approvalServiceResult);
         }
 
-        string? newEmail = await _dbContext.Set<EmailUpdateEntity>().Where(e => e.UserId == userId && e.ApprovalId == approvalServiceResult.Value.AprrovalCodeId)
+        string? newEmail = await _dbContext.Set<EmailUpdateEntity>().Where(e => e.UserId == userId && e.ApprovalId == approvalServiceResult.Value.AprrovalId)
             .Select(e => e.NewEmail).SingleOrDefaultAsync(cancellationToken);
 
         if (StaticValidator.ValidateEmail(newEmail) is false)
@@ -55,7 +55,7 @@ public class EmailUpdater
             throw new InvalidOperationException("В таблицу EmailUpdateEntities попали невалидные значения. Параметр newEmail не прошел валидацию.");
         }
 
-        userFromRepo.Email = newEmail;
+        userFromRepo.Email = newEmail!;
         await _dbContext.SaveChangesAsync(cancellationToken);
         return ServiceResult.Ok("Email адрес обновлен.");
     }
@@ -95,7 +95,7 @@ public class EmailUpdater
             UserId = userFromRepo.UserId,
             OldEmail = userFromRepo.Email,
             NewEmail = newEmail,
-            ApprovalId = approvalResult.Value.AprrovalCodeId
+            ApprovalId = approvalResult.Value.AprrovalId
         };
 
         _dbContext.Set<EmailUpdateEntity>().Add(emailUpdateInstance);

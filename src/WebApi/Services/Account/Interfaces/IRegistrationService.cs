@@ -1,4 +1,4 @@
-﻿using Models.Entities.Users;
+﻿using Models.Entities.Identity.Users;
 
 namespace WebApi.Services.Account.Interfaces
 {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models.Entities.Users;
+using Models.Entities.Identity;
+using Models.Entities.Identity.Users;
 using Repository;
 using WebApi.Services.Account.Interfaces;
 
@@ -33,7 +34,7 @@ namespace WebApi.Services.Account.Implementations
                 return new ServiceResult(false, "Пользователь не найден в бд.");
             }
 
-            var approvalServiceResult = await _approvalService.VerifyAndRevokeCodeAsync(validUser.UserId, approvalCode, ApprovalCode.ApprovalCodeType.Unregistration, cancellationToken: cancellationToken);
+            var approvalServiceResult = await _approvalService.VerifyAndRevokeCodeAsync(validUser.UserId, approvalCode, Approval.ApprovalCodeType.Unregistration, cancellationToken: cancellationToken);
             if (approvalServiceResult.Success is false)
             {
                 return new ServiceResult(false, "Код подтверждения для удаления аккаунта не принят.", approvalServiceResult);

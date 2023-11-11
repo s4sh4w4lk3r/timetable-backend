@@ -1,7 +1,7 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Models.Entities.Users;
+﻿using Microsoft.EntityFrameworkCore;
+using Models.Entities.Identity;
 using Repository;
+using Validation;
 using WebApi.Services.Account.Interfaces;
 
 namespace WebApi.Services.Account.Implementations;
@@ -10,21 +10,18 @@ public class UserSessionService : IUserSessionService
 {
     private readonly TimetableContext _dbContext;
     private readonly DbSet<UserSession> _userSessions;
-    private readonly IValidator<UserSession> _userSessionValidator;
-
     public IQueryable<UserSession> UserSessions => _userSessions.AsQueryable();
 
-    public UserSessionService(TimetableContext dbContext, IValidator<UserSession> validator)
+    public UserSessionService(TimetableContext dbContext)
     {
         _dbContext = dbContext;
         _userSessions = _dbContext.Set<UserSession>();
-        _userSessionValidator = validator;
     }
 
 
     public async Task<ServiceResult> AddAsync(UserSession userSession, CancellationToken cancellationToken = default)
     {
-        var validationResult = _userSessionValidator.Validate(userSession);
+        var validationResult = new UserSessionValidator().Validate(userSession);
         if (validationResult.IsValid is false)
         {
             return new ServiceResult(false, validationResult.ToString());
@@ -37,7 +34,7 @@ public class UserSessionService : IUserSessionService
 
     public async Task<ServiceResult> UpdateAsync(UserSession userSession, CancellationToken cancellationToken = default)
     {
-        var validationResult = _userSessionValidator.Validate(userSession);
+        var validationResult = new UserSessionValidator().Validate(userSession);
         if (validationResult.IsValid is false)
         {
             return new ServiceResult(false, validationResult.ToString());

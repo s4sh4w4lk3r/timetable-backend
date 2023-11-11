@@ -1,6 +1,5 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Models.Entities.Users;
+﻿using Microsoft.EntityFrameworkCore;
+using Models.Entities.Identity;
 using Repository;
 using WebApi.Services.Account.Interfaces;
 
@@ -15,31 +14,31 @@ public class ApprovalService : IApprovalService
         _dbContext = dbContext;
     }
 
-    public async Task<ServiceResult<ApprovalCode>> VerifyAndRevokeCodeAsync(int userId, int approvalCode, ApprovalCode.ApprovalCodeType approvalCodeType, bool deleteRequired = true, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult<Approval>> VerifyAndRevokeCodeAsync(int userId, int approvalCode, Approval.ApprovalCodeType approvalCodeType, bool deleteRequired = true, CancellationToken cancellationToken = default)
     {
-        var approval = await _dbContext.Set<ApprovalCode>()
+        var approval = await _dbContext.Set<Approval>()
             .Where(e => e.User!.UserId == userId
-            && e.Code == approvalCode 
-            && e.CodeType == approvalCodeType 
+            && e.Code == approvalCode
+            && e.CodeType == approvalCodeType
             && e.IsRevoked == false)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (approval is null)
         {
-            return ServiceResult<ApprovalCode>.Fail("Код подтверждения не был найден в бд.", null);
+            return ServiceResult<Approval>.Fail("Код подтверждения не был найден в бд.", null);
         }
 
         if (approval.IsNotExpired() is false)
         {
-            _dbContext.Set<ApprovalCode>().Remove(approval);
+            _dbContext.Set<Approval>().Remove(approval);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            return ServiceResult<ApprovalCode>.Fail("Код подтверждения просрочен.", null);
+            return ServiceResult<Approval>.Fail("Код подтверждения просрочен.", null);
         }
 
         await RevokeAsync(approval, deleteRequired: deleteRequired, cancellationToken: cancellationToken);
-        return ServiceResult<ApprovalCode>.Ok("Код подтверждения был подтвержден.", approval);
+        return ServiceResult<Approval>.Ok("Код подтверждения был подтвержден.", approval);
     }
-    private async Task<ServiceResult> RevokeAsync(ApprovalCode approvalCode, bool deleteRequired = true, CancellationToken cancellationToken = default)
+    private async Task<ServiceResult> RevokeAsync(Approval approvalCode, bool deleteRequired = true, CancellationToken cancellationToken = default)
     {
         if (approvalCode is null)
         {
@@ -48,14 +47,14 @@ public class ApprovalService : IApprovalService
 
         if (deleteRequired)
         {
-            _dbContext.Set<ApprovalCode>().Remove(approvalCode);
+            _dbContext.Set<Approval>().Remove(approvalCode);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return new ServiceResult(true, "Код подтверждения был удален из бд.");
         }
         else
         {
             approvalCode.SetRevoked();
-            _dbContext.Set<ApprovalCode>().Update(approvalCode);
+            _dbContext.Set<Approval>().Update(approvalCode);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return new ServiceResult(true, "Код подтверждения был помечен как использованный в бд.");
         }
