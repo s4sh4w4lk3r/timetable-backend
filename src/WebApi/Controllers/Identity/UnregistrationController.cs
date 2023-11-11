@@ -5,7 +5,7 @@ using WebApi.Services.Identity.Interfaces;
 
 namespace WebApi.Controllers.Account
 {
-    [ApiController, Route("api/account/unregister")]
+    [ApiController, Route("identity/unregister")]
     public class UnregistrationController : ControllerBase
     {
         private readonly IUnregistrationService _unregistrationService;
@@ -16,7 +16,7 @@ namespace WebApi.Controllers.Account
         }
 
 
-        [HttpGet, Route("send-email"), Authorize]
+        [HttpPost, Route("send-email"), Authorize]
         public async Task<IActionResult> UnregisterSendMail(CancellationToken cancellationToken = default)
         {
             if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false)

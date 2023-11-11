@@ -5,7 +5,7 @@ using WebApi.Services.Identity.Interfaces;
 
 namespace WebApi.Controllers.Identity;
 
-[ApiController, Route("api/account/register")]
+[ApiController, Route("identity/register")]
 public class RegistrationController : ControllerBase
 {
     private readonly IRegistrationService _registerService;

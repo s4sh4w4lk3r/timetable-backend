@@ -7,7 +7,7 @@ using WebApi.Services.Identity.Implementations;
 
 namespace WebApi.Controllers.Account;
 
-[ApiController, Route("api/account")]
+[ApiController, Route("identity")]
 public class UpdateController : Controller
 {
     private readonly EmailUpdater _emailService;

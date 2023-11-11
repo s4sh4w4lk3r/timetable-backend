@@ -13,7 +13,7 @@ using WebApi.Types.Account;
 
 namespace WebApi.Controllers.Identity;
 
-[ApiController, Route("api/account")]
+[ApiController, Route("identity")]
 public class AuthController : ControllerBase
 {
     private readonly IUserSessionService _userSessionService;
@@ -95,7 +95,7 @@ public class AuthController : ControllerBase
         return Ok(new TokenPair(accessToken, refreshToken));
     }
 
-    [HttpGet, Authorize, Route("terminate-all-sessions")]
+    [HttpPost, Authorize, Route("terminate-all-sessions")]
     public async Task<IActionResult> TermainateAllSessions(CancellationToken cancellationToken = default)
     {
         if (User.TryGetUserIdFromClaimPrincipal(out int userId) is false)
