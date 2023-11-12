@@ -1,5 +1,9 @@
-﻿namespace WebApi.Services;
+﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+namespace WebApi.Services;
 
+/// <summary>
+/// Класс, который содержит в себе информацию о том, как отработал метод сервиса.
+/// </summary>
 public class ServiceResult
 {
     public bool Success { get; init; }
@@ -40,9 +44,15 @@ public class ServiceResult
         return $"Success: {Success}, Description: {Description}, InnverServiceResult: {InnerServiceResult}";
     }
 }
+
+/// <summary>
+/// <inheritdoc/>
+/// </summary>
+/// <typeparam name="T">Тип объекта для свойства Value.</typeparam>
 public class ServiceResult<T> : ServiceResult
 {
     public T? Value { get; init; }
+
     public ServiceResult(bool success, string description, T? value) : base(success, description)
     {
         Value = value;
@@ -78,3 +88,4 @@ public class ServiceResult<T> : ServiceResult
         return $"{base.ToString()}, Value: {Value}";
     }
 }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
