@@ -48,7 +48,7 @@ public class AccessTokenAuthenticationHandler : AuthenticationHandler<AccessToke
 
         bool userIdOk = claimsPrinciapal.TryGetUserIdFromClaimPrincipal(out int userId);
         bool userSessionIdOk = int.TryParse(userSessionIdStr, out int userSessionId);
-        bool userRoleOk = !string.IsNullOrWhiteSpace(claimsPrinciapal.FindFirstValue(TimetableClaimTypes.UserRole));
+        bool userRoleOk = !string.IsNullOrWhiteSpace(claimsPrinciapal.FindFirstValue(ClaimsIdentity.DefaultRoleClaimType));
 
         if (userIdOk is false)
         {
@@ -75,7 +75,7 @@ public class AccessTokenAuthenticationHandler : AuthenticationHandler<AccessToke
             return AuthenticateResult.Fail("Валидация AccessToken не прошла. Роль не указана.");
         }
 
-        bool userAndSessionIsMatch = await _dbContext.Set<UserSession>().AnyAsync(e => e. UserId == userId && e.UserSessionId == userSessionId);
+        bool userAndSessionIsMatch = await _dbContext.Set<UserSession>().AnyAsync(e => e.UserId == userId && e.UserSessionId == userSessionId);
         if (userAndSessionIsMatch is false)
         {
             return AuthenticateResult.Fail("Валидация AccessToken не прошла. Не найдена пара UserId и UserSessionId в бд.");

@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost, Route("login")]
-    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] EmailPasswordPair emailPasswordPair, [FromServices] PasswordService passwordService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] EmailPasswordPairDto emailPasswordPair, [FromServices] PasswordService passwordService, CancellationToken cancellationToken = default)
     {
         if (StaticValidator.ValidateEmail(emailPasswordPair.Email) is false)
         {
@@ -73,15 +73,15 @@ public class AuthController : ControllerBase
         switch (userFromRepo)
         {
             case Student:
-                claims.Add(new Claim(TimetableClaimTypes.UserRole, TimetableRoles.Student));
+                claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, TimetableRoles.Student));
                 break;
 
             case Teacher:
-                claims.Add(new Claim(TimetableClaimTypes.UserRole, TimetableRoles.Teacher));
+                claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, TimetableRoles.Teacher));
                 break;
 
             case Admin:
-                claims.Add(new Claim(TimetableClaimTypes.UserRole, TimetableRoles.Admin));
+                claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, TimetableRoles.Admin));
                 break;
 
             default:
@@ -92,7 +92,7 @@ public class AuthController : ControllerBase
 
         string accessToken = _tokenService.GenerateAccessToken(claims);
 
-        return Ok(new TokenPair(accessToken, refreshToken));
+        return Ok(new TokenPairDto(accessToken, refreshToken));
     }
 
     [HttpPost, Authorize, Route("terminate-all-sessions")]
@@ -118,7 +118,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost, Route("token/refresh")]
-    public async Task<IActionResult> RefreshToken([FromBody, Bind("AccessToken", "RefreshToken")] TokenPair tokenPair, CancellationToken cancellationToken)
+    public async Task<IActionResult> RefreshToken([FromBody, Bind("AccessToken", "RefreshToken")] TokenPairDto tokenPair, CancellationToken cancellationToken)
     {
         string? accessToken = tokenPair.AccessToken;
         string? refreshToken = tokenPair.RefreshToken;
@@ -172,11 +172,11 @@ public class AuthController : ControllerBase
         userSessionFromRepo.IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
         await _userSessionService.UpdateAsync(userSessionFromRepo, cancellationToken);
 
-        return Ok(new TokenPair(accessToken, refreshToken));
+        return Ok(new TokenPairDto(accessToken, refreshToken));
     }
 
     [HttpPost, Authorize, Route("token/revoke")]
-    public async Task<IActionResult> TermainateSession([FromBody, Bind("AccessToken", "RefreshToken")] TokenPair tokenPair, CancellationToken cancellationToken)
+    public async Task<IActionResult> TermainateSession([FromBody, Bind("AccessToken", "RefreshToken")] TokenPairDto tokenPair, CancellationToken cancellationToken)
     {
         string? refreshToken = tokenPair.RefreshToken;
         if (string.IsNullOrWhiteSpace(refreshToken))
@@ -200,6 +200,6 @@ public class AuthController : ControllerBase
     }
 
 
-    public record class TokenPair(string? AccessToken, string? RefreshToken);
-    public record class EmailPasswordPair(string? Email, string? Password);
+    public record class TokenPairDto(string? AccessToken, string? RefreshToken);
+    public record class EmailPasswordPairDto(string? Email, string? Password);
 }

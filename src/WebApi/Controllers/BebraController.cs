@@ -6,7 +6,7 @@ namespace WebApi.Controllers
     [ApiController, Route("/test")]
     public class BebraController : ControllerBase
     {
-        [HttpGet, Route(""), Authorize]
+        [HttpGet, Route(""), Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> DoIt()
         {
             return Ok();

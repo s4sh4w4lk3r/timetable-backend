@@ -33,7 +33,7 @@ public class Program
             db.Dispose();
         }
 
-         app.Run();
+        app.Run();
     }
 
     private static void ConfigureServices(WebApplicationBuilder builder)
@@ -43,7 +43,7 @@ public class Program
 
 
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
-         .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, options => { });
+         .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, _ => { });
         builder.Services.AddAuthorization();
         /* builder.Services.AddGraphQLServer()
             .AddQueryType<Queries>()
