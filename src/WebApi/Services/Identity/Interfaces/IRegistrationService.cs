@@ -1,4 +1,5 @@
-﻿using Models.Entities.Identity.Users;
+﻿using Models.Entities.Identity;
+using Models.Entities.Identity.Users;
 
 namespace WebApi.Services.Identity.Interfaces
 {
@@ -28,5 +29,13 @@ namespace WebApi.Services.Identity.Interfaces
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ServiceResult> SendEmailAsync(string userEmail, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Создает коды для регистрации указанного количества пользователей с указанной ролью.
+        /// </summary>
+        /// <param name="role"></param>
+        /// <param name="numberOfLinks"></param>
+        /// <returns></returns>
+        Task<ServiceResult<IEnumerable<string?>?>> CreateAndSaveRegisterCodes(RegistrationEntity.Role role, int numberOfLinks = 1);
     }
 }

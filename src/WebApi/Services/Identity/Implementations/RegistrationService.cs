@@ -95,4 +95,32 @@ public class RegistrationService : IRegistrationService
 
         return ServiceResult.Ok(sendApprovalResult.Description);
     }
+    public async Task<ServiceResult<IEnumerable<string?>?>> CreateAndSaveRegisterCodes(RegistrationEntity.Role role, int numberOfLinks = 1)
+    {
+        if (numberOfLinks < 1 || numberOfLinks > 1000)
+        {
+            return ServiceResult<IEnumerable<string?>?>.Fail("Количество запрашиваемых ссылок не должно быть меньше 1 и больше 1000.", null);
+        }
+
+        if (Enum.IsDefined(role) is false)
+        {
+            return ServiceResult<IEnumerable<string?>?>.Fail("Получена несуществующая роль.", null);
+        }
+
+        var registrationEntities = new List<RegistrationEntity>();
+        for (int i = 0; i < numberOfLinks; i++)
+        {
+            var regEntity = new RegistrationEntity()
+            {
+                CodeExpires = DateTime.UtcNow.AddDays(14),
+                DesiredRole = role,
+                SecretKey = RegistrationEntity.GenerateSecretKey()
+            };
+
+            registrationEntities.Add(regEntity);
+        }
+        await _dbContext.Set<RegistrationEntity>().AddRangeAsync(registrationEntities);
+        await _dbContext.SaveChangesAsync();
+        return ServiceResult<IEnumerable<string?>?>.Ok("Коды созданы и сохранены. Они действительны в течени 14-ти суток.", registrationEntities.Select(e=>e.SecretKey));
+    }
 }

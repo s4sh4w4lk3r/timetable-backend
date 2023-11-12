@@ -55,5 +55,12 @@ namespace Repository
             entity.Property(e => e.OldEmail).IsRequired();
             entity.Property(e => e.NewEmail).IsRequired();
         }
+
+        public static void ConfigureRegistrationEntity(EntityTypeBuilder<RegistrationEntity> entity)
+        {
+            entity.ToTable("RegistrationEntity", "identity");
+            entity.HasKey(e => e.RegistrationEntityId);
+            entity.Property(e => e.SecretKey).IsRequired();
+        }
     }
 }

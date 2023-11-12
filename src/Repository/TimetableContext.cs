@@ -51,6 +51,7 @@ public class TimetableContext : DbContext
         modelBuilder.Entity<UserSession>(ConfigureUserSession);
         modelBuilder.Entity<Approval>(ConfigureApproval);
         modelBuilder.Entity<EmailUpdateEntity>(ConfigureEmailUpdateEntity);
+        modelBuilder.Entity<RegistrationEntity>(ConfigureRegistrationEntity);
         #endregion
 
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Models.Entities.Identity;
 using Models.Entities.Identity.Users;
 using Validation;
 using WebApi.Services.Identity.Interfaces;
@@ -77,6 +79,17 @@ public class RegistrationController : ControllerBase
             return BadRequest(confirmResult);
         }
         return Ok(confirmResult);
+    }
+
+    [HttpGet, Route("create-register-links"), Authorize(Roles = "Admin")]
+    public async Task<IActionResult> CreateRegisterCodes([FromQuery] RegistrationEntity.Role role, [FromQuery] int numberOfLinks = 1)
+    {
+        var serviceResult = await _registerService.CreateAndSaveRegisterCodes(role, numberOfLinks);
+        if (serviceResult.Success is false)
+        {
+            return BadRequest(serviceResult);
+        }
+        return Ok(serviceResult);
     }
 
     public record ConfirmEmailDto(string Email, int ApprovalCode);
