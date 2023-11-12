@@ -82,9 +82,9 @@ public class RegistrationController : ControllerBase
     }
 
     [HttpGet, Route("create-register-links"), Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateRegisterCodes([FromQuery] RegistrationEntity.Role role, [FromQuery] int numberOfLinks = 1)
+    public async Task<IActionResult> CreateRegisterCodes([FromQuery] RegistrationEntity.Role role, [FromQuery] int numberOfLinks = 1, [FromQuery] int studentGroupId = 0)
     {
-        var serviceResult = await _registerService.CreateAndSaveRegisterCodes(role, numberOfLinks);
+        var serviceResult = await _registerService.CreateAndSaveRegisterCodes(role, numberOfLinks, studentGroupId);
         if (serviceResult.Success is false)
         {
             return BadRequest(serviceResult);

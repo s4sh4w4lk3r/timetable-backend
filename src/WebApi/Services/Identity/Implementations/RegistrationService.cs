@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Models.Entities.Identity;
 using Models.Entities.Identity.Users;
+using Models.Entities.Timetables;
 using Repository;
 using Validation;
 using WebApi.Services.Identity.Interfaces;
@@ -95,7 +96,7 @@ public class RegistrationService : IRegistrationService
 
         return ServiceResult.Ok(sendApprovalResult.Description);
     }
-    public async Task<ServiceResult<IEnumerable<string?>?>> CreateAndSaveRegisterCodes(RegistrationEntity.Role role, int numberOfLinks = 1)
+    public async Task<ServiceResult<IEnumerable<string?>?>> CreateAndSaveRegisterCodes(RegistrationEntity.Role role, int numberOfLinks = 1, int studentGroupId = 0)
     {
         if (numberOfLinks < 1 || numberOfLinks > 1000)
         {
@@ -107,6 +108,19 @@ public class RegistrationService : IRegistrationService
             return ServiceResult<IEnumerable<string?>?>.Fail("Получена несуществующая роль.", null);
         }
 
+        if (role is RegistrationEntity.Role.Student)
+        {
+            if (studentGroupId < 1)
+            {
+                return ServiceResult<IEnumerable<string?>?>.Fail("Для создания роли студента, нужно указать studentGroupId, который должен быть больше 0.", null);
+            }
+
+            if (await _dbContext.Set<Group>().AnyAsync(e => e.GroupId == studentGroupId) is false)
+            {
+                return ServiceResult<IEnumerable<string?>?>.Fail("Группы с таким studentGroupId не существует.", null);
+            }
+        }
+
         var registrationEntities = new List<RegistrationEntity>();
         for (int i = 0; i < numberOfLinks; i++)
         {
@@ -114,7 +128,8 @@ public class RegistrationService : IRegistrationService
             {
                 CodeExpires = DateTime.UtcNow.AddDays(14),
                 DesiredRole = role,
-                SecretKey = RegistrationEntity.GenerateSecretKey()
+                SecretKey = RegistrationEntity.GenerateSecretKey(),
+                StudentGroupId = (role is RegistrationEntity.Role.Student) ? studentGroupId : default
             };
 
             registrationEntities.Add(regEntity);
