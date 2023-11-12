@@ -14,13 +14,15 @@ public class RegistrationService : IRegistrationService
     private readonly DbSet<User> _users;
     private readonly IApprovalService _approvalService;
     private readonly IApprovalSender _approvalSender;
+    private readonly ILogger _logger;
 
-    public RegistrationService(TimetableContext dbContext, IApprovalService approvalService, IApprovalSender approvalSender)
+    public RegistrationService(TimetableContext dbContext, IApprovalService approvalService, IApprovalSender approvalSender, ILoggerFactory loggerFactory)
     {
         _dbContext = dbContext;
         _users = _dbContext.Set<User>();
         _approvalService = approvalService;
         _approvalSender = approvalSender;
+        _logger = loggerFactory.CreateLogger<RegistrationService>();
     }
     public async Task<ServiceResult> AddUserToRepoAsync(User user, CancellationToken cancellationToken = default)
     {
@@ -44,11 +46,37 @@ public class RegistrationService : IRegistrationService
             return new ServiceResult(false, "Пользователь с таким Email уже есть в бд, но Email не подтвержден.");
         }
 
-        user.IsEmailConfirmed = false;
-        user.Password = PasswordService.HashPassword(user.Password!);
-        await _users.AddAsync(user, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return new ServiceResult(true, "Пользователь добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
+        if (user is Student student)
+        {
+            bool isGroupExist = await _dbContext.Set<Group>().AnyAsync(e => e.GroupId == student.GroupId, cancellationToken);
+            if (isGroupExist is false)
+            {
+                return ServiceResult.Fail("Группы с таким id не существует");
+            }
+
+            student.Password = PasswordService.HashPassword(student.Password);
+            await _dbContext.Set<Student>().AddAsync(student, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return ServiceResult.Ok("Студент добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
+        }
+        else if (user is Teacher teacher)
+        {
+            teacher.Password = PasswordService.HashPassword(teacher.Password);
+            await _dbContext.Set<Teacher>().AddAsync(teacher, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return ServiceResult.Ok("Учитель добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
+        }
+        else if (user is Admin admin)
+        {
+            admin.Password = PasswordService.HashPassword(admin.Password);
+            await _dbContext.Set<Admin>().AddAsync(admin, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return ServiceResult.Ok("Учитель добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
+        }
+
+        string errorMsg = "Была произведена попытка зарегать юзера неизветсного типа.";
+        _logger.LogCritical("Класс: {class}, Метод: {method}, {msg}", nameof(RegistrationService), nameof(AddUserToRepoAsync), errorMsg);
+        return ServiceResult.Fail(errorMsg);
     }
     public async Task<ServiceResult> ConfirmAsync(string userEmail, int approvalCode, CancellationToken cancellationToken = default)
     {
@@ -95,47 +123,5 @@ public class RegistrationService : IRegistrationService
         }
 
         return ServiceResult.Ok(sendApprovalResult.Description);
-    }
-    public async Task<ServiceResult<IEnumerable<string?>?>> CreateAndSaveRegisterCodes(RegistrationEntity.Role role, int numberOfLinks = 1, int studentGroupId = 0)
-    {
-        if (numberOfLinks < 1 || numberOfLinks > 1000)
-        {
-            return ServiceResult<IEnumerable<string?>?>.Fail("Количество запрашиваемых ссылок не должно быть меньше 1 и больше 1000.", null);
-        }
-
-        if (Enum.IsDefined(role) is false)
-        {
-            return ServiceResult<IEnumerable<string?>?>.Fail("Получена несуществующая роль.", null);
-        }
-
-        if (role is RegistrationEntity.Role.Student)
-        {
-            if (studentGroupId < 1)
-            {
-                return ServiceResult<IEnumerable<string?>?>.Fail("Для создания роли студента, нужно указать studentGroupId, который должен быть больше 0.", null);
-            }
-
-            if (await _dbContext.Set<Group>().AnyAsync(e => e.GroupId == studentGroupId) is false)
-            {
-                return ServiceResult<IEnumerable<string?>?>.Fail("Группы с таким studentGroupId не существует.", null);
-            }
-        }
-
-        var registrationEntities = new List<RegistrationEntity>();
-        for (int i = 0; i < numberOfLinks; i++)
-        {
-            var regEntity = new RegistrationEntity()
-            {
-                CodeExpires = DateTime.UtcNow.AddDays(14),
-                DesiredRole = role,
-                SecretKey = RegistrationEntity.GenerateSecretKey(),
-                StudentGroupId = (role is RegistrationEntity.Role.Student) ? studentGroupId : default
-            };
-
-            registrationEntities.Add(regEntity);
-        }
-        await _dbContext.Set<RegistrationEntity>().AddRangeAsync(registrationEntities);
-        await _dbContext.SaveChangesAsync();
-        return ServiceResult<IEnumerable<string?>?>.Ok("Коды созданы и сохранены. Они действительны в течени 14-ти суток.", registrationEntities.Select(e=>e.SecretKey));
     }
 }

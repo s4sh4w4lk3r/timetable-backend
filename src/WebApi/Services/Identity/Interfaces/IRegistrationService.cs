@@ -29,14 +29,5 @@ namespace WebApi.Services.Identity.Interfaces
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ServiceResult> SendEmailAsync(string userEmail, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Создает коды для регистрации указанного количества пользователей с указанной ролью.
-        /// </summary>
-        /// <param name="role"></param>
-        /// <param name="numberOfLinks"></param>
-        /// <param name="studentGroupId">Id группы, в которую надо закинуть студента. Если роль != student, но указан id, то id будет проигнорирован.</param>
-        /// <returns></returns>
-        Task<ServiceResult<IEnumerable<string?>?>> CreateAndSaveRegisterCodes(RegistrationEntity.Role role, int numberOfLinks = 1, int studentGroupId = 0);
     }
 }

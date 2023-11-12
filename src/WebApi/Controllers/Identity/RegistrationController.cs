@@ -1,43 +1,93 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Entities.Identity;
 using Models.Entities.Identity.Users;
 using Validation;
+using WebApi.Services;
 using WebApi.Services.Identity.Interfaces;
 
 namespace WebApi.Controllers.Identity;
 
-[ApiController, Route("identity/register")]
+[ApiController, Route("identity/registration")]
 public class RegistrationController : ControllerBase
 {
     private readonly IRegistrationService _registerService;
+    private readonly IRegistrationEntityService _registrationEntityService;
+    private readonly ILogger _logger;
 
-    public RegistrationController(IRegistrationService registerService)
+    public RegistrationController(IRegistrationService registerService, IRegistrationEntityService registrationEntityService, ILoggerFactory loggerFactory)
     {
         _registerService = registerService;
+        _registrationEntityService = registrationEntityService;
+        _logger = loggerFactory.CreateLogger<RegistrationController>();
     }
 
-    [HttpPost, Route("")]
-    public async Task<IActionResult> RegisterAdmin([FromBody] UserRegistrationDto userRegistrationDto, CancellationToken cancellationToken = default)
+    [HttpPost, Route("register")]
+    public async Task<IActionResult> Register([FromBody] UserRegistrationDto userRegistrationDto, CancellationToken cancellationToken = default)
     {
-#warning сделать ендпоинты для регистрации разных типов юезров.
-        if (StaticValidator.ValidateEmail(userRegistrationDto.Email) is false)
+        var validateResult = new UserRegistrationDtoValidator().Validate(userRegistrationDto);
+        if (validateResult.IsValid is false)
         {
-            return BadRequest("Неверный формат почты.");
+            return BadRequest(validateResult);
         }
 
-        if (StaticValidator.ValidatePassword(userRegistrationDto.Password) is false)
+        var regEntity = await _registrationEntityService.CheckRegistrationEntityExistsAsync(userRegistrationDto.RegisterKey, userRegistrationDto.Role, cancellationToken);
+        if (regEntity.Success is false || regEntity.Value is null)
         {
-            return BadRequest("Пароль не соответствует тербованиям.");
+            return BadRequest(regEntity);
         }
 
-        Admin user = new() { Email = userRegistrationDto.Email, Password = userRegistrationDto.Password, Firstname = "d", Lastname = "d", Middlename = "d" };
-        var regResult = await _registerService.AddUserToRepoAsync(user, cancellationToken);
+        ServiceResult? regResult;
+
+        switch (userRegistrationDto.Role)
+        {
+            case RegistrationEntity.Role.Student:
+                {
+                    Student student = new()
+                    {
+                        Firstname = userRegistrationDto.Firstname, Lastname = userRegistrationDto.Lastname, Middlename = userRegistrationDto.Middlename,
+                        Email = userRegistrationDto.Email, Password = userRegistrationDto.Password, GroupId = regEntity.Value.StudentGroupId
+                    };
+                    regResult = await _registerService.AddUserToRepoAsync(student, cancellationToken);
+                    break;
+                }
+
+            case RegistrationEntity.Role.Teacher:
+                {
+                    Teacher teacher = new()
+                    {
+                        Firstname = userRegistrationDto.Firstname, Lastname = userRegistrationDto.Lastname, Middlename = userRegistrationDto.Middlename,
+                        Email = userRegistrationDto.Email, Password = userRegistrationDto.Password
+                    };
+                    regResult = await _registerService.AddUserToRepoAsync(teacher, cancellationToken);
+                    break;
+                }
+
+            case RegistrationEntity.Role.Admin:
+                {
+                    Admin admin = new()
+                    {
+                        Firstname = userRegistrationDto.Firstname, Lastname = userRegistrationDto.Lastname, Middlename = userRegistrationDto.Middlename,
+                        Email = userRegistrationDto.Email, Password = userRegistrationDto.Password
+                    };
+                    regResult = await _registerService.AddUserToRepoAsync(admin, cancellationToken);
+                    break;
+                }
+
+            default:
+                _logger.LogCritical("В контроллере {controller} в методе {method} случился дефолт в enum ролей.", nameof(RegistrationController), nameof(Register));
+                return StatusCode(500, "Что-то пошло не так, см. логи");
+        }
+
         if (regResult.Success is false)
         {
             return BadRequest(regResult);
         }
 
+#error проверить
+#warning также добавить ендпоинт чтобы большой папочка мог как-то регать админов.
+        await _registrationEntityService.RemoveRegistrationEntityAsync(regEntity.Value, cancellationToken);
         return Ok(regResult);
     }
 
@@ -84,7 +134,7 @@ public class RegistrationController : ControllerBase
     [HttpGet, Route("create-register-links"), Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateRegisterCodes([FromQuery] RegistrationEntity.Role role, [FromQuery] int numberOfLinks = 1, [FromQuery] int studentGroupId = 0)
     {
-        var serviceResult = await _registerService.CreateAndSaveRegisterCodes(role, numberOfLinks, studentGroupId);
+        var serviceResult = await _registrationEntityService.CreateAndSaveRegistrationEntitesAsync(role, numberOfLinks, studentGroupId);
         if (serviceResult.Success is false)
         {
             return BadRequest(serviceResult);
@@ -94,5 +144,19 @@ public class RegistrationController : ControllerBase
 
     public record ConfirmEmailDto(string Email, int ApprovalCode);
     public record EmailAddressDto(string Email);
-    public record UserRegistrationDto(string Email, string Password);
+    public record UserRegistrationDto(string Email, string Password, string Lastname, string Firstname, string Middlename, RegistrationEntity.Role Role, string RegisterKey);
+
+    public class UserRegistrationDtoValidator : AbstractValidator<UserRegistrationDto>
+    {
+        public UserRegistrationDtoValidator()
+        {
+            RuleFor(e => e.Email).Must(StaticValidator.ValidateEmail).WithMessage("Неверный формат почты.");
+            RuleFor(e => e.Password).Must(StaticValidator.ValidatePassword).WithMessage("Пароль не соответствует минимальным требованиям безопасности.");
+            RuleFor(e => e.Middlename).NotEmpty();
+            RuleFor(e => e.Firstname).NotEmpty();
+            RuleFor(e => e.Lastname).NotEmpty();
+            RuleFor(e => e.RegisterKey).NotEmpty();
+            RuleFor(e => e.Role).IsInEnum();
+        }
+    }
 }

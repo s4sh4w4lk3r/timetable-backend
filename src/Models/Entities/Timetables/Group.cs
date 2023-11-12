@@ -1,4 +1,5 @@
-﻿using Models.Entities.Identity.Users;
+﻿using Models.Entities.Identity;
+using Models.Entities.Identity.Users;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
@@ -11,6 +12,9 @@ public class Group
 
     [JsonIgnore]
     public ICollection<Student>? Students { get; set; }
+
+    [JsonIgnore]
+    public ICollection<RegistrationEntity>? RegistrationEntities { get; set; }
     private Group() { }
 
     [SetsRequiredMembers]
