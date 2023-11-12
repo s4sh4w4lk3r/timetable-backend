@@ -11,10 +11,10 @@ public class Cabinet
 
 
     [JsonIgnore]
-    public List<ActualTimetableCell>? ActualTimetableCells { get; set; }
+    public ICollection<ActualTimetableCell>? ActualTimetableCells { get; set; }
 
     [JsonIgnore]
-    public List<StableTimetableCell>? StableTimetableCells { get; set; }
+    public ICollection<StableTimetableCell>? StableTimetableCells { get; set; }
 
     private Cabinet() { }
 

@@ -1,32 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Models.Entities.Timetables.Cells.CellMembers;
-using Models.Entities.Timetables.Cells;
-using Repository;
-using Models.Entities.Timetables;
-using Microsoft.EntityFrameworkCore;
-using WebApi.Services.Timetables;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace WebApi.Controllers
 {
-    [ApiController, Route("/api/test")]
+    
+    [ApiController, Route("/test")]
     public class BebraController : ControllerBase
     {
-        [HttpGet, Route("")]
-        public async Task<IActionResult> DoIt([FromServices] ActualTimetableService actualTimetableService)
+        [HttpGet, Route(""), Authorize()]
+        public async Task<IActionResult> DoIt()
         {
-            var datesOnly = new List<DateOnly>()
+            var sb = new StringBuilder();
+            foreach (var item in User.Claims)
             {
-                DateOnly.Parse("06.11.2023"),
-                DateOnly.Parse("07.11.2023"),
-                DateOnly.Parse("08.11.2023"),
-                DateOnly.Parse("09.11.2023"),
-                DateOnly.Parse("10.11.2023"),
-            };
-
-            await actualTimetableService.GetTimetableAsync(1, 1);
-            return Ok();
+                sb.Append(item.Type).Append(" - ").Append(item.Value).Append('\n');
+            }
+            return Ok(sb.ToString());
         }
-        private static List<StableTimetableCell> GetListCells()
+        /*private static List<StableTimetableCell> GetListCells()
         {
             var mdk1101 = new Subject(0, "МДК 11.01 Технология разработки и защиты баз данных");
             var mdk0701 = new Subject(0, "МДК 07.01 Управление и автоматизация баз данных");
@@ -116,6 +108,6 @@ namespace WebApi.Controllers
 
             oddList.AddRange(evenList);
             return oddList;
-        }
+        }*/
     }
 }

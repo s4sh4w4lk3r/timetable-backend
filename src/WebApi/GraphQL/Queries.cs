@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Authorization;
-using Models.Entities.Timetables.Cells.CellMembers;
+using Models.Entities.Identity;
+using Models.Entities.Identity.Users;
 using Repository;
 
 namespace WebApi.GraphQL
@@ -9,10 +10,10 @@ namespace WebApi.GraphQL
         [UseProjection]
         [UseFiltering]
         [UseSorting]
-        [Authorize]
-        public IQueryable<Teacher> GetTeachers([Service] TimetableContext dbContext)
+        [Authorize(Roles = new string[] {"Student"})]
+        public IQueryable<UserSession> GetTeachers([Service] TimetableContext dbContext)
         {
-            return dbContext.Set<Teacher>().AsQueryable();
+            return dbContext.Set<UserSession>().AsQueryable();
         }
     }
 }

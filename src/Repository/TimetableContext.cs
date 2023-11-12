@@ -4,19 +4,18 @@ using Microsoft.Extensions.Options;
 using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Timetables.Cells.CellMembers;
-using Models.Entities.Users;
 using Throw;
-using static Repository.TimetableEntityBuilderMethods;
-using static Repository.UserEntityBuilderMethods;
+using static Repository.TimetableSchemaMethods;
+using static Repository.IdentitySchemaMethods;
+using Models.Entities.Identity.Users;
+using Models.Entities.Identity;
 
 namespace Repository;
 
 public class TimetableContext : DbContext
 {
-
     private readonly DbConfiguration _configuration;
     private readonly ILoggerFactory _loggerFactory;
-    private static bool IsEnsureCreated = false;
 
     public TimetableContext(IOptions<DbConfiguration> options, ILoggerFactory loggerFactory)
     {
@@ -24,29 +23,7 @@ public class TimetableContext : DbContext
 
         _loggerFactory = loggerFactory;
         _configuration = options.Value;
-
-        if (IsEnsureCreated is false)
-        {
-            //Database.EnsureDeleted();
-            Database.EnsureCreated();
-            IsEnsureCreated = true;
-        }
     }
-
-    /*public DbSet<Cabinet> Cabinets => Set<Cabinet>();
-    public DbSet<LessonTime> LessonTimes => Set<LessonTime>();
-    public DbSet<Subject> Subjects => Set<Subject>();
-    public DbSet<Teacher> Teachers => Set<Teacher>();
-    public DbSet<Group> Groups => Set<Group>();
-    public DbSet<User> Users => Set<User>();
-    public DbSet<Timetable> Timetables => Set<Timetable>();
-    public DbSet<ApprovalCode> ApprovalCodes => Set<ApprovalCode>();
-    public DbSet<UserSession> UserSessions => Set<UserSession>();
-    public DbSet<EmailUpdateEntity> EmailUpdateEntities => Set<EmailUpdateEntity>();
-    public DbSet<ActualTimetableCell> ActualTimetableCells => Set<ActualTimetableCell>();
-    public DbSet<StableTimetableCell> StableTimetableCells => Set<StableTimetableCell>();
-    public DbSet<StableTimetable> StableTimetables => Set<StableTimetable>();
-    public DbSet<ActualTimetable> ActualTimetables => Set<ActualTimetable>();*/
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -65,22 +42,22 @@ public class TimetableContext : DbContext
         {
             modelBuilder.UseCollation(_configuration.Collation);
         }
+        #region Настройка схемы identity
 
         modelBuilder.Entity<User>(ConfigureUser);
-
-        modelBuilder.Entity<ApprovalCode>(ConfigureApprovalCode);
-
+        modelBuilder.Entity<Teacher>(ConfigureTeacher);
+        modelBuilder.Entity<Admin>(ConfigureAdmin);
+        modelBuilder.Entity<Student>(ConfigureStudent);
         modelBuilder.Entity<UserSession>(ConfigureUserSession);
-
+        modelBuilder.Entity<Approval>(ConfigureApproval);
         modelBuilder.Entity<EmailUpdateEntity>(ConfigureEmailUpdateEntity);
+        #endregion
 
-        modelBuilder.Entity<Timetable>(ConfigureTimetable);
 
+        #region Настройка схемы timetable
         modelBuilder.Entity<StableTimetable>(ConfigureStableTimetable);
 
         modelBuilder.Entity<ActualTimetable>(ConfigureActualTimetable);
-
-        modelBuilder.Entity<TimetableCell>(ConfigureTimetableCell);
 
         modelBuilder.Entity<StableTimetableCell>(ConfigureStableTimetableCell);
 
@@ -92,8 +69,9 @@ public class TimetableContext : DbContext
 
         modelBuilder.Entity<Subject>(ConfigureSubject);
 
-        modelBuilder.Entity<Teacher>(ConfigureTeacher);
+        modelBuilder.Entity<TeacherCM>(ConfigureTeacher);
 
         modelBuilder.Entity<Group>(ConfigureGroup);
+        #endregion
     }
 }

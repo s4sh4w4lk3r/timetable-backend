@@ -46,10 +46,6 @@ public static partial class StaticValidator
         return true;
     }
 
-
-
-
-
     [GeneratedRegex("^\\S+@\\S+\\.\\S+$")]
     private static partial Regex EmailRegex();
 

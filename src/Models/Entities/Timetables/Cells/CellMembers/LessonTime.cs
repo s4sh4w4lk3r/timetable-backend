@@ -12,17 +12,16 @@ namespace Models.Entities.Timetables.Cells.CellMembers
 
 
         [JsonIgnore]
-        public List<ActualTimetableCell>? ActualTimetableCells { get; set; }
+        public ICollection<ActualTimetableCell>? ActualTimetableCells { get; set; }
 
         [JsonIgnore]
-        public List<StableTimetableCell>? StableTimetableCells { get; set; }
+        public ICollection<StableTimetableCell>? StableTimetableCells { get; set; }
 
         private LessonTime() { }
 
         [SetsRequiredMembers]
         public LessonTime(int lessonTimePk, int number, TimeOnly startsAt, TimeOnly endsAt)
         {
-#warning добавить проверку
             LessonTimeId = lessonTimePk;
             Number = number;
             StartsAt = startsAt;

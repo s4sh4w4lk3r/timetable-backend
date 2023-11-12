@@ -1,15 +1,13 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.HttpOverrides;
+﻿using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.OpenApi.Models;
 using Repository;
 using Serilog;
-using Validation;
+using System.Reflection;
 using WebApi.GraphQL;
-using WebApi.Middlewares.Auth;
-using WebApi.Services.Account.Implementations;
-using WebApi.Services.Account.Interfaces;
-using WebApi.Services.Timetables;
+using WebApi.Middlewares.Authentication;
+using WebApi.Services.Identity.Implementations;
+using WebApi.Services.Identity.Interfaces;
 using WebApi.Types.Configuration;
-using WebApi.Types.Validation;
 
 namespace WebApi;
 
@@ -26,11 +24,17 @@ public class Program
         ConfigureServices(builder);
         ConfigureDependencies(builder);
         ConfigureIOptions(builder);
-        ConfigureValidators(builder);
 
         var app = builder.Build();
         ConfigureMiddlewares(app);
-        app.MapGet("/", () => "Hello World!");
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<TimetableContext>();
+            //db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+            db.Dispose();
+        }
 
         app.Run();
     }
@@ -38,18 +42,40 @@ public class Program
     private static void ConfigureServices(WebApplicationBuilder builder)
     {
         builder.Services.AddControllers();
-        builder.Services.AddSwaggerGen();
 
-        
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Version = "v1",
+                Title = "ToDo API",
+                Description = "An ASP.NET Core Web API for managing ToDo items",
+                TermsOfService = new Uri("https://example.com/terms"),
+                Contact = new OpenApiContact
+                {
+                    Name = "Example Contact",
+                    Url = new Uri("https://example.com/contact")
+                },
+                License = new OpenApiLicense
+                {
+                    Name = "Example License",
+                    Url = new Uri("https://example.com/license")
+                }
+            });
+
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            options.IncludeXmlComments(System.IO.Path.Combine(AppContext.BaseDirectory, xmlFilename));
+        });
+
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
-        .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, options => { });
+         .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, _ => { });
         builder.Services.AddAuthorization();
         builder.Services.AddGraphQLServer()
-            .AddQueryType<Queries>()
-            .AddProjections()
-            .AddFiltering()
-            .AddSorting()
-            .AddAuthorization();
+           .AddQueryType<Queries>()
+           .AddProjections()
+           .AddFiltering()
+           .AddSorting()
+           .AddAuthorization();
     }
     private static void ConfigureDependencies(WebApplicationBuilder builder)
     {
@@ -62,7 +88,6 @@ public class Program
         builder.Services.AddScoped<IUserSessionService, UserSessionService>();
         builder.Services.AddScoped<IApprovalService, ApprovalService>();
         builder.Services.AddScoped<IApprovalSender, ApprovalSender>();
-        builder.Services.AddScoped<ActualTimetableService>();
 
         if (builder.Environment.IsDevelopment())
         {
@@ -72,15 +97,6 @@ public class Program
         {
             builder.Services.AddTransient<IEmailClient, MailKitClient>();
         }
-    }
-    private static void ConfigureValidators(WebApplicationBuilder builder)
-    {
-        builder.Services.AddValidatorsFromAssemblyContaining<CabinetValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<TeacherValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<JwtConfigurationValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<UserSessionValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<MailConfigurationValidator>();
     }
     private static void ConfigureIOptions(WebApplicationBuilder builder)
     {
@@ -108,7 +124,6 @@ public class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
-#warning нормально описать сваггер.
         }
     }
 }

@@ -1,25 +1,43 @@
 ﻿using Models.Entities.Timetables.Cells.CellMembers;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Models.Entities.Timetables.Cells
 {
-    public class ActualTimetableCell : TimetableCell
+    public class ActualTimetableCell : ITimetableCell
     {
-        public required DateOnly Date { get; init; }
-        public required bool IsModified { get; set; }
-        public required bool IsCanceled { get; set; }
-        public required bool IsMoved { get; set; }
+        public int TimetableCellId { get; init; }
+        public TeacherCM? Teacher { get; init; }
+        public Subject? Subject { get; init; }
+        public Cabinet? Cabinet { get; init; }
+        public LessonTime? LessonTime { get; init; }
+        public int TeacherId { get; init; }
+        public int SubjectId { get; init; }
+        public int CabinetId { get; init; }
+        public int LessonTimeId { get; init; }
+        public DateOnly Date { get; init; }
+        public bool IsModified { get; set; } = false;
+        public bool IsCanceled { get; set; } = false;
+        public bool IsMoved { get; set; } = false;
 
-        public ActualTimetableCell() : base() { }
+        private ActualTimetableCell() { }
 
-        [SetsRequiredMembers]
-        public ActualTimetableCell(int actualTimetableCellId, Teacher teacher, Subject subject, Cabinet cabinet, LessonTime lessonTime, DateOnly date, bool isModified = false, bool isCanceled = false, bool isMoved = false)
-            : base(actualTimetableCellId, teacher, subject, cabinet, lessonTime)
+        public ActualTimetableCell(int timetableCellId, TeacherCM? teacher, Subject? subject, Cabinet? cabinet, LessonTime? lessonTime, DateOnly dateOnly)
         {
-            Date = date;
-            IsModified = isModified;
-            IsCanceled = isCanceled;
-            IsMoved = isMoved;
+            TimetableCellId = timetableCellId;
+            Teacher = teacher;
+            Subject = subject;
+            Cabinet = cabinet;
+            LessonTime = lessonTime;
+            Date = dateOnly;
+        }
+
+        public ActualTimetableCell(int timetableCellId, int teacherId, int subjectId, int cabinetId, int lessonTimeId, DateOnly dateOnly)
+        {
+            TimetableCellId = timetableCellId;
+            TeacherId = teacherId;
+            SubjectId = subjectId;
+            CabinetId = cabinetId;
+            LessonTimeId = lessonTimeId;
+            Date = dateOnly;
         }
     }
 }
