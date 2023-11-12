@@ -2,7 +2,7 @@
 
 namespace Models.Entities.Identity.Users
 {
-    public abstract class User
+    public class User
     {
         public int UserId { get; set; }
         public required string Lastname { get; set; }
@@ -21,5 +21,7 @@ namespace Models.Entities.Identity.Users
 
         [JsonIgnore] 
         public ICollection<EmailUpdateEntity>? EmailUpdateEntities { get; set; }
+
+        internal protected User() { }
     }
 }

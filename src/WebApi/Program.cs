@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.OpenApi.Models;
 using Repository;
 using Serilog;
+using System.Reflection;
+using WebApi.GraphQL;
 using WebApi.Middlewares.Authentication;
 using WebApi.Services.Identity.Implementations;
 using WebApi.Services.Identity.Interfaces;
@@ -39,18 +42,40 @@ public class Program
     private static void ConfigureServices(WebApplicationBuilder builder)
     {
         builder.Services.AddControllers();
-        builder.Services.AddSwaggerGen();
 
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Version = "v1",
+                Title = "ToDo API",
+                Description = "An ASP.NET Core Web API for managing ToDo items",
+                TermsOfService = new Uri("https://example.com/terms"),
+                Contact = new OpenApiContact
+                {
+                    Name = "Example Contact",
+                    Url = new Uri("https://example.com/contact")
+                },
+                License = new OpenApiLicense
+                {
+                    Name = "Example License",
+                    Url = new Uri("https://example.com/license")
+                }
+            });
+
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            options.IncludeXmlComments(System.IO.Path.Combine(AppContext.BaseDirectory, xmlFilename));
+        });
 
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
          .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, _ => { });
         builder.Services.AddAuthorization();
-        /* builder.Services.AddGraphQLServer()
-            .AddQueryType<Queries>()
-            .AddProjections()
-            .AddFiltering()
-            .AddSorting()
-            .AddAuthorization();*/
+        builder.Services.AddGraphQLServer()
+           .AddQueryType<Queries>()
+           .AddProjections()
+           .AddFiltering()
+           .AddSorting()
+           .AddAuthorization();
     }
     private static void ConfigureDependencies(WebApplicationBuilder builder)
     {
@@ -87,7 +112,7 @@ public class Program
         app.UseSerilogRequestLogging();
         app.UseAuthentication();
         app.UseAuthorization();
-        //app.MapGraphQL();
+        app.MapGraphQL();
         app.MapControllers();
 
         app.UseForwardedHeaders(new ForwardedHeadersOptions

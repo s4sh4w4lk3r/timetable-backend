@@ -22,7 +22,12 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
-  <ItemGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<!--<NoWarn>$(NoWarn);1591</NoWarn>-->
+	</PropertyGroup>
+
+	<ItemGroup>
     <ProjectReference Include="..\Repository\Repository.csproj" />
     <ProjectReference Include="..\Validation\Validation.csproj" />
   </ItemGroup>
