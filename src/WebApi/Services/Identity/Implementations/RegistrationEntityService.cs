@@ -49,12 +49,12 @@ namespace WebApi.Services.Identity.Implementations
                     CodeExpires = DateTime.UtcNow.AddDays(14),
                     DesiredRole = role,
                     SecretKey = RegistrationEntity.GenerateSecretKey(),
-                    StudentGroupId = (role is RegistrationEntity.Role.Student) ? studentGroupId : default
+                    StudentGroupId = (role is RegistrationEntity.Role.Student) ? studentGroupId : null
                 };
 
                 registrationEntities.Add(regEntity);
             }
-            await _dbContext.Set<RegistrationEntity>().AddRangeAsync(registrationEntities);
+            await _dbContext.Set<RegistrationEntity>().AddRangeAsync(registrationEntities, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return ServiceResult<IEnumerable<string?>?>.Ok("Коды созданы и сохранены. Они действительны в течени 14-ти суток.", registrationEntities.Select(e => e.SecretKey));
         }
