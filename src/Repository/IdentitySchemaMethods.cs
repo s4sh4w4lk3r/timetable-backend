@@ -61,7 +61,7 @@ namespace Repository
             entity.ToTable("RegistrationEntity", "identity");
             entity.HasKey(e => e.RegistrationEntityId);
             entity.Property(e => e.SecretKey).IsRequired();
-            entity.HasOne(e => e.Group).WithMany(e=>e.RegistrationEntities).HasForeignKey(e=>e.StudentGroupId).IsRequired();
+            entity.HasOne(e => e.Group).WithMany(e => e.RegistrationEntities).HasForeignKey(e => e.StudentGroupId).IsRequired(false);
         }
     }
 }

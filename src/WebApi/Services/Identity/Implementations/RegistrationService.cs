@@ -71,7 +71,7 @@ public class RegistrationService : IRegistrationService
             admin.Password = PasswordService.HashPassword(admin.Password);
             await _dbContext.Set<Admin>().AddAsync(admin, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            return ServiceResult.Ok("Учитель добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
+            return ServiceResult.Ok("Админ добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
         }
 
         string errorMsg = "Была произведена попытка зарегать юзера неизветсного типа.";

@@ -10,7 +10,7 @@ namespace Models.Entities.Identity
         public string? SecretKey { get; set; }
         public DateTime CodeExpires { get; set; }
         public Role DesiredRole { get; set; }
-        public int StudentGroupId { get; set; }
+        public int? StudentGroupId { get; set; }
         public Group? Group { get; set; }
 
         public bool IsCodeNotExpired() => DateTime.UtcNow < CodeExpires;

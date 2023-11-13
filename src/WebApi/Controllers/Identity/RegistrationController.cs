@@ -42,12 +42,12 @@ public class RegistrationController : ControllerBase
 
         switch (userRegistrationDto.Role)
         {
-            case RegistrationEntity.Role.Student:
+            case RegistrationEntity.Role.Student when regEntity.Value.StudentGroupId is int studentGroupId:
                 {
                     Student student = new()
                     {
                         Firstname = userRegistrationDto.Firstname, Lastname = userRegistrationDto.Lastname, Middlename = userRegistrationDto.Middlename,
-                        Email = userRegistrationDto.Email, Password = userRegistrationDto.Password, GroupId = regEntity.Value.StudentGroupId
+                        Email = userRegistrationDto.Email, Password = userRegistrationDto.Password, GroupId = studentGroupId
                     };
                     regResult = await _registerService.AddUserToRepoAsync(student, cancellationToken);
                     break;
@@ -85,7 +85,6 @@ public class RegistrationController : ControllerBase
             return BadRequest(regResult);
         }
 
-#error проверить
 #warning также добавить ендпоинт чтобы большой папочка мог как-то регать админов.
         await _registrationEntityService.RemoveRegistrationEntityAsync(regEntity.Value, cancellationToken);
         return Ok(regResult);

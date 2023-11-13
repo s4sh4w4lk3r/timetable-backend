@@ -88,6 +88,7 @@ public class Program
         builder.Services.AddScoped<IUserSessionService, UserSessionService>();
         builder.Services.AddScoped<IApprovalService, ApprovalService>();
         builder.Services.AddScoped<IApprovalSender, ApprovalSender>();
+        builder.Services.AddScoped<IRegistrationEntityService, RegistrationEntityService>();
 
         if (builder.Environment.IsDevelopment())
         {
