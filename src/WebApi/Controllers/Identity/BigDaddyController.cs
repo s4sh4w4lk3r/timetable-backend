@@ -28,7 +28,7 @@ namespace WebApi.Controllers.Identity
                 return BadRequest("Ключ папочки неверный.");
             }
 
-            var serviceResult = await _registrationEntityService.CreateAndSaveRegistrationEntitesAsync(RegistrationEntity.Role.Admin, ONLY_ONE_CODE, default, cancellationToken);
+            var serviceResult = await _registrationEntityService.CreateAndSaveRegistrationEntitesAsync(RegistrationEntity.Role.Admin, numberOfCodes: ONLY_ONE_CODE, studentGroupId: default, subGroup: default, cancellationToken);
             if (serviceResult.Success is false)
             {
                 return BadRequest(serviceResult);

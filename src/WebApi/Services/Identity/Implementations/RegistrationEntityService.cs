@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Models.Entities.Identity;
 using Models.Entities.Timetables;
+using Models.Entities.Timetables.Cells.CellMembers;
 using Repository;
 using Throw;
 using WebApi.Services.Identity.Interfaces;
@@ -16,7 +17,8 @@ namespace WebApi.Services.Identity.Implementations
             _dbContext = dbContext;
         }
 
-        public async Task<ServiceResult<IEnumerable<string?>?>> CreateAndSaveRegistrationEntitesAsync(RegistrationEntity.Role role, int numberOfLinks = 1, int studentGroupId = 0, CancellationToken cancellationToken = default)
+        public async Task<ServiceResult<IEnumerable<string?>?>> CreateAndSaveRegistrationEntitesAsync(RegistrationEntity.Role role, int numberOfLinks = 1, 
+            int studentGroupId = 0, SubGroup subGroup = 0, CancellationToken cancellationToken = default)
         {
             if (numberOfLinks < 1 || numberOfLinks > 1000)
             {
@@ -49,7 +51,8 @@ namespace WebApi.Services.Identity.Implementations
                     CodeExpires = DateTime.UtcNow.AddDays(14),
                     DesiredRole = role,
                     SecretKey = RegistrationEntity.GenerateSecretKey(),
-                    StudentGroupId = (role is RegistrationEntity.Role.Student) ? studentGroupId : null
+                    StudentGroupId = (role is RegistrationEntity.Role.Student) ? studentGroupId : null,
+                    SubGroup = (role is RegistrationEntity.Role.Student) ? subGroup : null
                 };
 
                 registrationEntities.Add(regEntity);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Entities.Identity;
 using Models.Entities.Identity.Users;
+using Models.Entities.Timetables.Cells.CellMembers;
 using Validation;
 using WebApi.Services;
 using WebApi.Services.Identity.Interfaces;
@@ -42,12 +43,14 @@ public class RegistrationController : ControllerBase
 
         switch (userRegistrationDto.Role)
         {
-            case RegistrationEntity.Role.Student when regEntity.Value.StudentGroupId is int studentGroupId:
+            case RegistrationEntity.Role.Student 
+                when regEntity.Value.StudentGroupId is int studentGroupId 
+                && regEntity.Value.SubGroup is SubGroup subGroup && Enum.IsDefined(subGroup):
                 {
                     Student student = new()
                     {
                         Firstname = userRegistrationDto.Firstname, Lastname = userRegistrationDto.Lastname, Middlename = userRegistrationDto.Middlename,
-                        Email = userRegistrationDto.Email, Password = userRegistrationDto.Password, GroupId = studentGroupId
+                        Email = userRegistrationDto.Email, Password = userRegistrationDto.Password, GroupId = studentGroupId, SubGroup = subGroup
                     };
                     regResult = await _registerService.AddUserToRepoAsync(student, cancellationToken);
                     break;
@@ -85,7 +88,6 @@ public class RegistrationController : ControllerBase
             return BadRequest(regResult);
         }
 
-#warning также добавить ендпоинт чтобы большой папочка мог как-то регать админов.
         await _registrationEntityService.RemoveRegistrationEntityAsync(regEntity.Value, cancellationToken);
         return Ok(regResult);
     }

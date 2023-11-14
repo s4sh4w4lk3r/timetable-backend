@@ -1,4 +1,5 @@
 ﻿using Models.Entities.Timetables;
+using Models.Entities.Timetables.Cells.CellMembers;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -11,6 +12,7 @@ namespace Models.Entities.Identity
         public DateTime CodeExpires { get; set; }
         public Role DesiredRole { get; set; }
         public int? StudentGroupId { get; set; }
+        public SubGroup? SubGroup { get; set; }
         public Group? Group { get; set; }
 
         public bool IsCodeNotExpired() => DateTime.UtcNow < CodeExpires;
