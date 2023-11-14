@@ -12,16 +12,8 @@ namespace WebApi.Controllers
     public class BebraController : ControllerBase
     {
         [HttpGet, Route("")]
-        public async Task<IActionResult> DoIt([FromServices] TimetableContext db)
+        public async Task<IActionResult> DoIt()
         {
-            await new AscConverter.Converter(@"C:\Users\sanchous\Desktop\projects\timetable-backend\данные\база.xml", db).SaveToDbAsync();
-
-            var b = (await db.Set<StableTimetable>()
-                .Include(e => e!.StableTimetableCells)!.ThenInclude(e => e.Cabinet)
-                .Include(e => e!.StableTimetableCells)!.ThenInclude(e => e.Teacher)
-                .Include(e => e!.StableTimetableCells)!.ThenInclude(e => e.Subject)
-                .Include(e => e!.StableTimetableCells)!.ThenInclude(e => e.LessonTime)
-                .Include(e => e.Group)!.Where(e => e.Group!.Name == "4ИП-2-20")!.FirstOrDefaultAsync())!.StableTimetableCells!.Where(e => e.DayOfWeek == DayOfWeek.Monday)!.ToList();
             return Ok();
         }
     }

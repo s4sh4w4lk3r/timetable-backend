@@ -3,6 +3,7 @@ using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Timetables.Cells.CellMembers;
 using Repository;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace AscConverter;
@@ -11,11 +12,10 @@ public class Converter
     private readonly AscXmlObjects.Timetable _ascTimetable;
     private readonly TimetableContext _dbContext;
 
-    public Converter(string ascXmlPath, TimetableContext dbContext)
+    public Converter(XmlReader xmlReader, TimetableContext dbContext)
     {
         var serializer = new XmlSerializer(typeof(AscXmlObjects.Timetable));
-        using var reader = new StreamReader(ascXmlPath);
-        _ascTimetable = serializer.Deserialize(reader) as AscXmlObjects.Timetable ?? throw new InvalidCastException("Не получилось привести десериализованный объект к Timetable");
+        _ascTimetable = serializer.Deserialize(xmlReader) as AscXmlObjects.Timetable ?? throw new InvalidCastException("Не получилось привести десериализованный объект к Timetable");
         _dbContext = dbContext;
     }
 
@@ -23,8 +23,8 @@ public class Converter
     {
         OOPTypes.Timetable oopTimetable = ConvertToOOP(_ascTimetable);
         await FillDbContext(oopTimetable);
-        await ConvertToStableTimetable(oopTimetable);
-        _dbContext.SaveChanges();
+        await ConvertToStableTimetableAndSaveToContext(oopTimetable);
+        await _dbContext.SaveChangesAsync();
     }
 
     /// <summary>
@@ -115,7 +115,13 @@ public class Converter
         return oopTypesTimetable;
     }
 
-    private async Task ConvertToStableTimetable(OOPTypes.Timetable oopTimetable)
+    /// <summary>
+    /// Достает данные об объектах ячейки из дбконтекста и с помощью них создает ячейки, расписания и сохраняет обратно в контекст всё.
+    /// </summary>
+    /// <param name="oopTimetable"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    private async Task ConvertToStableTimetableAndSaveToContext(OOPTypes.Timetable oopTimetable)
     {
         var cards = oopTimetable.Cards;
         List<StableTimetable> stableTimetables = new();
@@ -155,7 +161,7 @@ public class Converter
                         break;
 
                     default:
-                        throw new Exception("Четностb недели не определена.");
+                        throw new ArgumentException("Четностb недели не определена.");
                 }
 
             }
@@ -165,7 +171,7 @@ public class Converter
     }
 
     /// <summary>
-    /// Заполяняет контекст инфой для ячеек.
+    /// Заполяняет контекст инфой для ячеек и сейвит всё это в субд, чтобы получить айдишники.
     /// </summary>
     /// <param name="oopTimetable"></param>
     private async Task FillDbContext(OOPTypes.Timetable oopTimetable)
