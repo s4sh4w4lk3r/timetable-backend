@@ -17,6 +17,7 @@ namespace Models.Entities.Timetables.Cells
         public bool IsModified { get; set; } = false;
         public bool IsCanceled { get; set; } = false;
         public bool IsMoved { get; set; } = false;
+        public SubGroup SubGroup { get; init; }
 
         private ActualTimetableCell() { }
 

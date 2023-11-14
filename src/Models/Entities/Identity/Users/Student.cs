@@ -1,4 +1,5 @@
 ﻿using Models.Entities.Timetables;
+using Models.Entities.Timetables.Cells.CellMembers;
 
 namespace Models.Entities.Identity.Users
 {
@@ -6,5 +7,8 @@ namespace Models.Entities.Identity.Users
     {
         public Group? Group { get; set; }
         public int GroupId { get; set; }
+        public SubGroup SubGroup { get; set; } = SubGroup.All;
+
+#warning добавить в регстрацию студента возможность указать подгруппу.
     }
 }

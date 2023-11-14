@@ -15,6 +15,7 @@ namespace Models.Entities.Timetables.Cells
         public int LessonTimeId { get; internal set; }
         public bool IsWeekEven { get; internal set; }
         public DayOfWeek DayOfWeek { get; internal set; }
+        public SubGroup SubGroup { get; internal set; }
 
         internal StableTimetableCell() { }
     }

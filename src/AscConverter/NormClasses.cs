@@ -1,39 +1,39 @@
-﻿namespace CorrectCLRTypes
+﻿namespace OOPTypes
 {
-    public class Group
+    internal class Group
     {
         public required string Id { get; set; }
         public required string Name { get; set; }
     }
 
-    public class Teacher
+    internal class Teacher
     {
         public required string Id { get; set; }
         public required string Lastname { get; set; }
         public required string Firstname { get; set; }
     }
 
-    public class Building
+    internal class Building
     {
         public required string Id { get; set; }
         public required string Name { get; set; }
     }
 
-    public class Period
+    internal class Period
     {
         public required string Number { get; set; }
         public required TimeOnly StartTime { get; set; }
         public required TimeOnly EndTime { get; set; }
     }
 
-    public class Daydef
+    internal class Daydef
     {
         public required string DayCode { get; set; }
         public required string Id { get; set; }
         public required string Name { get; set; }
     }
 
-    public class Cabinet
+    internal class Cabinet
     {
         public required Building Building { get; set; }
         public required string CabinetId { get; set; }
@@ -41,14 +41,14 @@
         public required string ShortName { get; set; }
     }
 
-    public class Subject
+    internal class Subject
     {
         public required string Id { get; set; }
         public required string Name { get; set; }
         public required string ShortName { get; set; }
     }
 
-    public class WeekDef
+    internal class WeekDef
     {
         public required string Id { get; set; }
         public required string Name { get; set; }
@@ -56,14 +56,14 @@
         public required string WeekCode { get; set; }
     }
 
-    public class SubGroup
+    internal class SubGroup
     {
         public required string Id { get; set; }
         public required string Name { get; set; }
 
     }
 
-    public class Lesson
+    internal class Lesson
     {
         public required string Id { get; set; }
         public required WeekDef WeeksDef { get; set; }
@@ -79,7 +79,7 @@
 
 
 
-    public class Card
+    internal class Card
     {
         public string? Id { get; set; }
         public required Daydef Daysdef { get; set; }
@@ -90,7 +90,7 @@
         public required Period Period { get; set; }
     }
 
-    public class Timetable
+    internal class Timetable
     {
         public required IList<Group> Groups { get; set; }
         public required IList<SubGroup> PodGroups { get; set; }

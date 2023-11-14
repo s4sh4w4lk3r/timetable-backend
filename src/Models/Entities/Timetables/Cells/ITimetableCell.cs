@@ -9,6 +9,7 @@ namespace Models.Entities.Timetables.Cells
         public Subject? Subject { get; }
         public Cabinet? Cabinet { get; }
         public LessonTime? LessonTime { get; }
+        public SubGroup SubGroup { get; }
 
         public int TeacherId { get; }
         public int SubjectId { get; }

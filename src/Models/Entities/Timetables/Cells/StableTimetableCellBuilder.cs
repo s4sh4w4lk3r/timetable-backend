@@ -51,6 +51,12 @@ namespace Models.Entities.Timetables.Cells
             return this;
         }
 
+        public StableTimetableCellBuilder AddSubGroup(SubGroup subGroup)
+        {
+            _stableTimetableCell.SubGroup = subGroup;
+            return this;
+        }
+
         public StableTimetableCell Build()
         {
             _stableTimetableCell.Subject.ThrowIfNull();

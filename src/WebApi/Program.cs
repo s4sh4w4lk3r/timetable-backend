@@ -35,7 +35,6 @@ public class Program
             db.Database.EnsureCreated();
             db.Dispose();
         }
-
         app.Run();
     }
 

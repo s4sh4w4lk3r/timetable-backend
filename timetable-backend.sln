@@ -22,6 +22,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.Tests", "test\WebApi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AscConverter", "src\AscConverter\AscConverter.csproj", "{3DA6275D-351E-4D18-BA00-E9624E6D7A67}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleDebugApp", "test\ConsoleDebugApp\ConsoleDebugApp.csproj", "{132C8A22-FC4B-4C3A-91B9-7F79FCCDA6ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,10 @@ Global
 		{3DA6275D-351E-4D18-BA00-E9624E6D7A67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DA6275D-351E-4D18-BA00-E9624E6D7A67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DA6275D-351E-4D18-BA00-E9624E6D7A67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{132C8A22-FC4B-4C3A-91B9-7F79FCCDA6ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{132C8A22-FC4B-4C3A-91B9-7F79FCCDA6ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{132C8A22-FC4B-4C3A-91B9-7F79FCCDA6ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{132C8A22-FC4B-4C3A-91B9-7F79FCCDA6ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,6 +69,7 @@ Global
 		{16BC11F9-4165-47B2-97DA-A20028E3DCDD} = {BEC07E23-200A-4EF4-9C60-9D721E9D842E}
 		{7CB8E268-2D60-4FDC-BEEC-A266C6AC053E} = {41FCEB84-7D12-4C53-B096-C0CC9AED8AA5}
 		{3DA6275D-351E-4D18-BA00-E9624E6D7A67} = {BEC07E23-200A-4EF4-9C60-9D721E9D842E}
+		{132C8A22-FC4B-4C3A-91B9-7F79FCCDA6ED} = {41FCEB84-7D12-4C53-B096-C0CC9AED8AA5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23608A5E-9784-4D31-9835-B800DF461F7B}
