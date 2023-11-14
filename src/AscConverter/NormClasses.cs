@@ -70,7 +70,7 @@
         public required Teacher Teacher { get; set; }
         public required Subject Subject { get; set; }
         public required Group Group { get; set; }
-        public required SubGroup PodGroup { get; set; }
+        public required SubGroup SubGroup { get; set; }
         public required Cabinet Cabinet { get; set; }
         public required Daydef Daysdef { get; set; }
         public required string PeriodsPerCard { get; set; }
@@ -93,7 +93,8 @@
     internal class Timetable
     {
         public required IList<Group> Groups { get; set; }
-        public required IList<SubGroup> PodGroups { get; set; }
+        public required IList<SubGroup> SubGroups { get; set; }
+        public required IList<string> SubGroupsDestincted { get; set; }
         public required IList<Teacher> Teachers { get; set; }
         public required IList<Building> Buildings { get; set; }
         public required IList<Period> Periods { get; set; }

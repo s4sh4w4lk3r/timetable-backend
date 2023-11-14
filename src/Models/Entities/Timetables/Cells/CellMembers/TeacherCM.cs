@@ -24,9 +24,9 @@ public class TeacherCM
     [SetsRequiredMembers]
     public TeacherCM(int teacherPK, string surname, string firstname, string middlename)
     {
-        surname.ThrowIfNull().IfWhiteSpace();
-        firstname.ThrowIfNull().IfWhiteSpace();
-        middlename.ThrowIfNull().IfWhiteSpace();
+        surname.ThrowIfNull(); ;
+        firstname.ThrowIfNull();
+        middlename.ThrowIfNull();
 
         TeacherId = teacherPK;
         Surname = surname;
