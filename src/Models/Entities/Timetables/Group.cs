@@ -9,6 +9,7 @@ public class Group
 {
     public int GroupId { get; init; }
     public required string Name { get; set; }
+    public string? AscId { get; set; }
 
     [JsonIgnore]
     public ICollection<Student>? Students { get; set; }

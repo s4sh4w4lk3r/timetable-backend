@@ -12,6 +12,7 @@ public class TeacherCM
     public required string Surname { get; set; }
     public required string FirstName { get; set; }
     public required string MiddleName { get; set; }
+    public string? AscId { get; set; }
 
     [JsonIgnore]
     public ICollection<ActualTimetableCell>? ActualTimetableCells { get; set; }

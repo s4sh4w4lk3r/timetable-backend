@@ -1,24 +1,29 @@
 ﻿using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Timetables.Cells.CellMembers;
+using Repository;
 using System.Xml.Serialization;
 
 namespace AscConverter;
 public class Converter
 {
     private readonly AscXmlObjects.Timetable _ascTimetable;
+    private readonly TimetableContext _dbContext;
 
-    public Converter(string ascXmlPath)
+    public Converter(string ascXmlPath, TimetableContext dbContext)
     {
         var serializer = new XmlSerializer(typeof(AscXmlObjects.Timetable));
         using var reader = new StreamReader(ascXmlPath);
         _ascTimetable = serializer.Deserialize(reader) as AscXmlObjects.Timetable ?? throw new InvalidCastException("Не получилось привести десериализованный объект к Timetable");
+        _dbContext = dbContext;
     }
 
-    public IList<StableTimetable> Convert()
+    public void /*List<StableTimetable>*/ Convert()
     {
         OOPTypes.Timetable oopTimetable = ConvertToOOP(_ascTimetable);
-        return ConvertToStableTimetable(oopTimetable);
+        FillDbContext(oopTimetable);
+        ConvertToStableTimetable(oopTimetable);
+        _dbContext.SaveChanges();
     }
 
     private static OOPTypes.Timetable ConvertToOOP(AscXmlObjects.Timetable ascTimetable)
@@ -42,7 +47,7 @@ public class Converter
         var normkorpusa = korpusa.Select(e => new OOPTypes.Building { Id = e.Id, Name = e.Name }).ToList();
         var normperiods = periods.Select(e => new OOPTypes.Period() { EndTime = TimeOnly.Parse(e.Endtime), Number = e._period, StartTime = TimeOnly.Parse(e.Starttime) }).ToList();
         var normdaysdef = daysdef.Select(e => new OOPTypes.Daydef() { DayCode = e.Days, Id = e.Id, Name = e.Name }).ToList();
-        var normclassrooms = classrooms.Select(e => new OOPTypes.Cabinet() { CabinetId = e.Id, Name = e.Name, ShortName = e.Short, Building = normkorpusa.Single(x => x.Id == e.Buildingid) }).ToList();
+        var normclassrooms = classrooms.Select(e => new OOPTypes.Cabinet() { Id = e.Id, Name = e.Name, ShortName = e.Short, Building = normkorpusa.Single(x => x.Id == e.Buildingid) }).ToList();
         var normsubjects = subjects.Select(e => new OOPTypes.Subject() { Id = e.Id, Name = e.Name, ShortName = e.Short }).ToList();
         var normweeksdef = weeksdef.Select(e => new OOPTypes.WeekDef() { Id = e.Id, ShortName = e.Short, WeekCode = e.Weeks, Name = e.Name }).ToList();
 
@@ -56,7 +61,7 @@ public class Converter
             normlessons.Add(new OOPTypes.Lesson()
             {
                 Id = item.Id,
-                Cabinet = normclassrooms.SingleOrDefault(e => e.CabinetId == item.Classroomids),
+                Cabinet = normclassrooms.SingleOrDefault(e => e.Id == item.Classroomids),
                 Group = normgroups.SingleOrDefault(e => e.Id == item.Classids),
                 Subject = normsubjects.SingleOrDefault(e => e.Id == item.Subjectid),
                 Teacher = normteachers.SingleOrDefault(e => e.Id == item.Teacherids),
@@ -73,7 +78,7 @@ public class Converter
             normcards.Add(new OOPTypes.Card
             {
                 Daysdef = normdaysdef.Single(e => e.DayCode == item.Days),
-                Cabinet = normclassrooms.Single(e => e.CabinetId == item.Classroomids),
+                Cabinet = normclassrooms.Single(e => e.Id == item.Classroomids),
                 Week = normweeksdef.Single(e => e.WeekCode == item.Weeks),
                 Period = normperiods.Single(e => e.Number == item.Period),
                 Lesson = normlessons.Single(e => e.Id == item.Lessonid),
@@ -100,10 +105,10 @@ public class Converter
         return oopTypesTimetable;
     }
 
-    private IList<StableTimetable> ConvertToStableTimetable(OOPTypes.Timetable oopTimetable)
+    private void /*List<StableTimetable>*/ ConvertToStableTimetable(OOPTypes.Timetable oopTimetable)
     {
         var cards = oopTimetable.Cards;
-        IList<StableTimetable> stableTimetables = new List<StableTimetable>();
+        List<StableTimetable> stableTimetables = new List<StableTimetable>();
 
         foreach (var group in oopTimetable.Groups)
         {
@@ -114,10 +119,10 @@ public class Converter
             {
                 WeekEvenness weekEvenness = DetermineWeekEvenness(card.Week.WeekCode);
                 DayOfWeek dayOfWeek = DetermineDayOfWeek(card.Daysdef.DayCode);
-                TeacherCM teacherCM = new TeacherCM(default, card.Lesson.Teacher.Lastname, card.Lesson.Teacher.Firstname, string.Empty);
-                Subject subject = new Subject(default, card.Lesson.Subject.Name);
-                LessonTime lessonTime = new LessonTime(default, int.Parse(card.Period.Number), card.Period.StartTime, card.Period.EndTime);
-                Cabinet cabinet = new Cabinet(default, card.Cabinet.Building.Name, card.Cabinet.ShortName);
+                TeacherCM teacherCM = _dbContext.Set<TeacherCM>().Single(e => card.Lesson.Teacher.Id == e.AscId);
+                Subject subject = _dbContext.Set<Subject>().Single(e => e.AscId == card.Lesson.Subject.Id);
+                LessonTime lessonTime = _dbContext.Set<LessonTime>().Single(e => e.Number == int.Parse(card.Period.Number));
+                Cabinet cabinet = _dbContext.Set<Cabinet>().Single(e => e.AscId == card.Cabinet.Id);
                 SubGroup subGroup = DetermineSubgroup(card.Lesson.SubGroup.Name);
 
                 switch (weekEvenness)
@@ -145,10 +150,24 @@ public class Converter
 
             }
             var currentStableTimetable = new StableTimetable(default, new Group(default, group.Name), cellsOfCurrentGroup);
-            stableTimetables.Add(currentStableTimetable);
+            _dbContext.Add(currentStableTimetable);
+            //stableTimetables.Add(currentStableTimetable);
         }
-        return stableTimetables;
+        //return stableTimetables;
     }
+
+    private void FillDbContext(OOPTypes.Timetable oopTimetable)
+    {
+        _dbContext.AddRange(oopTimetable.Teachers.Select(e => new TeacherCM(default, e.Lastname, e.Firstname, string.Empty) { AscId = e.Id }));
+        _dbContext.AddRange(oopTimetable.Subjects.Select(e => new Subject(default, e.Name) { AscId = e.Id }));
+        _dbContext.AddRange(oopTimetable.Cards.Select(e => new LessonTime(default, int.Parse(e.Period.Number), e.Period.StartTime, e.Period.EndTime)).Distinct());
+        _dbContext.AddRange(oopTimetable.Cabinets.Select(e=> new Cabinet(default, e.Building.Name, e.Name) { AscId = e.Id }));
+        _dbContext.AddRange(oopTimetable.Groups.Select(e=> new Group(default, e.Name) { AscId = e.Id}));
+        _dbContext.SaveChanges();
+    }
+
+
+
 
     private static DayOfWeek DetermineDayOfWeek(string dayOfWeekCode)
     {

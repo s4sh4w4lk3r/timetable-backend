@@ -8,6 +8,7 @@ public class Cabinet
     public int CabinetId { get; init; }
     public required string Address { get; set; }
     public required string Number { get; set; }
+    public string? AscId { get; set; }
 
 
     [JsonIgnore]

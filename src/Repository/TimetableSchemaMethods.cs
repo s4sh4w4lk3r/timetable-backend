@@ -52,6 +52,7 @@ namespace Repository
             entity.HasKey(c => c.CabinetId);
             entity.Property(c => c.Address);
             entity.Property(c => c.Number);
+            entity.HasIndex(e => e.AscId).IsUnique().AreNullsDistinct();
         }
 
         public static void ConfigureSubject(EntityTypeBuilder<Subject> entity)
@@ -59,6 +60,7 @@ namespace Repository
             entity.ToTable("Subject", "timetable");
             entity.HasKey(s => s.SubjectId);
             entity.Property(s => s.Name);
+            entity.HasIndex(e => e.AscId).IsUnique().AreNullsDistinct();
         }
 
         public static void ConfigureTeacher(EntityTypeBuilder<TeacherCM> entity)
@@ -68,6 +70,7 @@ namespace Repository
             entity.Property(t => t.FirstName);
             entity.Property(t => t.MiddleName);
             entity.Property(t => t.Surname);
+            entity.HasIndex(e => e.AscId).IsUnique().AreNullsDistinct();
         }
 
         public static void ConfigureGroup(EntityTypeBuilder<Group> entity)
@@ -75,6 +78,7 @@ namespace Repository
             entity.ToTable("Group", "timetable");
             entity.HasKey(g => g.GroupId);
             entity.Property(g => g.Name);
+            entity.HasIndex(e => e.AscId).IsUnique().AreNullsDistinct();
         }
     }
 }

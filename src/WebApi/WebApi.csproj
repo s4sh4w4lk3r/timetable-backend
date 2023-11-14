@@ -28,6 +28,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+    <ProjectReference Include="..\AscConverter\AscConverter.csproj" />
     <ProjectReference Include="..\Repository\Repository.csproj" />
     <ProjectReference Include="..\Validation\Validation.csproj" />
   </ItemGroup>

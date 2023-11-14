@@ -7,6 +7,7 @@ public class Subject
 {
     public int SubjectId { get; init; }
     public required string Name { get; set; }
+    public string? AscId { get; set; }
 
     [JsonIgnore]
     public ICollection<ActualTimetableCell>? ActualTimetableCells { get; set; }

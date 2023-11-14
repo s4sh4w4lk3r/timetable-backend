@@ -36,7 +36,7 @@
     internal class Cabinet
     {
         public required Building Building { get; set; }
-        public required string CabinetId { get; set; }
+        public required string Id { get; set; }
         public required string Name { get; set; }
         public required string ShortName { get; set; }
     }
