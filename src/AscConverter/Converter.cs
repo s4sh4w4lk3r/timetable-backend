@@ -9,18 +9,35 @@ using System.Xml.Serialization;
 namespace AscConverter;
 public class Converter
 {
-    private readonly AscXmlObjects.Timetable _ascTimetable;
+    private AscXmlObjects.Timetable _ascTimetable = null!;
     private readonly TimetableContext _dbContext;
+    private bool _isReaded;
 
-    public Converter(XmlReader xmlReader, TimetableContext dbContext)
+    public Converter(TimetableContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    /// <summary>
+    /// Читает Stream, потом вызывает Dispose.
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidCastException"></exception>
+    public async Task ReadAsync(Stream stream)
     {
         var serializer = new XmlSerializer(typeof(AscXmlObjects.Timetable));
-        _ascTimetable = serializer.Deserialize(xmlReader) as AscXmlObjects.Timetable ?? throw new InvalidCastException("Не получилось привести десериализованный объект к Timetable");
-        _dbContext = dbContext;
+        var reader = XmlReader.Create(stream, new XmlReaderSettings { Async = true });
+        _isReaded = await reader.ReadAsync();
+        _ascTimetable = serializer.Deserialize(reader) as AscXmlObjects.Timetable ?? throw new InvalidCastException("Не получилось привести десериализованный объект к Timetable");
+        reader.Dispose();
+        await stream.DisposeAsync();
     }
 
     public async Task SaveToDbAsync()
     {
+        if (_isReaded is false) throw new IOException("Xml не прочитан.");
+
         OOPTypes.Timetable oopTimetable = ConvertToOOP(_ascTimetable);
         await FillDbContext(oopTimetable);
         await ConvertToStableTimetableAndSaveToContext(oopTimetable);

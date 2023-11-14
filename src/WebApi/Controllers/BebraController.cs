@@ -12,7 +12,9 @@ namespace WebApi.Controllers
     public class BebraController : ControllerBase
     {
         [HttpGet, Route("")]
+#pragma warning disable 1998
         public async Task<IActionResult> DoIt()
+#pragma warning restore 1998
         {
             return Ok();
         }

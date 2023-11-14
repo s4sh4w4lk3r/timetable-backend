@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.OpenApi.Models;
 using Repository;
 using Serilog;
@@ -7,6 +8,8 @@ using WebApi.GraphQL;
 using WebApi.Middlewares.Authentication;
 using WebApi.Services.Identity.Implementations;
 using WebApi.Services.Identity.Interfaces;
+using WebApi.Services.Timetables;
+using WebApi.Services.Timetables.Interfaces;
 using WebApi.Types.Configuration;
 
 namespace WebApi;
@@ -78,7 +81,7 @@ public class Program
     }
     private static void ConfigureDependencies(WebApplicationBuilder builder)
     {
-        builder.Services.AddDbContext<TimetableContext>();
+        builder.Services.AddDbContext<TimetableContext>(contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped);
         builder.Services.AddScoped<EmailUpdater>();
         builder.Services.AddScoped<PasswordService>();
         builder.Services.AddScoped<IRegistrationService, RegistrationService>();
@@ -88,6 +91,7 @@ public class Program
         builder.Services.AddScoped<IApprovalService, ApprovalService>();
         builder.Services.AddScoped<IApprovalSender, ApprovalSender>();
         builder.Services.AddScoped<IRegistrationEntityService, RegistrationEntityService>();
+        builder.Services.AddScoped<IStableTimetableService, StableTimetableService>();
 
         if (builder.Environment.IsDevelopment())
         {
@@ -104,6 +108,10 @@ public class Program
         builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetRequiredSection(nameof(JwtConfiguration)));
         builder.Services.Configure<ApiSettings>(builder.Configuration.GetRequiredSection(nameof(ApiSettings)));
         builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetRequiredSection(nameof(EmailConfiguration)));
+        builder.Services.Configure<KestrelServerOptions>(options =>
+        {
+            options.AllowSynchronousIO = true;
+        });
     }
 
     private static void ConfigureMiddlewares(WebApplication app)

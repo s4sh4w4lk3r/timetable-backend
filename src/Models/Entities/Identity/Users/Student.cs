@@ -9,6 +9,6 @@ namespace Models.Entities.Identity.Users
         public int GroupId { get; set; }
         public SubGroup SubGroup { get; set; } = SubGroup.All;
 
-#warning добавить в регстрацию студента возможность указать подгруппу.
+#warning проверить добавляется ли подругрппа студента при регистрации
     }
 }
