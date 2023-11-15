@@ -143,10 +143,10 @@ public class Converter
         var cards = oopTimetable.Cards;
         List<StableTimetable> stableTimetables = new();
 
-        foreach (var group in oopTimetable.Groups)
+        foreach (var group in await _dbContext.Set<Group>().ToListAsync())
         {
             var cellsOfCurrentGroup = new List<StableTimetableCell>();
-            var cardsOfCurrentGroup = oopTimetable.Cards.Where(e => e.Lesson.Group.Id == group.Id).ToList();
+            var cardsOfCurrentGroup = oopTimetable.Cards.Where(e => e.Lesson.Group.Id == group.AscId).ToList();
 
             foreach (var card in cardsOfCurrentGroup)
             {
@@ -182,7 +182,7 @@ public class Converter
                 }
 
             }
-            var currentStableTimetable = new StableTimetable(default, new Group(default, group.Name), cellsOfCurrentGroup);
+            var currentStableTimetable = new StableTimetable(default, group, cellsOfCurrentGroup);
             await _dbContext.AddAsync(currentStableTimetable);
         }
     }
