@@ -1,8 +1,7 @@
 ﻿using Repository;
-using System.Xml;
 using WebApi.Services.Timetables.Interfaces;
 
-namespace WebApi.Services.Timetables
+namespace WebApi.Services.Timetables.Implementations
 {
     public class StableTimetableService : IStableTimetableService
     {
@@ -13,13 +12,13 @@ namespace WebApi.Services.Timetables
             _timetableContext = timetableContext;
         }
 
-        public async Task<ServiceResult> ReadAndSaveAscXmlToRepoAsync(Stream stream)
+        public async Task<ServiceResult> ReadAndSaveAscXmlToRepoAsync(Stream stream, CancellationToken cancellationToken = default)
         {
             try
             {
                 var converter = new AscConverter.Converter(_timetableContext);
                 await converter.ReadAsync(stream);
-                await converter.SaveToDbAsync();
+                await converter.SaveToDbAsync(cancellationToken);
             }
             catch (Exception ex)
             {

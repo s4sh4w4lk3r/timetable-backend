@@ -34,14 +34,14 @@ public class Converter
         await stream.DisposeAsync();
     }
 
-    public async Task SaveToDbAsync()
+    public async Task SaveToDbAsync(CancellationToken cancellationToken = default)
     {
         if (_isReaded is false) throw new IOException("Xml не прочитан.");
 
         OOPTypes.Timetable oopTimetable = ConvertToOOP(_ascTimetable);
-        await FillDbContext(oopTimetable);
-        await ConvertToStableTimetableAndSaveToContext(oopTimetable);
-        await _dbContext.SaveChangesAsync();
+        await FillDbContext(oopTimetable, cancellationToken);
+        await ConvertToStableTimetableAndSaveToContext(oopTimetable, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -138,12 +138,12 @@ public class Converter
     /// <param name="oopTimetable"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    private async Task ConvertToStableTimetableAndSaveToContext(OOPTypes.Timetable oopTimetable)
+    private async Task ConvertToStableTimetableAndSaveToContext(OOPTypes.Timetable oopTimetable, CancellationToken cancellationToken = default)
     {
         var cards = oopTimetable.Cards;
         List<StableTimetable> stableTimetables = new();
 
-        foreach (var group in await _dbContext.Set<Group>().ToListAsync())
+        foreach (var group in await _dbContext.Set<Group>().ToListAsync(cancellationToken))
         {
             var cellsOfCurrentGroup = new List<StableTimetableCell>();
             var cardsOfCurrentGroup = oopTimetable.Cards.Where(e => e.Lesson.Group.Id == group.AscId).ToList();
@@ -152,10 +152,10 @@ public class Converter
             {
                 WeekEvenness weekEvenness = DetermineWeekEvenness(card.Week.WeekCode);
                 DayOfWeek dayOfWeek = DetermineDayOfWeek(card.Daysdef.DayCode);
-                TeacherCM teacherCM = await _dbContext.Set<TeacherCM>().SingleAsync(e => card.Lesson.Teacher.Id == e.AscId);
-                Subject subject = await _dbContext.Set<Subject>().SingleAsync(e => e.AscId == card.Lesson.Subject.Id);
-                LessonTime lessonTime = await _dbContext.Set<LessonTime>().SingleAsync(e => e.Number == int.Parse(card.Period.Number));
-                Cabinet cabinet = await _dbContext.Set<Cabinet>().SingleAsync(e => e.AscId == card.Cabinet.Id);
+                TeacherCM teacherCM = await _dbContext.Set<TeacherCM>().SingleAsync(e => card.Lesson.Teacher.Id == e.AscId, cancellationToken: cancellationToken);
+                Subject subject = await _dbContext.Set<Subject>().SingleAsync(e => e.AscId == card.Lesson.Subject.Id, cancellationToken: cancellationToken);
+                LessonTime lessonTime = await _dbContext.Set<LessonTime>().SingleAsync(e => e.Number == int.Parse(card.Period.Number), cancellationToken: cancellationToken);
+                Cabinet cabinet = await _dbContext.Set<Cabinet>().SingleAsync(e => e.AscId == card.Cabinet.Id, cancellationToken: cancellationToken);
                 SubGroup subGroup = DetermineSubgroup(card.Lesson.SubGroup.Name);
 
                 switch (weekEvenness)
@@ -183,7 +183,7 @@ public class Converter
 
             }
             var currentStableTimetable = new StableTimetable(default, group, cellsOfCurrentGroup);
-            await _dbContext.AddAsync(currentStableTimetable);
+            await _dbContext.AddAsync(currentStableTimetable,cancellationToken);
         }
     }
 
@@ -191,14 +191,14 @@ public class Converter
     /// Заполяняет контекст инфой для ячеек и сейвит всё это в субд, чтобы получить айдишники.
     /// </summary>
     /// <param name="oopTimetable"></param>
-    private async Task FillDbContext(OOPTypes.Timetable oopTimetable)
+    private async Task FillDbContext(OOPTypes.Timetable oopTimetable, CancellationToken cancellationToken = default)
     {
-        await _dbContext.AddRangeAsync(oopTimetable.Teachers.Select(e => new TeacherCM(default, e.Lastname, e.Firstname, string.Empty) { AscId = e.Id }));
-        await _dbContext.AddRangeAsync(oopTimetable.Subjects.Select(e => new Subject(default, e.Name) { AscId = e.Id }));
-        await _dbContext.AddRangeAsync(oopTimetable.Cards.Select(e => new LessonTime(default, int.Parse(e.Period.Number), e.Period.StartTime, e.Period.EndTime)).Distinct());
-        await _dbContext.AddRangeAsync(oopTimetable.Cabinets.Select(e=> new Cabinet(default, e.Building.Name, e.Name) { AscId = e.Id }));
-        await _dbContext.AddRangeAsync(oopTimetable.Groups.Select(e=> new Group(default, e.Name) { AscId = e.Id}));
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.AddRangeAsync(oopTimetable.Teachers.Select(e => new TeacherCM(default, e.Lastname, e.Firstname, string.Empty) { AscId = e.Id }), cancellationToken);
+        await _dbContext.AddRangeAsync(oopTimetable.Subjects.Select(e => new Subject(default, e.Name) { AscId = e.Id }), cancellationToken);
+        await _dbContext.AddRangeAsync(oopTimetable.Cards.Select(e => new LessonTime(default, int.Parse(e.Period.Number), e.Period.StartTime, e.Period.EndTime)).Distinct(), cancellationToken);
+        await _dbContext.AddRangeAsync(oopTimetable.Cabinets.Select(e=> new Cabinet(default, e.Building.Name, e.Name) { AscId = e.Id }), cancellationToken);
+        await _dbContext.AddRangeAsync(oopTimetable.Groups.Select(e=> new Group(default, e.Name) { AscId = e.Id}), cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     private static DayOfWeek DetermineDayOfWeek(string dayOfWeekCode)

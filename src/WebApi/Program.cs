@@ -8,7 +8,7 @@ using WebApi.GraphQL;
 using WebApi.Middlewares.Authentication;
 using WebApi.Services.Identity.Implementations;
 using WebApi.Services.Identity.Interfaces;
-using WebApi.Services.Timetables;
+using WebApi.Services.Timetables.Implementations;
 using WebApi.Services.Timetables.Interfaces;
 using WebApi.Types.Configuration;
 
@@ -92,6 +92,7 @@ public class Program
         builder.Services.AddScoped<IApprovalSender, ApprovalSender>();
         builder.Services.AddScoped<IRegistrationEntityService, RegistrationEntityService>();
         builder.Services.AddScoped<IStableTimetableService, StableTimetableService>();
+        builder.Services.AddScoped<IActualTimetableService, ActualTimetableService>();
 
         if (builder.Environment.IsDevelopment())
         {
