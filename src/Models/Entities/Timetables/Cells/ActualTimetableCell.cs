@@ -5,10 +5,10 @@ namespace Models.Entities.Timetables.Cells
     public class ActualTimetableCell : ITimetableCell
     {
         public int TimetableCellId { get; init; }
-        public TeacherCM? Teacher { get; init; }
-        public Subject? Subject { get; init; }
-        public Cabinet? Cabinet { get; init; }
-        public LessonTime? LessonTime { get; init; }
+        public TeacherCM? Teacher { get; set; }
+        public Subject? Subject { get; set; }
+        public Cabinet? Cabinet { get; set; }
+        public LessonTime? LessonTime { get; set; }
         public int TeacherId { get; init; }
         public int SubjectId { get; init; }
         public int CabinetId { get; init; }
@@ -17,7 +17,7 @@ namespace Models.Entities.Timetables.Cells
         public bool IsModified { get; set; } = false;
         public bool IsCanceled { get; set; } = false;
         public bool IsMoved { get; set; } = false;
-        public SubGroup SubGroup { get; init; }
+        public SubGroup SubGroup { get; set; }
 
         private ActualTimetableCell() { }
 

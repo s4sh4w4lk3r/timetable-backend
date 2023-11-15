@@ -74,6 +74,7 @@ public class Program
         builder.Services.AddAuthorization();
         builder.Services.AddGraphQLServer()
            .AddQueryType<Queries>()
+           .AddMutationType<Mutations>()
            .AddProjections()
            .AddFiltering()
            .AddSorting()
@@ -82,8 +83,8 @@ public class Program
     private static void ConfigureDependencies(WebApplicationBuilder builder)
     {
         builder.Services.AddDbContext<TimetableContext>(contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped);
-        builder.Services.AddScoped<EmailUpdater>();
-        builder.Services.AddScoped<PasswordService>();
+        builder.Services.AddScoped<IEmailUpdater, EmailUpdater>();
+        builder.Services.AddScoped<IPasswordService, PasswordService>();
         builder.Services.AddScoped<IRegistrationService, RegistrationService>();
         builder.Services.AddScoped<IUnregistrationService, UnregistrationService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
@@ -93,6 +94,7 @@ public class Program
         builder.Services.AddScoped<IRegistrationEntityService, RegistrationEntityService>();
         builder.Services.AddScoped<IStableTimetableService, StableTimetableService>();
         builder.Services.AddScoped<IActualTimetableService, ActualTimetableService>();
+        builder.Services.AddScoped<IActualCellEditor, ActualCellEditor>();
 
         if (builder.Environment.IsDevelopment())
         {

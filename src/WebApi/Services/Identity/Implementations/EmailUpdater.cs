@@ -7,7 +7,7 @@ using WebApi.Services.Identity.Interfaces;
 
 namespace WebApi.Services.Identity.Implementations;
 
-public class EmailUpdater
+public class EmailUpdater : IEmailUpdater
 {
     private readonly TimetableContext _dbContext;
     private readonly DbSet<User> _users;
