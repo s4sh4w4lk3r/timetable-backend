@@ -199,6 +199,17 @@ public class AuthController : ControllerBase
         return Ok(userSessionResult);
     }
 
+    [HttpGet, Authorize, Route("whoami")]
+    public IActionResult CheckAuthorization()
+    {
+        bool? isAuthenticated = HttpContext.User?.Identity?.IsAuthenticated;
+        if (isAuthenticated is false || isAuthenticated is null)
+        {
+            return Unauthorized();
+        }
+        string? rolename = HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
+        return Ok(rolename);
+    }
 
     public record class TokenPairDto(string? AccessToken, string? RefreshToken);
     public record class EmailPasswordPairDto(string? Email, string? Password);
