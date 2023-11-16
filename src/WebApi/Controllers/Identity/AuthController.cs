@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost, Route("login")]
-    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] EmailPasswordPairDto emailPasswordPair, [FromServices] PasswordService passwordService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] EmailPasswordPairDto emailPasswordPair, [FromServices] IPasswordService passwordService, CancellationToken cancellationToken = default)
     {
         if (StaticValidator.ValidateEmail(emailPasswordPair.Email) is false)
         {

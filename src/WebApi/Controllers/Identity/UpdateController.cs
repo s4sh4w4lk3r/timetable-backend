@@ -2,17 +2,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Validation;
 using WebApi.Extensions;
-using WebApi.Services.Identity.Implementations;
+using WebApi.Services.Identity.Interfaces;
 
 namespace WebApi.Controllers.Account;
 
 [ApiController, Route("identity")]
 public class UpdateController : Controller
 {
-    private readonly EmailUpdater _emailService;
-    private readonly PasswordService _passwordService;
+    private readonly IEmailUpdater _emailService;
+    private readonly IPasswordService _passwordService;
 
-    public UpdateController(EmailUpdater emailService, PasswordService passwordService)
+    public UpdateController(IEmailUpdater emailService, IPasswordService passwordService)
     {
         _emailService = emailService;
         _passwordService = passwordService;
