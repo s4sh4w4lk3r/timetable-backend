@@ -5,6 +5,7 @@ using Repository;
 using Serilog;
 using System.Reflection;
 using WebApi.GraphQL;
+using WebApi.GraphQL.Types.Timetables;
 using WebApi.Middlewares.Authentication;
 using WebApi.Services.Identity.Implementations;
 using WebApi.Services.Identity.Interfaces;
@@ -25,6 +26,7 @@ public class Program
         .ReadFrom.Configuration(ctx.Configuration));
 
         ConfigureServices(builder);
+        ConfigureGraphQL(builder);
         ConfigureDependencies(builder);
         ConfigureIOptions(builder);
 
@@ -72,13 +74,8 @@ public class Program
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
          .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, _ => { });
         builder.Services.AddAuthorization();
-        builder.Services.AddGraphQLServer()
-           .AddQueryType<Queries>()
-           .AddMutationType<Mutations>()
-           .AddProjections()
-           .AddFiltering()
-           .AddSorting()
-           .AddAuthorization();
+
+        
     }
     private static void ConfigureDependencies(WebApplicationBuilder builder)
     {
@@ -116,7 +113,6 @@ public class Program
             options.AllowSynchronousIO = true;
         });
     }
-
     private static void ConfigureMiddlewares(WebApplication app)
     {
 
@@ -136,5 +132,24 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+    }
+    private static void ConfigureGraphQL(WebApplicationBuilder builder)
+    {
+        builder.Services.AddGraphQLServer()
+            .ModifyOptions(options => { options.DefaultBindingBehavior = BindingBehavior.Explicit; })
+            .AddQueryType<QueryType>()
+           //.AddMutationType<Mutations>()
+           .AddType<ActualTimetableType>()
+           .AddType<SubjectType>()
+           .AddType<GroupType>()
+           .AddType<ActualTimetableCellType>()
+           .AddType<TeacherType>()
+           .AddType<SubjectType>()
+           .AddType<CabinetType>()
+           .AddType<LessonTimeType>()
+           .AddProjections()
+           .AddFiltering()
+           .AddSorting()
+           .AddAuthorization();
     }
 }
