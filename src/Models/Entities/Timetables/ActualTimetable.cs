@@ -30,6 +30,7 @@ namespace Models.Entities.Timetables
 
         public bool CheckNoDuplicates()
         {
+#warning не забыть эту проверку в сервисах поставить!
             ActualTimetableCells.ThrowIfNull().IfHasNullElements().IfEmpty();
 
             foreach (var item in ActualTimetableCells)

@@ -67,9 +67,9 @@ namespace Repository
         {
             entity.ToTable("TeacherCM", "timetable");
             entity.HasKey(t => t.TeacherId);
-            entity.Property(t => t.FirstName);
-            entity.Property(t => t.MiddleName);
-            entity.Property(t => t.Surname);
+            entity.Property(t => t.Firstname);
+            entity.Property(t => t.Middlename);
+            entity.Property(t => t.Lastname);
             entity.HasIndex(e => e.AscId).IsUnique().AreNullsDistinct();
         }
 

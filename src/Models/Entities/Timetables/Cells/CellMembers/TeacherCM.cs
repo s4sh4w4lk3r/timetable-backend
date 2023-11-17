@@ -9,9 +9,9 @@ namespace Models.Entities.Timetables.Cells.CellMembers;
 public class TeacherCM
 {
     public int TeacherId { get; init; }
-    public required string Surname { get; set; }
-    public required string FirstName { get; set; }
-    public required string MiddleName { get; set; }
+    public required string Lastname { get; set; }
+    public required string Firstname { get; set; }
+    public required string Middlename { get; set; }
     public string? AscId { get; set; }
 
     [JsonIgnore]
@@ -30,8 +30,8 @@ public class TeacherCM
         middlename.ThrowIfNull();
 
         TeacherId = teacherPK;
-        Surname = surname;
-        FirstName = firstname;
-        MiddleName = middlename;
+        Lastname = surname;
+        Firstname = firstname;
+        Middlename = middlename;
     }
 }
