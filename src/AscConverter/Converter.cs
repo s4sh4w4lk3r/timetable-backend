@@ -183,6 +183,8 @@ public class Converter
 
             }
             var currentStableTimetable = new StableTimetable(default, group, cellsOfCurrentGroup);
+            if (currentStableTimetable.CheckNoDuplicates() is false) { throw new ArgumentException("В стабильном расписании дубликаты."); }
+#warning проверить это.
             await _dbContext.AddAsync(currentStableTimetable,cancellationToken);
         }
     }

@@ -13,7 +13,7 @@
         /// <summary>
         /// Должен проверять наличие ячеек-дубликатов, которые ссылаются на одно и то же время занятий.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True - если нет дубликатов, в противном случае False.</returns>
         public bool CheckNoDuplicates();
     }
 }
