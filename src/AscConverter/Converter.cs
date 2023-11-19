@@ -248,3 +248,6 @@ public class Converter
     }
     private enum WeekEvenness { Both = 0, Even = 1, Odd = 2 }
 }
+
+#warning в номере кабинета указывается название корпуса.
+#warning проработать внесение замен из хмл

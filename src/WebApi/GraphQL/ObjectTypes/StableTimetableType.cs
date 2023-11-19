@@ -7,6 +7,7 @@ namespace WebApi.GraphQL.ObjectTypes
         protected override void Configure(IObjectTypeDescriptor<StableTimetable> descriptor)
         {
             descriptor.BindFieldsImplicitly();
+            descriptor.Ignore(e => e.CheckNoDuplicates());
         }
     }
 }

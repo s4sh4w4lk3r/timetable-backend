@@ -35,7 +35,6 @@
 
 	<ItemGroup>
 	  <Folder Include="GraphQL\EnumTypes\" />
-	  <Folder Include="GraphQL\FilterTypes\" />
 	</ItemGroup>
 
 </Project>

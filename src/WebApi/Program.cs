@@ -145,5 +145,6 @@ public class Program
            .AddFiltering()
            .AddSorting()
            .AddAuthorization();
+#warning изучить даталоудеры или еще как-то решить проблему с query, так как два query запроса вызовут исключение
     }
 }

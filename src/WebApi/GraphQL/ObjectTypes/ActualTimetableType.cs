@@ -8,7 +8,8 @@ namespace WebApi.GraphQL.ObjectTypes
     {
         protected override void Configure(IObjectTypeDescriptor<ActualTimetable> descriptor)
         {
-            descriptor.BindFieldsImplicitly(); ;
+            descriptor.BindFieldsImplicitly();
+            descriptor.Ignore(e => e.CheckNoDuplicates());
         }
     }
 }
