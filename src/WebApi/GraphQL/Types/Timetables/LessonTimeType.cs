@@ -8,8 +8,8 @@ namespace WebApi.GraphQL.Types.Timetables
         {
             descriptor.Field(e => e.LessonTimeId);
             descriptor.Field(e => e.Number);
-            descriptor.Field(e => e.StartsAt).Type<StringType>();
-            descriptor.Field(e => e.EndsAt).Type<StringType>();
+            descriptor.Field(e => e.StartsAt).Type<NonNullType<StringType>>();
+            descriptor.Field(e => e.EndsAt).Type<NonNullType<StringType>>();
         }
     }
 }

@@ -2,20 +2,19 @@
 
 namespace WebApi.GraphQL.Types.Timetables
 {
-    public class ActualTimetableCellType : ObjectType<ActualTimetableCell>
+    public class StableTimetableCellType : ObjectType<StableTimetableCell>
     {
-        protected override void Configure(IObjectTypeDescriptor<ActualTimetableCell> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<StableTimetableCell> descriptor)
         {
+            descriptor.Field(e => e.SubGroup).Type<SubGroupType>();
+            descriptor.Field(e => e.IsWeekEven);
             descriptor.Field(e => e.TimetableCellId);
-
-            descriptor.Field(e => e.IsCanceled);
-            descriptor.Field(e => e.IsModified);
-            descriptor.Field(e => e.IsMoved);
+            descriptor.Field(e => e.DayOfWeek).Type<DayOfWeekType>();
 
             descriptor.Field(e => e.Cabinet).Type<NonNullType<CabinetType>>();
             descriptor.Field(e => e.CabinetId);
 
-            descriptor.Field(e => e.Teacher).Type<NonNullType<LessonTimeType>>();
+            descriptor.Field(e => e.Teacher).Type<NonNullType<TeacherType>>();
             descriptor.Field(e => e.TeacherId);
 
             descriptor.Field(e => e.Subject).Type<NonNullType<SubjectType>>();
@@ -23,9 +22,6 @@ namespace WebApi.GraphQL.Types.Timetables
 
             descriptor.Field(e => e.LessonTime).Type<NonNullType<LessonTimeType>>();
             descriptor.Field(e => e.LessonTimeId);
-
-            descriptor.Field(e => e.Date).Type<NonNullType<StringType>>();
-            descriptor.Field(e => e.SubGroup).Type<SubGroupType>();
         }
     }
 }

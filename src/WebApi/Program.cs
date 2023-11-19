@@ -135,6 +135,7 @@ public class Program
     }
     private static void ConfigureGraphQL(WebApplicationBuilder builder)
     {
+#warning ограничить браузинг схемы.
         builder.Services.AddGraphQLServer()
             .ModifyOptions(options => { options.DefaultBindingBehavior = BindingBehavior.Explicit; })
             .AddQueryType<QueryType>()
@@ -147,6 +148,9 @@ public class Program
            .AddType<SubjectType>()
            .AddType<CabinetType>()
            .AddType<LessonTimeType>()
+           .AddType<StableTimetableType>()
+           .AddType<StableTimetableCellType>()
+           .AddType<DayOfWeekType>()
            .AddProjections()
            .AddFiltering()
            .AddSorting()

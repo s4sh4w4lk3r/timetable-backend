@@ -1,6 +1,6 @@
 ﻿namespace WebApi.GraphQL
 {
-    public class Mutations
+    public class MutationType
     {
     }
 }

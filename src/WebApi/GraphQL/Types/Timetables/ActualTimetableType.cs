@@ -11,7 +11,7 @@ namespace WebApi.GraphQL.Types.Timetables
             descriptor.Field(e => e.TimetableId);
             descriptor.Field(e => e.WeekNumber);
             descriptor.Field(e => e.ActualTimetableCells);
-            descriptor.Field(e => e.Group);
+            descriptor.Field(e => e.Group).Type<NonNullType<GroupType>>();
             descriptor.Field(e => e.GroupId);
         }
     }
