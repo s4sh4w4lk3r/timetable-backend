@@ -28,32 +28,58 @@ namespace WebApi.GraphQL.OperationTypes
                 .UseFiltering<TeacherCM>(x =>
                 {
                     x.BindFieldsImplicitly(); x.Ignore(e => e.StableTimetableCells); x.Ignore(e => e.ActualTimetableCells);
+                })
+                .UseSorting<TeacherCM>(x =>
+                {
+                    x.BindFieldsImplicitly(); x.Ignore(e => e.StableTimetableCells); x.Ignore(e => e.ActualTimetableCells);
                 });
+
 
             descriptor.Field(e => e.GetCabinets(default!))
                 .UseFiltering<Cabinet>(x =>
                 {
                     x.BindFieldsImplicitly(); x.Ignore(e => e.StableTimetableCells); x.Ignore(e => e.ActualTimetableCells);
+                })
+                .UseSorting<Cabinet>(x =>
+                {
+                    x.BindFieldsImplicitly(); x.Ignore(e => e.StableTimetableCells); x.Ignore(e => e.ActualTimetableCells);
                 });
+
 
             descriptor.Field(e => e.GetLessonTimes(default!))
                 .UseFiltering<LessonTime>(x =>
                 {
                     x.BindFieldsImplicitly(); x.Ignore(e => e.StableTimetableCells); x.Ignore(e => e.ActualTimetableCells);
                     x.Field(e => e.EndsAt).Type<NonNullType<StringType>>(); x.Field(e => e.StartsAt).Type<NonNullType<StringType>>();
+                })
+                .UseSorting<LessonTime>(x =>
+                {
+                    x.BindFieldsImplicitly(); x.Ignore(e => e.StableTimetableCells); x.Ignore(e => e.ActualTimetableCells);
+                    x.Field(e => e.EndsAt).Type<NonNullType<StringType>>(); x.Field(e => e.StartsAt).Type<NonNullType<StringType>>();
                 });
+
 
             descriptor.Field(e => e.GetSubjects(default!))
                 .UseFiltering<Subject>(x =>
                 {
                     x.BindFieldsImplicitly(); x.Ignore(e => e.StableTimetableCells); x.Ignore(e => e.ActualTimetableCells);
+                })
+                .UseSorting<Subject>(x =>
+                {
+                    x.BindFieldsImplicitly(); x.Ignore(e => e.StableTimetableCells); x.Ignore(e => e.ActualTimetableCells);
                 });
+
 
             descriptor.Field(e => e.GetGroups(default!))
                 .UseFiltering<Group>(x =>
                 {
                     x.BindFieldsImplicitly(); x.Ignore(e => e.RegistrationEntities); x.Ignore(e => e.Students);
+                })
+                .UseSorting<Group>(x =>
+                {
+                    x.BindFieldsImplicitly(); x.Ignore(e => e.RegistrationEntities); x.Ignore(e => e.Students);
                 });
+
 
             descriptor.Field(e => e.GetActualTimetableCells(default!)).UseFiltering<ActualTimetableCellFilterType>();
             descriptor.Field(e => e.GetActualTimetables(default!)).UseFiltering<ActualTimetableFilterType>();
