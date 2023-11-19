@@ -1,6 +1,6 @@
 ﻿using Models.Entities.Timetables.Cells.CellMembers;
 
-namespace WebApi.GraphQL.Types.Timetables
+namespace WebApi.GraphQL.EnumTypes
 {
     public class SubGroupType : EnumType<SubGroup>
     {

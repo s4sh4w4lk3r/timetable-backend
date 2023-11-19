@@ -1,13 +1,15 @@
 ﻿using Models.Entities.Timetables.Cells.CellMembers;
 
-namespace WebApi.GraphQL.Types.Timetables
+namespace WebApi.GraphQL.ObjectTypes
 {
     public class SubjectType : ObjectType<Subject>
     {
         protected override void Configure(IObjectTypeDescriptor<Subject> descriptor)
         {
-            descriptor.Field(e => e.SubjectId);
-            descriptor.Field(e => e.Name);
+            descriptor.BindFieldsImplicitly();
+
+            descriptor.Ignore(e => e.StableTimetableCells);
+            descriptor.Ignore(e => e.ActualTimetableCells);
         }
     }
 }

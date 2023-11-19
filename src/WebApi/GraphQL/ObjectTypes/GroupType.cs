@@ -1,13 +1,14 @@
 ﻿using Models.Entities.Timetables;
 
-namespace WebApi.GraphQL.Types.Timetables
+namespace WebApi.GraphQL.ObjectTypes
 {
     public class GroupType : ObjectType<Group>
     {
         protected override void Configure(IObjectTypeDescriptor<Group> descriptor)
         {
-            descriptor.Field(e => e.GroupId);
-            descriptor.Field(e => e.Name);
+            descriptor.BindFieldsImplicitly();
+            descriptor.Ignore(e => e.RegistrationEntities);
+            descriptor.Ignore(e => e.Students);
         }
     }
 }

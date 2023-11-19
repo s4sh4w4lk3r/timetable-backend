@@ -1,4 +1,4 @@
-﻿namespace WebApi.GraphQL
+﻿namespace WebApi.GraphQL.OperationTypes
 {
     public class MutationType
     {

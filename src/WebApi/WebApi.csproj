@@ -33,4 +33,9 @@
     <ProjectReference Include="..\Validation\Validation.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="GraphQL\EnumTypes\" />
+	  <Folder Include="GraphQL\FilterTypes\" />
+	</ItemGroup>
+
 </Project>

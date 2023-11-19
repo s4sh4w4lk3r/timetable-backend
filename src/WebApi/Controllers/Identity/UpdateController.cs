@@ -4,7 +4,7 @@ using Validation;
 using WebApi.Extensions;
 using WebApi.Services.Identity.Interfaces;
 
-namespace WebApi.Controllers.Account;
+namespace WebApi.Controllers.Identity;
 
 [ApiController, Route("identity")]
 public class UpdateController : Controller
@@ -26,7 +26,7 @@ public class UpdateController : Controller
             return BadRequest("Пароль не проходит проверку.");
         }
 
-        if ((HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false) || userId == default)
+        if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false || userId == default)
         {
             return BadRequest("Не получилось получить id из клеймов.");
         }

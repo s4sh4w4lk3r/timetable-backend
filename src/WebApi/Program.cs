@@ -4,8 +4,9 @@ using Microsoft.OpenApi.Models;
 using Repository;
 using Serilog;
 using System.Reflection;
-using WebApi.GraphQL;
-using WebApi.GraphQL.Types.Timetables;
+using WebApi.GraphQL.EnumTypes;
+using WebApi.GraphQL.ObjectTypes;
+using WebApi.GraphQL.OperationTypes;
 using WebApi.Middlewares.Authentication;
 using WebApi.Services.Identity.Implementations;
 using WebApi.Services.Identity.Interfaces;
@@ -141,7 +142,7 @@ public class Program
             .AddQueryType<QueryType>()
            //.AddMutationType<Mutations>()
            .AddType<ActualTimetableType>()
-           .AddType<SubjectType>()
+           .AddType<SubGroupType>()
            .AddType<GroupType>()
            .AddType<ActualTimetableCellType>()
            .AddType<TeacherType>()

@@ -1,4 +1,4 @@
-﻿namespace WebApi.GraphQL.Types.Timetables
+﻿namespace WebApi.GraphQL.EnumTypes
 {
     public class DayOfWeekType : EnumType<DayOfWeek>
     {
