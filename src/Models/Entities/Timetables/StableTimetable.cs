@@ -28,7 +28,7 @@ namespace Models.Entities.Timetables
             foreach (var item in StableTimetableCells)
             {
                 // Проверяем на дубликаты по времени занятия, четности и дню недели.
-                int count = StableTimetableCells.Count(x => x.LessonTime == item.LessonTime && x.IsWeekEven == item.IsWeekEven && x.DayOfWeek == item.DayOfWeek);
+                int count = StableTimetableCells.Count(x => x.LessonTime == item.LessonTime && x.IsWeekEven == item.IsWeekEven && x.DayOfWeek == item.DayOfWeek && x.SubGroup == item.SubGroup);
                 if (count > 1)
                 {
                     return false;

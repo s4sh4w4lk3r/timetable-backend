@@ -84,8 +84,8 @@ namespace WebApi.GraphQL.OperationTypes
             descriptor.Field(e => e.GetActualTimetableCells(default!)).UseFiltering<ActualTimetableCellFilterType>();
             descriptor.Field(e => e.GetActualTimetables(default!)).UseFiltering<ActualTimetableFilterType>();
 
-            descriptor.Field(e => e.GetStableTimetableCells(default!)).UseFiltering<StableTimetableCellFilterType>();
-            descriptor.Field(e => e.GetStableTimetables(default!)).UseFiltering<StableTimetableFilterType>();
+            descriptor.Field(e => e.GetStableTimetableCells(default!)).UseProjection().UseFiltering<StableTimetableCellFilterType>();
+            descriptor.Field(e => e.GetStableTimetables(default!)).UseProjection().UseFiltering<StableTimetableFilterType>();
         }
     }
 }
