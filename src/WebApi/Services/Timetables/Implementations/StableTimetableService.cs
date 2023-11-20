@@ -22,7 +22,8 @@ namespace WebApi.Services.Timetables.Implementations
             }
             catch (Exception ex)
             {
-                return ServiceResult.Fail(ex.Message);
+                //return ServiceResult.Fail(ex.Message);
+                throw;
             }
 
             return ServiceResult.Ok("База загружена.");
