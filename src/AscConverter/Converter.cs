@@ -198,7 +198,7 @@ public class Converter
         await _dbContext.AddRangeAsync(oopTimetable.Teachers.Select(e => new TeacherCM(default, e.Lastname, e.Firstname, string.Empty) { AscId = e.Id }), cancellationToken);
         await _dbContext.AddRangeAsync(oopTimetable.Subjects.Select(e => new Subject(default, e.Name) { AscId = e.Id }), cancellationToken);
         await _dbContext.AddRangeAsync(oopTimetable.Cards.Select(e => new LessonTime(default, int.Parse(e.Period.Number), e.Period.StartTime, e.Period.EndTime)).Distinct(), cancellationToken);
-        await _dbContext.AddRangeAsync(oopTimetable.Cabinets.Select(e=> new Cabinet(default, e.Building.Name, e.Name) { AscId = e.Id }), cancellationToken);
+        await _dbContext.AddRangeAsync(oopTimetable.Cabinets.Select(e=> new Cabinet(default, e.Building.Name, e.ShortName) { AscId = e.Id }), cancellationToken);
         await _dbContext.AddRangeAsync(oopTimetable.Groups.Select(e=> new Group(default, e.Name) { AscId = e.Id}), cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
@@ -250,5 +250,4 @@ public class Converter
     private enum WeekEvenness { Both = 0, Even = 1, Odd = 2 }
 }
 
-#warning в номере кабинета указывается название корпуса.
 #warning проработать внесение замен из хмл
