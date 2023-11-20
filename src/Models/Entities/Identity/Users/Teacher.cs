@@ -5,7 +5,5 @@
     /// </summary>
     public class Teacher : User
     {
-        public Timetables.Cells.CellMembers.TeacherCM? TeacherCellMember { get; init; }
-        public int? TeacherCellMemberId { get; init; }
     }
 }
