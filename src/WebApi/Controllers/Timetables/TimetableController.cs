@@ -45,7 +45,6 @@ namespace WebApi.Controllers.Timetables
         [HttpPost, Route("convert-stable-to-actual-for-group"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> ConvertStableToActualForSpecifiedGroup(GroupIdAndDatesDto groupIdAndDatesDto)
         {
-#warning проверить
             if ((groupIdAndDatesDto.Dates is null) || (groupIdAndDatesDto.Dates.Any() is false))
             {
                 return BadRequest("Даты не получены");
@@ -87,7 +86,6 @@ namespace WebApi.Controllers.Timetables
         [HttpPost, Route("convert-stable-to-actual-all-groups"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> ConvertStableToActualForAllGroups(GroupIdAndDatesDto groupIdAndDatesDto)
         {
-#warning проверить
             if ((groupIdAndDatesDto.Dates is null) || (groupIdAndDatesDto.Dates.Any() is false))
             {
                 return BadRequest("Даты не получены");

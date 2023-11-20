@@ -20,7 +20,7 @@ namespace WebApi.Services.Timetables.Implementations
                 await converter.ReadAsync(stream);
                 await converter.SaveToDbAsync(cancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //return ServiceResult.Fail(ex.Message);
                 throw;

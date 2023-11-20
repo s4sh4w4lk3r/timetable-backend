@@ -31,7 +31,7 @@ namespace WebApi.Services.Timetables.Implementations
             return ServiceResult.Ok("Расписание для всех существующих групп с константным расписанием будет создано на указанные дни.");
         }
 
-        public async Task<ServiceResult> CreateActualTimetableForGroup(int stableTimetableId, IEnumerable<DateOnly> datesOnly, CancellationToken cancellationToken = default)
+        public async Task<ServiceResult> CreateOnlyOneActualTimetable(int stableTimetableId, IEnumerable<DateOnly> datesOnly, CancellationToken cancellationToken = default)
         {
 
             var stableTimeTable = await _dbContext.Set<StableTimetable>()
@@ -51,11 +51,6 @@ namespace WebApi.Services.Timetables.Implementations
 
             return ServiceResult.Ok("Расписание будет добавлено на указанные дни.");
             
-        }
-
-        public Task<ServiceResult> CreateOnlyOneActualTimetable(int stableTimetableId, IEnumerable<DateOnly> datesOnly, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
         }
     }
 }
