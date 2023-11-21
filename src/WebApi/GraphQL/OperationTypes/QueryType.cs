@@ -4,6 +4,7 @@ using Models.Entities.Timetables.Cells;
 using Models.Entities.Timetables.Cells.CellMembers;
 using Repository;
 using WebApi.GraphQL.FilterTypes;
+using WebApi.GraphQL.SortTypes;
 
 namespace WebApi.GraphQL.OperationTypes
 {
@@ -80,12 +81,12 @@ namespace WebApi.GraphQL.OperationTypes
                     x.BindFieldsImplicitly(); x.Ignore(e => e.RegistrationEntities); x.Ignore(e => e.Students);
                 });
 
+#warning проверить
+            descriptor.Field(e => e.GetActualTimetableCells(default!)).UseFiltering<ActualTimetableCellFilterType>().UseSorting<ActualTimetableCellSortType>();
+            descriptor.Field(e => e.GetActualTimetables(default!)).UseFiltering<ActualTimetableFilterType>().UseSorting<ActualTimetableSortType>();
 
-            descriptor.Field(e => e.GetActualTimetableCells(default!)).UseFiltering<ActualTimetableCellFilterType>();
-            descriptor.Field(e => e.GetActualTimetables(default!)).UseFiltering<ActualTimetableFilterType>();
-
-            descriptor.Field(e => e.GetStableTimetableCells(default!)).UseProjection().UseFiltering<StableTimetableCellFilterType>();
-            descriptor.Field(e => e.GetStableTimetables(default!)).UseProjection().UseFiltering<StableTimetableFilterType>();
+            descriptor.Field(e => e.GetStableTimetableCells(default!)).UseProjection().UseFiltering<StableTimetableCellFilterType>().UseSorting<StableTimetableCellSortType>();
+            descriptor.Field(e => e.GetStableTimetables(default!)).UseProjection().UseFiltering<StableTimetableFilterType>().UseSorting<StableTimetableSortType>();
         }
     }
 }
