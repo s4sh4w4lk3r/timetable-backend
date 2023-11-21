@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.HttpOverrides;
+﻿using HotChocolate.AspNetCore;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.OpenApi.Models;
 using Repository;
@@ -65,7 +66,7 @@ public class Program
          .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, _ => { });
         builder.Services.AddAuthorization();
 
-        
+
     }
     private static void ConfigureDependencies(WebApplicationBuilder builder)
     {
@@ -109,7 +110,13 @@ public class Program
         app.UseSerilogRequestLogging();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.MapGraphQL();
+        app.MapGraphQL().WithOptions(new GraphQLServerOptions
+        {
+            Tool =
+            {
+                Enable = !app.Environment.IsProduction()
+            }
+        });
         app.MapControllers();
 
         app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -125,7 +132,6 @@ public class Program
     }
     private static void ConfigureGraphQL(WebApplicationBuilder builder)
     {
-#warning ограничить браузинг схемы.
         builder.Services.AddGraphQLServer()
             .ModifyOptions(options => { options.DefaultBindingBehavior = BindingBehavior.Explicit; })
             .AddQueryType<QueryType>()
