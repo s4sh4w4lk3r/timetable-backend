@@ -81,7 +81,6 @@ namespace WebApi.GraphQL.OperationTypes
                     x.BindFieldsImplicitly(); x.Ignore(e => e.RegistrationEntities); x.Ignore(e => e.Students);
                 });
 
-#warning проверить
             descriptor.Field(e => e.GetActualTimetableCells(default!)).UseFiltering<ActualTimetableCellFilterType>().UseSorting<ActualTimetableCellSortType>();
             descriptor.Field(e => e.GetActualTimetables(default!)).UseFiltering<ActualTimetableFilterType>().UseSorting<ActualTimetableSortType>();
 

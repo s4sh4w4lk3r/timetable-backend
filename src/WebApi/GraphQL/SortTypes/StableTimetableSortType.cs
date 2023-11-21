@@ -9,7 +9,7 @@ namespace WebApi.GraphQL.SortTypes
         protected override void Configure(ISortInputTypeDescriptor<StableTimetable> descriptor)
         {
             descriptor.BindFieldsImplicitly();
-            descriptor.Field(e => e.StableTimetableCells).Type<StableTimetableCellSortType>();
+            //descriptor.Field(e => e.StableTimetableCells);
         }
     }
 }

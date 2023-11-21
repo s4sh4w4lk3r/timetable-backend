@@ -8,7 +8,7 @@ namespace WebApi.GraphQL.SortTypes
         protected override void Configure(ISortInputTypeDescriptor<ActualTimetable> descriptor)
         {
             descriptor.BindFieldsImplicitly();
-            descriptor.Field(e => e.ActualTimetableCells).Type < ActualTimetableCellSortType>();
+            //descriptor.Field(e => e.ActualTimetableCells).Type<ActualTimetableCellSortType>();
         }
     }
 }
