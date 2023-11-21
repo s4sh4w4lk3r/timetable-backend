@@ -18,12 +18,12 @@
 
   "JwtConfiguration": {
     "Issuer": "timetable-backend",
-    "SecurityKey": null
+    "SecurityKey": ""
   },
 
   "ApiSettings": {
-    "BigDaddyKey": null,
-    "Hostname": null
+    "BigDaddyKey": "",
+    "Hostname": ""
   },
 
   "EmailConfiguration": {

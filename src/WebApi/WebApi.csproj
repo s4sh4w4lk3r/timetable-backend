@@ -8,7 +8,12 @@
 
   <ItemGroup>
     <None Remove=".dockerignore" />
+    <None Remove="appsettings.json.example" />
     <None Remove="Dockerfile" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json.example" />
   </ItemGroup>
 
   <ItemGroup>
