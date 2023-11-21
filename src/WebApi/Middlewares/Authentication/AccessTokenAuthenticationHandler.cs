@@ -15,8 +15,8 @@ public class AccessTokenAuthenticationHandler : AuthenticationHandler<AccessToke
 {
     private readonly TimetableContext _dbContext;
     private readonly ITokenService _tokenService;
-    public AccessTokenAuthenticationHandler(IOptionsMonitor<AccessTokenAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock,
-        TimetableContext dbContext, ITokenService tokenService) : base(options, logger, encoder, clock)
+    public AccessTokenAuthenticationHandler(IOptionsMonitor<AccessTokenAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder,
+        TimetableContext dbContext, ITokenService tokenService) : base(options, logger, encoder)
     {
         logger.CreateLogger<AccessTokenAuthenticationHandler>();
         _tokenService = tokenService;
