@@ -1,4 +1,4 @@
-﻿using Models.Entities.Timetables.Cells;
+﻿using Core.Entities.Timetables.Cells;
 
 namespace WebApi.Services.Timetables.Interfaces
 {

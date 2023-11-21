@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models.Entities.Identity;
-using Models.Entities.Identity.Users;
-using Models.Entities.Timetables;
+using Core.Entities.Identity;
+using Core.Entities.Identity.Users;
+using Core.Entities.Timetables;
 using Repository;
 using Validation;
 using WebApi.Services.Identity.Interfaces;

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Models.Entities.Identity;
-using Models.Entities.Identity.Users;
+using Core.Entities.Identity;
+using Core.Entities.Identity.Users;
 using System.Security.Claims;
 using Validation;
 using WebApi.Extensions;

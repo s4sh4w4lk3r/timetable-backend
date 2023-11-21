@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Models.Entities.Identity;
+using Core.Entities.Identity;
 using Repository;
 using System.Security.Claims;
 using System.Text.Encodings.Web;

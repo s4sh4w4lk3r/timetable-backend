@@ -1,6 +1,6 @@
-﻿using Models.Entities.Timetables.Cells.CellMembers;
+﻿using Core.Entities.Timetables.Cells.CellMembers;
 
-namespace Models.Entities.Timetables.Cells
+namespace Core.Entities.Timetables.Cells
 {
     public class ActualTimetableCell : ITimetableCell
     {

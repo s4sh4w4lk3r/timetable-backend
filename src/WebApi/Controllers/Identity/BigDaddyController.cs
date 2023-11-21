@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Models.Entities.Identity;
+using Core.Entities.Identity;
 using WebApi.Services.Identity.Interfaces;
 using WebApi.Types.Configuration;
 

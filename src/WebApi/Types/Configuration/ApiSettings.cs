@@ -2,6 +2,6 @@
 
 public class ApiSettings
 {
-    public required string BigDaddyKey { get; init; }
-    public required string Hostname { get; init; }
+    public required string BigDaddyKey { get; set; }
+    public required string Hostname { get; set; }
 }

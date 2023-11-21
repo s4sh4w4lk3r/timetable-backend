@@ -1,4 +1,4 @@
-﻿namespace Models.Entities.Timetables
+﻿namespace Core.Entities.Timetables
 {
     /// <summary>
     /// Интерфейс расписания.

@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Models.Extenstions
+namespace Core.Extenstions
 {
     public static class DateAndTimeExtensions
     {

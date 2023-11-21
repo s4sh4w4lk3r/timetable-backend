@@ -1,4 +1,4 @@
-﻿using Models.Entities.Timetables.Cells.CellMembers;
+﻿using Core.Entities.Timetables.Cells.CellMembers;
 
 namespace WebApi.GraphQL.EnumTypes
 {

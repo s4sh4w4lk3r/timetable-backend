@@ -1,5 +1,5 @@
-﻿using Models.Entities.Identity;
-using static Models.Entities.Identity.Approval;
+﻿using Core.Entities.Identity;
+using static Core.Entities.Identity.Approval;
 
 namespace WebApi.Services.Identity.Interfaces
 {

@@ -1,8 +1,8 @@
-﻿using Models.Entities.Timetables.Cells;
-using Models.Extenstions;
+﻿using Core.Entities.Timetables.Cells;
+using Core.Extenstions;
 using System.Globalization;
 
-namespace Models.Entities.Timetables
+namespace Core.Entities.Timetables
 {
     public class ActualTimetableFactory
     {

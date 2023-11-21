@@ -1,4 +1,4 @@
-﻿namespace Models.Entities.Timetables.Cells.CellMembers
+﻿namespace Core.Entities.Timetables.Cells.CellMembers
 {
     public enum SubGroup
     {

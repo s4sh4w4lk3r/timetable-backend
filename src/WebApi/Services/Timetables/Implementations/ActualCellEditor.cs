@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models.Entities.Timetables.Cells;
-using Models.Entities.Timetables.Cells.CellMembers;
+using Core.Entities.Timetables.Cells;
+using Core.Entities.Timetables.Cells.CellMembers;
 using Repository;
 using Validation.IdValidators;
 using WebApi.Services.Timetables.Interfaces;

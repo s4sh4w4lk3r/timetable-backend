@@ -1,7 +1,7 @@
-﻿using Models.Entities.Identity.Users;
+﻿using Core.Entities.Identity.Users;
 using System.Text.Json.Serialization;
 
-namespace Models.Entities.Identity
+namespace Core.Entities.Identity
 {
     public class Approval
     {

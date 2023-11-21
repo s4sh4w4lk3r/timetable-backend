@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Models.Entities.Identity;
-using Models.Entities.Identity.Users;
+using Core.Entities.Identity;
+using Core.Entities.Identity.Users;
 
 namespace Repository
 {

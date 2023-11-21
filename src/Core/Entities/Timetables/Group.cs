@@ -1,9 +1,9 @@
-﻿using Models.Entities.Identity;
-using Models.Entities.Identity.Users;
+﻿using Core.Entities.Identity;
+using Core.Entities.Identity.Users;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace Models.Entities.Timetables;
+namespace Core.Entities.Timetables;
 
 public class Group
 {

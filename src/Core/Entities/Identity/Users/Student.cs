@@ -1,7 +1,7 @@
-﻿using Models.Entities.Timetables;
-using Models.Entities.Timetables.Cells.CellMembers;
+﻿using Core.Entities.Timetables;
+using Core.Entities.Timetables.Cells.CellMembers;
 
-namespace Models.Entities.Identity.Users
+namespace Core.Entities.Identity.Users
 {
     public class Student : User
     {

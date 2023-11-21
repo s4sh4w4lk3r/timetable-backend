@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Models.Entities.Timetables;
-using Models.Entities.Timetables.Cells;
-using Models.Entities.Timetables.Cells.CellMembers;
+using Core.Entities.Timetables;
+using Core.Entities.Timetables.Cells;
+using Core.Entities.Timetables.Cells.CellMembers;
 using Throw;
 using static Repository.TimetableSchemaMethods;
 using static Repository.IdentitySchemaMethods;
-using Models.Entities.Identity.Users;
-using Models.Entities.Identity;
+using Core.Entities.Identity.Users;
+using Core.Entities.Identity;
 
 namespace Repository;
 

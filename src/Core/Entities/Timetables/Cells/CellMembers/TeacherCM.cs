@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace Models.Entities.Timetables.Cells.CellMembers;
+namespace Core.Entities.Timetables.Cells.CellMembers;
 
 /// <summary>
 /// Сущность учителя для расписания (не имя для входа).

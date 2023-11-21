@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models.Entities.Identity;
-using Models.Entities.Identity.Users;
-using Models.Entities.Timetables.Cells.CellMembers;
+using Core.Entities.Identity;
+using Core.Entities.Identity.Users;
+using Core.Entities.Timetables.Cells.CellMembers;
 using Validation;
 using WebApi.Services;
 using WebApi.Services.Identity.Interfaces;

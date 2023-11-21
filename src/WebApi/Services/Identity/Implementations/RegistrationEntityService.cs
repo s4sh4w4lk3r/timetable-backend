@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models.Entities.Identity;
-using Models.Entities.Timetables;
-using Models.Entities.Timetables.Cells.CellMembers;
+using Core.Entities.Identity;
+using Core.Entities.Timetables;
+using Core.Entities.Timetables.Cells.CellMembers;
 using Repository;
 using Throw;
 using WebApi.Services.Identity.Interfaces;

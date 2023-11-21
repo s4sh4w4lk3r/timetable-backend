@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models.Entities.Timetables;
+using Core.Entities.Timetables;
 using Repository;
 using WebApi.Services.Timetables.Interfaces;
 

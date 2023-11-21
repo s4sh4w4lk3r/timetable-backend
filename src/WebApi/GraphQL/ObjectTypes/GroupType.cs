@@ -1,4 +1,4 @@
-﻿using Models.Entities.Timetables;
+﻿using Core.Entities.Timetables;
 
 namespace WebApi.GraphQL.ObjectTypes
 {

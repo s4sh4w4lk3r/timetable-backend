@@ -1,4 +1,4 @@
-﻿using Models.Entities.Identity;
+﻿using Core.Entities.Identity;
 
 namespace WebApi.Services.Identity.Interfaces;
 

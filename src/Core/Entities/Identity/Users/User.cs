@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Models.Entities.Identity.Users
+namespace Core.Entities.Identity.Users
 {
     public class User
     {

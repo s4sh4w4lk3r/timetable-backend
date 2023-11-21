@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models.Entities.Timetables;
-using Models.Entities.Timetables.Cells;
-using Models.Entities.Timetables.Cells.CellMembers;
+using Core.Entities.Timetables;
+using Core.Entities.Timetables.Cells;
+using Core.Entities.Timetables.Cells.CellMembers;
 using Repository;
 using System.Xml;
 using System.Xml.Serialization;

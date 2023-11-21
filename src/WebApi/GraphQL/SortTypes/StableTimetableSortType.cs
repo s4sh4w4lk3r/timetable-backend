@@ -1,5 +1,5 @@
 ﻿using HotChocolate.Data.Sorting;
-using Models.Entities.Timetables;
+using Core.Entities.Timetables;
 using WebApi.GraphQL.FilterTypes;
 
 namespace WebApi.GraphQL.SortTypes

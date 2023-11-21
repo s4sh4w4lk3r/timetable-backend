@@ -1,6 +1,6 @@
-﻿using Models.Entities.Timetables.Cells;
+﻿using Core.Entities.Timetables.Cells;
 
-namespace Models.Entities.Timetables
+namespace Core.Entities.Timetables
 {
     public class StableTimetable : ITimetable
     {

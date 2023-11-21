@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models.Entities.Identity.Users;
+using Core.Entities.Identity.Users;
 using Repository;
 using Validation;
 using WebApi.Services.Identity.Interfaces;

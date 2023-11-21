@@ -1,5 +1,5 @@
-﻿using Models.Entities.Identity;
-using Models.Entities.Timetables.Cells.CellMembers;
+﻿using Core.Entities.Identity;
+using Core.Entities.Timetables.Cells.CellMembers;
 
 namespace WebApi.Services.Identity.Interfaces
 {

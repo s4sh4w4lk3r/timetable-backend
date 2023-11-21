@@ -1,6 +1,6 @@
-﻿using Models.Entities.Identity.Users;
+﻿using Core.Entities.Identity.Users;
 
-namespace Models.Entities.Identity;
+namespace Core.Entities.Identity;
 
 public class UserSession
 {
