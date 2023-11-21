@@ -5,12 +5,15 @@ using Models.Entities.Timetables.Cells.CellMembers;
 using Repository;
 using Throw;
 using WebApi.Services.Identity.Interfaces;
+using WebApi.StaticsAndExtensions;
 
 namespace WebApi.Services.Identity.Implementations
 {
     public class RegistrationEntityService : IRegistrationEntityService
     {
         private readonly TimetableContext _dbContext;
+        private const int REGISTER_KEY_EXPIRATION_DAYS = 14;
+        private const int REGISTER_KEY_LENGTH = 64;
 
         public RegistrationEntityService(TimetableContext dbContext)
         {
@@ -48,9 +51,9 @@ namespace WebApi.Services.Identity.Implementations
             {
                 var regEntity = new RegistrationEntity()
                 {
-                    CodeExpires = DateTime.UtcNow.AddDays(14),
+                    CodeExpires = DateTime.UtcNow.AddDays(REGISTER_KEY_EXPIRATION_DAYS),
                     DesiredRole = role,
-                    SecretKey = RegistrationEntity.GenerateSecretKey(),
+                    SecretKey = KeyGen.Generate(REGISTER_KEY_LENGTH),
                     StudentGroupId = (role is RegistrationEntity.Role.Student) ? studentGroupId : null,
                     SubGroup = (role is RegistrationEntity.Role.Student) ? subGroup : null
                 };
