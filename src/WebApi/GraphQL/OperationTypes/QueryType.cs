@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Models.Entities.Timetables;
+﻿using Models.Entities.Timetables;
 using Models.Entities.Timetables.Cells;
 using Models.Entities.Timetables.Cells.CellMembers;
 using Repository;
@@ -10,15 +9,15 @@ namespace WebApi.GraphQL.OperationTypes
 {
     public class Query
     {
-        public IQueryable<Subject> GetSubjects([FromServices] TimetableContext context) => context.Set<Subject>();
-        public IQueryable<TeacherCM> GetTeachers([FromServices] TimetableContext context) => context.Set<TeacherCM>();
-        public IQueryable<Group> GetGroups([FromServices] TimetableContext context) => context.Set<Group>();
-        public IQueryable<Cabinet> GetCabinets([FromServices] TimetableContext context) => context.Set<Cabinet>();
-        public IQueryable<LessonTime> GetLessonTimes([FromServices] TimetableContext context) => context.Set<LessonTime>();
-        public IQueryable<ActualTimetableCell> GetActualTimetableCells([FromServices] TimetableContext context) => context.Set<ActualTimetableCell>();
-        public IQueryable<ActualTimetable> GetActualTimetables([FromServices] TimetableContext context) => context.Set<ActualTimetable>();
-        public IQueryable<StableTimetableCell> GetStableTimetableCells([FromServices] TimetableContext context) => context.Set<StableTimetableCell>();
-        public IQueryable<StableTimetable> GetStableTimetables([FromServices] TimetableContext context) => context.Set<StableTimetable>();
+        public IQueryable<Subject> GetSubjects([Service(ServiceKind.Synchronized)] TimetableContext context) => context.Set<Subject>();
+        public IQueryable<TeacherCM> GetTeachers([Service(ServiceKind.Synchronized)] TimetableContext context) => context.Set<TeacherCM>();
+        public IQueryable<Group> GetGroups([Service(ServiceKind.Synchronized)] TimetableContext context) => context.Set<Group>();
+        public IQueryable<Cabinet> GetCabinets([Service(ServiceKind.Synchronized)] TimetableContext context) => context.Set<Cabinet>();
+        public IQueryable<LessonTime> GetLessonTimes([Service(ServiceKind.Synchronized)] TimetableContext context) => context.Set<LessonTime>();
+        public IQueryable<ActualTimetableCell> GetActualTimetableCells([Service(ServiceKind.Synchronized)] TimetableContext context) => context.Set<ActualTimetableCell>();
+        public IQueryable<ActualTimetable> GetActualTimetables([Service(ServiceKind.Synchronized)] TimetableContext context) => context.Set<ActualTimetable>();
+        public IQueryable<StableTimetableCell> GetStableTimetableCells([Service(ServiceKind.Synchronized)] TimetableContext context) => context.Set<StableTimetableCell>();
+        public IQueryable<StableTimetable> GetStableTimetables([Service(ServiceKind.Synchronized)] TimetableContext context) => context.Set<StableTimetable>();
     }
 
     public class QueryType : ObjectType<Query>
