@@ -61,7 +61,7 @@ namespace WebApi.Services.Timetables.Implementations
             }
         }
 
-        public async Task<ServiceResult> InsertUpdate(ActualTimetableCell actualTimetableCell, CancellationToken cancellationToken = default)
+        public async Task<ServiceResult> InsertOrUpdate(ActualTimetableCell actualTimetableCell, CancellationToken cancellationToken = default)
         {
 #warning проверить
             if (actualTimetableCell is null)

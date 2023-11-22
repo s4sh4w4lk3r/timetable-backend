@@ -7,7 +7,7 @@ using WebApi.Services.Identity.Interfaces;
 namespace WebApi.Controllers.Identity;
 
 [ApiController, Route("identity")]
-public class UpdateController : Controller
+public class UpdateController : ControllerBase
 {
     private readonly IEmailUpdater _emailService;
     private readonly IPasswordService _passwordService;
