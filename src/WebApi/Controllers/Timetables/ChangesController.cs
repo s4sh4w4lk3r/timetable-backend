@@ -92,10 +92,10 @@ namespace WebApi.Controllers.Timetables
             }
 
 
-            ActualTimetableCell actualTimetableCell = new(insertableActualCellDto.ActualTimetableId, insertableActualCellDto.TeacherId,
+            ActualTimetableCell actualTimetableCell = new(default, insertableActualCellDto.TeacherId,
                 insertableActualCellDto.SubjectId, insertableActualCellDto.CabinetId, insertableActualCellDto.LessonTimeId, date);
 
-            var serviceResult = await _actualCellEditor.InsertOrUpdate(actualTimetableCell);
+            var serviceResult = await _actualCellEditor.Insert(insertableActualCellDto.ActualTimetableId, actualTimetableCell);
             if (serviceResult.Success is false)
             {
                 return BadRequest(serviceResult);
@@ -144,10 +144,10 @@ namespace WebApi.Controllers.Timetables
                 return BadRequest("Некорректная дата указана.");
             }
 
-            ActualTimetableCell actualTimetableCell = new(updatebleActualCellDto.ActualTimetableId, updatebleActualCellDto.TeacherId,
+            ActualTimetableCell actualTimetableCell = new(updatebleActualCellDto., updatebleActualCellDto.TeacherId,
                updatebleActualCellDto.SubjectId, updatebleActualCellDto.CabinetId, updatebleActualCellDto.LessonTimeId, date);
 
-            var serviceResult = _actualCellEditor.InsertOrUpdate()
+            var serviceResult = _actualCellEditor.Update(ac)
         }
 
         public record class InsertableActualCellDto(int ActualTimetableId, int SubjectId, int TeacherId, int LessonTimeId, int CabinetId, string Date, SubGroup SubGroup);

@@ -4,6 +4,8 @@ using Core.Entities.Timetables.Cells.CellMembers;
 using Repository;
 using Validation.IdValidators;
 using WebApi.Services.Timetables.Interfaces;
+using Core.Entities.Timetables;
+using WebApi.Types;
 
 namespace WebApi.Services.Timetables.Implementations
 {
@@ -61,12 +63,12 @@ namespace WebApi.Services.Timetables.Implementations
             }
         }
 
-        public async Task<ServiceResult> InsertOrUpdate(ActualTimetableCell actualTimetableCell, CancellationToken cancellationToken = default)
+        public async Task<ServiceResult> InsertOrUpdate(int actualTimetableId, ActualTimetableCell actualTimetableCell, CancellationToken cancellationToken = default)
         {
 #warning проверить
             if (actualTimetableCell is null)
             {
-                return ServiceResult.Fail("ActualTimetable is null.");
+                return ServiceResult.Fail("ActualTimetableCell is null.");
             }
 
             var validateIds = new TimetableCellIdValidator().Validate(actualTimetableCell);
@@ -89,7 +91,12 @@ namespace WebApi.Services.Timetables.Implementations
                 bool cabonetExist = await _timetableContext.Set<Cabinet>().AnyAsync(e => e.CabinetId == actualTimetableCell.CabinetId, cancellationToken);
                 if (cabonetExist is false) return ServiceResult.Fail("Кабинета с таким Id не существует.");
 
+                var actualTimetable = await _timetableContext.Set<ActualTimetable>().Include(e=>e.ActualTimetableCells)
+                    .SingleOrDefaultAsync(e => e.TimetableId == actualTimetableId, cancellationToken);
+                if (actualTimetable is null) return ServiceResult.Fail(ResponseMessage.GetMessageForDefaultValue("actualTimetableId"));
+
                 _timetableContext.Set<ActualTimetableCell>().Add(actualTimetableCell);
+                actualTimetable.ActualTimetableCells.Add(actualTimetableCell);
                 await _timetableContext.SaveChangesAsync(cancellationToken);
                 return ServiceResult.Ok("Ячейка добавлена.");
             }
