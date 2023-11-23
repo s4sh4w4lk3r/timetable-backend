@@ -34,7 +34,6 @@ namespace WebApi.Services.Timetables.Implementations
 
         public async Task<ServiceResult<bool>> SwitchCellFlag(int actualTimetableCellId, IActualCellEditor.CellFlagToUpdate flag, CancellationToken cancellationToken = default)
         {
-#warning проверить
             var actualTimetableCell = await _timetableContext.Set<ActualTimetableCell>().SingleOrDefaultAsync(e=>e.TimetableCellId == actualTimetableCellId, cancellationToken);
             if (actualTimetableCell is null)
             {
@@ -65,7 +64,6 @@ namespace WebApi.Services.Timetables.Implementations
 
         public async Task<ServiceResult> Update(ActualTimetableCell actualTimetableCell, CancellationToken cancellationToken = default)
         {
-#warning проверить
             if (actualTimetableCell is null)
             {
                 return ServiceResult.Fail("ActualTimetableCell is null.");
@@ -77,6 +75,11 @@ namespace WebApi.Services.Timetables.Implementations
                 return ServiceResult.Fail(validateIds.ToString());
             }
 
+            var actualTimetableCellFromRepo = await _timetableContext.Set<ActualTimetableCell>().SingleOrDefaultAsync(e => e.TimetableCellId == actualTimetableCell.TimetableCellId, cancellationToken: cancellationToken);
+            if (actualTimetableCellFromRepo is null)
+            {
+                return ServiceResult.Fail(ResponseMessage.GetMessageIfNotFoundInDb("ячейка актуального расписания"));
+            }
 
             bool teacherExist = await _timetableContext.Set<TeacherCM>().AnyAsync(e => e.TeacherId == actualTimetableCell.TeacherId, cancellationToken);
             if (teacherExist is false) return ServiceResult.Fail("Учителя с таким Id не существует.");
@@ -90,15 +93,16 @@ namespace WebApi.Services.Timetables.Implementations
             bool cabonetExist = await _timetableContext.Set<Cabinet>().AnyAsync(e => e.CabinetId == actualTimetableCell.CabinetId, cancellationToken);
             if (cabonetExist is false) return ServiceResult.Fail("Кабинета с таким Id не существует.");
 
+            actualTimetableCellFromRepo.TeacherId = actualTimetableCell.TeacherId;
+            actualTimetableCellFromRepo.SubjectId = actualTimetableCell.SubjectId;
+            actualTimetableCellFromRepo.LessonTimeId = actualTimetableCell.LessonTimeId;
+            actualTimetableCellFromRepo.CabinetId = actualTimetableCell.CabinetId;
+            actualTimetableCellFromRepo.SubGroup = actualTimetableCell.SubGroup;
 
-            actualTimetableCell.Teacher = null;
-            actualTimetableCell.Subject = null;
-            actualTimetableCell.LessonTime = null;
-            actualTimetableCell.Cabinet = null;
-
-            _timetableContext.Set<ActualTimetableCell>().Update(actualTimetableCell);
+            _timetableContext.Set<ActualTimetableCell>().Update(actualTimetableCellFromRepo);
             await _timetableContext.SaveChangesAsync(cancellationToken);
             return ServiceResult.Ok("Ячейка обновлена.");
+#warning сделать проверку чтобы нельзя было изменить лессонтайм на занятое место
         }
 
         public async Task<ServiceResult> Insert(int actualTimetableId, ActualTimetableCell actualTimetableCell, CancellationToken cancellationToken = default)

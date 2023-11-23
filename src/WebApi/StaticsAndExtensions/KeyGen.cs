@@ -6,9 +6,10 @@ namespace WebApi.StaticsAndExtensions
     public static class KeyGen
     {
         private const string _prefix = "TT-";
-        private const int _numberOfSecureBytesToGenerate = 32;
+        private const int _numberOfSecureBytesToGenerate = 64;
+        private const int _lengthOfKey = 48;
 
-        public static string Generate(int lengthOfKey = 64)
+        public static string Generate()
         {
             var bytes = RandomNumberGenerator.GetBytes(_numberOfSecureBytesToGenerate);
 
@@ -22,7 +23,7 @@ namespace WebApi.StaticsAndExtensions
                 .Replace("?", "*")
                 .ToString();
 
-            var keyLength = lengthOfKey - _prefix.Length;
+            var keyLength = _lengthOfKey - _prefix.Length;
 
             return _prefix + base64String[..keyLength];
         }

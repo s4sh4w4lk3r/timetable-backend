@@ -68,8 +68,8 @@ namespace Core.Entities.Timetables
                     subjectId: item.SubjectId,
                     cabinetId: item.CabinetId,
                     lessonTimeId: item.LessonTimeId,
-                    dateOnly: dateOnly)
-                {SubGroup = item.SubGroup };
+                    subGroup: item.SubGroup,
+                    dateOnly: dateOnly);
 
                 _actualTimetableCells.Add(actualCell);
             }

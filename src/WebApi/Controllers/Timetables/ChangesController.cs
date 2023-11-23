@@ -16,8 +16,7 @@ namespace WebApi.Controllers.Timetables
         [HttpPost, Route("switch-cell-flag"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> SwitchFlag(SwitchFlagDto switchFlagDto, CancellationToken cancellationToken)
         {
-#warning проверить ендпоинт
-            if (switchFlagDto.ActualCellId == default)
+            if (switchFlagDto.ActualTimetableCellId == default)
             {
                 return BadRequest(ResponseMessage.GetMessageIfDefaultValue("ActualCellId"));
             }
@@ -27,7 +26,7 @@ namespace WebApi.Controllers.Timetables
                 return BadRequest("Получен неверный Enum код.");
             }
 
-            var serviceResult = await _actualCellEditor.SwitchCellFlag(switchFlagDto.ActualCellId, switchFlagDto.Flag, cancellationToken);
+            var serviceResult = await _actualCellEditor.SwitchCellFlag(switchFlagDto.ActualTimetableCellId, switchFlagDto.Flag, cancellationToken);
             if (serviceResult.Success is false)
             {
                 return BadRequest(serviceResult);
@@ -54,6 +53,7 @@ namespace WebApi.Controllers.Timetables
             return Ok(serviceResult);
         }
 
+        [HttpPost, Route("insert-actual-cell"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> Insert(InsertableActualCellDto insertableActualCellDto)
         {
 #warning проверить ендпоинт
@@ -92,7 +92,7 @@ namespace WebApi.Controllers.Timetables
 
 
             ActualTimetableCell actualTimetableCell = new(default, insertableActualCellDto.TeacherId,
-                insertableActualCellDto.SubjectId, insertableActualCellDto.CabinetId, insertableActualCellDto.LessonTimeId, date);
+                insertableActualCellDto.SubjectId, insertableActualCellDto.CabinetId, insertableActualCellDto.LessonTimeId, subGroup: insertableActualCellDto.SubGroup, date);
 
             var serviceResult = await _actualCellEditor.Insert(insertableActualCellDto.ActualTimetableId, actualTimetableCell);
             if (serviceResult.Success is false)
@@ -103,9 +103,9 @@ namespace WebApi.Controllers.Timetables
             return Ok(serviceResult);
         }
 
+        [HttpPost, Route("update-actual-cell"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(UpdatebleActualCellDto updatebleActualCellDto)
         {
-#warning возможно надо тут переделатьь
             if (updatebleActualCellDto.ActualTimetableCellId == default)
             {
                 return BadRequest(ResponseMessage.GetMessageIfDefaultValue("ActualTimetableCellId"));
@@ -114,11 +114,6 @@ namespace WebApi.Controllers.Timetables
             if (updatebleActualCellDto.SubjectId == default)
             {
                 return BadRequest(ResponseMessage.GetMessageIfDefaultValue("SubjectId"));
-            }
-
-            if (updatebleActualCellDto.ActualTimetableId == default)
-            {
-                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("ActualTimetableId"));
             }
 
             if (updatebleActualCellDto.TeacherId == default)
@@ -136,15 +131,8 @@ namespace WebApi.Controllers.Timetables
                 return BadRequest(ResponseMessage.GetMessageIfDefaultValue("CabinetId"));
             }
 
-            bool dateParseOk = DateOnly.TryParse(updatebleActualCellDto.Date, out DateOnly date);
-            if (dateParseOk is false || date == default
-                || date < new DateOnly(2023, 11, 11) || date > new DateOnly(2123, 11, 11))
-            {
-                return BadRequest("Некорректная дата указана.");
-            }
-
             ActualTimetableCell actualTimetableCell = new(updatebleActualCellDto.ActualTimetableCellId, updatebleActualCellDto.TeacherId,
-               updatebleActualCellDto.SubjectId, updatebleActualCellDto.CabinetId, updatebleActualCellDto.LessonTimeId, date);
+               updatebleActualCellDto.SubjectId, updatebleActualCellDto.CabinetId, updatebleActualCellDto.LessonTimeId, updatebleActualCellDto.SubGroup, default);
 
             var serviceResult = await _actualCellEditor.Update(actualTimetableCell);
             if (serviceResult.Success is false)
@@ -156,7 +144,7 @@ namespace WebApi.Controllers.Timetables
         }
 
         public record class InsertableActualCellDto(int ActualTimetableId, int SubjectId, int TeacherId, int LessonTimeId, int CabinetId, string Date, SubGroup SubGroup);
-        public record class UpdatebleActualCellDto(int ActualTimetableCellId, int ActualTimetableId, int SubjectId, int TeacherId, int LessonTimeId, int CabinetId, string Date, SubGroup SubGroup);
-        public record class SwitchFlagDto(int ActualCellId, IActualCellEditor.CellFlagToUpdate Flag);
+        public record class UpdatebleActualCellDto(int ActualTimetableCellId, int SubjectId, int TeacherId, int LessonTimeId, int CabinetId, SubGroup SubGroup);
+        public record class SwitchFlagDto(int ActualTimetableCellId, IActualCellEditor.CellFlagToUpdate Flag);
     }
 }

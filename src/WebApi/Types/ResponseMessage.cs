@@ -1,5 +1,4 @@
-﻿using System.Text;
-
+﻿
 namespace WebApi.Types
 {
     public static class ResponseMessage
@@ -11,6 +10,12 @@ namespace WebApi.Types
         /// <returns></returns>
         public static string GetMessageIfDefaultValue(string propertyName) => $"Указанный {propertyName} не должен быть равен нулю";
 
+
+        /// <summary>
+        /// Формирует строку с  сообщением о том, что указанное поле не найдено в бд.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
         public static string GetMessageIfNotFoundInDb(string propertyName) => $"Запрашиваемый {propertyName} не найден в базе данных.";
     }
 }

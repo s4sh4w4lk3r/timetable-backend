@@ -80,8 +80,8 @@ namespace WebApi.GraphQL.OperationTypes
                     x.BindFieldsImplicitly(); x.Ignore(e => e.RegistrationEntities); x.Ignore(e => e.Students);
                 });
 
-            descriptor.Field(e => e.GetActualTimetableCells(default!)).UseFiltering<ActualTimetableCellFilterType>().UseSorting<ActualTimetableCellSortType>();
-            descriptor.Field(e => e.GetActualTimetables(default!)).UseFiltering<ActualTimetableFilterType>().UseSorting<ActualTimetableSortType>();
+            descriptor.Field(e => e.GetActualTimetableCells(default!)).UseProjection().UseFiltering<ActualTimetableCellFilterType>().UseSorting<ActualTimetableCellSortType>();
+            descriptor.Field(e => e.GetActualTimetables(default!)).UseProjection().UseFiltering<ActualTimetableFilterType>().UseSorting<ActualTimetableSortType>();
 
             descriptor.Field(e => e.GetStableTimetableCells(default!)).UseProjection().UseFiltering<StableTimetableCellFilterType>().UseSorting<StableTimetableCellSortType>();
             descriptor.Field(e => e.GetStableTimetables(default!)).UseProjection().UseFiltering<StableTimetableFilterType>().UseSorting<StableTimetableSortType>();

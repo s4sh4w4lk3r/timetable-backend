@@ -9,10 +9,10 @@ namespace Core.Entities.Timetables.Cells
         public Subject? Subject { get; set; }
         public Cabinet? Cabinet { get; set; }
         public LessonTime? LessonTime { get; set; }
-        public int TeacherId { get; init; }
-        public int SubjectId { get; init; }
-        public int CabinetId { get; init; }
-        public int LessonTimeId { get; init; }
+        public int TeacherId { get; set; }
+        public int SubjectId { get; set; }
+        public int CabinetId { get; set; }
+        public int LessonTimeId { get; set; }
         public DateOnly Date { get; init; }
         public bool IsModified { get; set; } = false;
         public bool IsCanceled { get; set; } = false;
@@ -31,13 +31,14 @@ namespace Core.Entities.Timetables.Cells
             Date = dateOnly;
         }
 
-        public ActualTimetableCell(int timetableCellId, int teacherId, int subjectId, int cabinetId, int lessonTimeId, DateOnly dateOnly)
+        public ActualTimetableCell(int timetableCellId, int teacherId, int subjectId, int cabinetId, int lessonTimeId, SubGroup subGroup, DateOnly dateOnly)
         {
             TimetableCellId = timetableCellId;
             TeacherId = teacherId;
             SubjectId = subjectId;
             CabinetId = cabinetId;
             LessonTimeId = lessonTimeId;
+            SubGroup = subGroup;
             Date = dateOnly;
         }
     }

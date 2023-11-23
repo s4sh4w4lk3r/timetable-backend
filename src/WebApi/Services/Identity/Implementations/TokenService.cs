@@ -14,7 +14,6 @@ public class TokenService : ITokenService
 {
     private readonly JwtConfiguration _jwtConfiguration;
     private readonly ILogger _logger;
-    private const int REFRESH_TOKEN_LENGTH = 64;
     public TokenService(IOptions<JwtConfiguration> options, ILoggerFactory loggerFactory)
     {
         _jwtConfiguration = options.Value;
@@ -39,7 +38,7 @@ public class TokenService : ITokenService
         return tokenString;
     }
 
-    public string GenerateRefreshToken() => KeyGen.Generate(REFRESH_TOKEN_LENGTH);
+    public string GenerateRefreshToken() => KeyGen.Generate();
 
     public ServiceResult<ClaimsPrincipal?> GetPrincipalFromAccessToken(string token, bool isLifetimeValidationRequired = true)
     {

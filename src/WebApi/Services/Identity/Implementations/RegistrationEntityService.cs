@@ -13,7 +13,6 @@ namespace WebApi.Services.Identity.Implementations
     {
         private readonly TimetableContext _dbContext;
         private const int REGISTER_KEY_EXPIRATION_DAYS = 14;
-        private const int REGISTER_KEY_LENGTH = 64;
 
         public RegistrationEntityService(TimetableContext dbContext)
         {
@@ -53,7 +52,7 @@ namespace WebApi.Services.Identity.Implementations
                 {
                     CodeExpires = DateTime.UtcNow.AddDays(REGISTER_KEY_EXPIRATION_DAYS),
                     DesiredRole = role,
-                    SecretKey = KeyGen.Generate(REGISTER_KEY_LENGTH),
+                    SecretKey = KeyGen.Generate(),
                     StudentGroupId = (role is RegistrationEntity.Role.Student) ? studentGroupId : null,
                     SubGroup = (role is RegistrationEntity.Role.Student) ? subGroup : null
                 };
