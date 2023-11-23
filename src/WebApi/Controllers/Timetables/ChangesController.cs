@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Services.Timetables.Interfaces;
 using WebApi.Types;
-using static WebApi.Controllers.Timetables.ChangesController;
 
 namespace WebApi.Controllers.Timetables
 {
@@ -20,7 +19,7 @@ namespace WebApi.Controllers.Timetables
 #warning проверить ендпоинт
             if (switchFlagDto.ActualCellId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("ActualCellId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("ActualCellId"));
             }
 
             if (Enum.IsDefined(switchFlagDto.Flag) is false)
@@ -43,7 +42,7 @@ namespace WebApi.Controllers.Timetables
 #warning проверить ендпоинт
             if (actualCellId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("actualCellId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("actualCellId"));
             }
 
             var serviceResult = await _actualCellEditor.Delete(actualCellId, cancellationToken);
@@ -55,33 +54,33 @@ namespace WebApi.Controllers.Timetables
             return Ok(serviceResult);
         }
 
-        public async Task<IActionResult> InsertCell(InsertableActualCellDto insertableActualCellDto)
+        public async Task<IActionResult> Insert(InsertableActualCellDto insertableActualCellDto)
         {
 #warning проверить ендпоинт
 
             if (insertableActualCellDto.SubjectId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("SubjectId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("SubjectId"));
             }
 
             if (insertableActualCellDto.ActualTimetableId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("ActualTimetableId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("ActualTimetableId"));
             }
 
             if (insertableActualCellDto.TeacherId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("TeacherId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("TeacherId"));
             }
 
             if (insertableActualCellDto.LessonTimeId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("LessonTimeId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("LessonTimeId"));
             }
 
             if (insertableActualCellDto.CabinetId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("CabinetId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("CabinetId"));
             }
 
             bool dateParseOk = DateOnly.TryParse(insertableActualCellDto.Date, out DateOnly date);
@@ -104,37 +103,37 @@ namespace WebApi.Controllers.Timetables
             return Ok(serviceResult);
         }
 
-        public async Task<IActionResult> UpdateCell(UpdatebleActualCellDto updatebleActualCellDto)
+        public async Task<IActionResult> Update(UpdatebleActualCellDto updatebleActualCellDto)
         {
 #warning возможно надо тут переделатьь
             if (updatebleActualCellDto.ActualTimetableCellId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("SubjectId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("ActualTimetableCellId"));
             }
 
             if (updatebleActualCellDto.SubjectId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("SubjectId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("SubjectId"));
             }
 
             if (updatebleActualCellDto.ActualTimetableId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("ActualTimetableId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("ActualTimetableId"));
             }
 
             if (updatebleActualCellDto.TeacherId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("TeacherId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("TeacherId"));
             }
 
             if (updatebleActualCellDto.LessonTimeId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("LessonTimeId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("LessonTimeId"));
             }
 
             if (updatebleActualCellDto.CabinetId == default)
             {
-                return BadRequest(ResponseMessage.GetMessageForDefaultValue("CabinetId"));
+                return BadRequest(ResponseMessage.GetMessageIfDefaultValue("CabinetId"));
             }
 
             bool dateParseOk = DateOnly.TryParse(updatebleActualCellDto.Date, out DateOnly date);
@@ -144,10 +143,16 @@ namespace WebApi.Controllers.Timetables
                 return BadRequest("Некорректная дата указана.");
             }
 
-            ActualTimetableCell actualTimetableCell = new(updatebleActualCellDto., updatebleActualCellDto.TeacherId,
+            ActualTimetableCell actualTimetableCell = new(updatebleActualCellDto.ActualTimetableCellId, updatebleActualCellDto.TeacherId,
                updatebleActualCellDto.SubjectId, updatebleActualCellDto.CabinetId, updatebleActualCellDto.LessonTimeId, date);
 
-            var serviceResult = _actualCellEditor.Update(ac)
+            var serviceResult = await _actualCellEditor.Update(actualTimetableCell);
+            if (serviceResult.Success is false)
+            {
+                return BadRequest(serviceResult);
+            }
+
+            return Ok(serviceResult);
         }
 
         public record class InsertableActualCellDto(int ActualTimetableId, int SubjectId, int TeacherId, int LessonTimeId, int CabinetId, string Date, SubGroup SubGroup);

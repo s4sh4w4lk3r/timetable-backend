@@ -9,6 +9,8 @@ namespace WebApi.Types
         /// </summary>
         /// <param name="propertyName">Свойство, имя которого надо высветить в сообщении.</param>
         /// <returns></returns>
-        public static string GetMessageForDefaultValue(string propertyName) => $"Указанный {propertyName} не должен быть равен нулю";
+        public static string GetMessageIfDefaultValue(string propertyName) => $"Указанный {propertyName} не должен быть равен нулю";
+
+        public static string GetMessageIfNotFoundInDb(string propertyName) => $"Запрашиваемый {propertyName} не найден в базе данных.";
     }
 }

@@ -63,7 +63,7 @@ namespace WebApi.Services.Timetables.Implementations
             }
         }
 
-        public async Task<ServiceResult> InsertOrUpdate(int actualTimetableId, ActualTimetableCell actualTimetableCell, CancellationToken cancellationToken = default)
+        public async Task<ServiceResult> Update(ActualTimetableCell actualTimetableCell, CancellationToken cancellationToken = default)
         {
 #warning проверить
             if (actualTimetableCell is null)
@@ -77,41 +77,64 @@ namespace WebApi.Services.Timetables.Implementations
                 return ServiceResult.Fail(validateIds.ToString());
             }
 
-            if (actualTimetableCell.TimetableCellId == default)
+
+            bool teacherExist = await _timetableContext.Set<TeacherCM>().AnyAsync(e => e.TeacherId == actualTimetableCell.TeacherId, cancellationToken);
+            if (teacherExist is false) return ServiceResult.Fail("Учителя с таким Id не существует.");
+
+            bool subjectExist = await _timetableContext.Set<Subject>().AnyAsync(e => e.SubjectId == actualTimetableCell.SubjectId, cancellationToken);
+            if (subjectExist is false) return ServiceResult.Fail("Предмета с таким Id не существует.");
+
+            bool lessontimeExist = await _timetableContext.Set<LessonTime>().AnyAsync(e => e.LessonTimeId == actualTimetableCell.LessonTimeId, cancellationToken);
+            if (lessontimeExist is false) return ServiceResult.Fail("Лессон тайма с таким Id не существует.");
+
+            bool cabonetExist = await _timetableContext.Set<Cabinet>().AnyAsync(e => e.CabinetId == actualTimetableCell.CabinetId, cancellationToken);
+            if (cabonetExist is false) return ServiceResult.Fail("Кабинета с таким Id не существует.");
+
+
+            actualTimetableCell.Teacher = null;
+            actualTimetableCell.Subject = null;
+            actualTimetableCell.LessonTime = null;
+            actualTimetableCell.Cabinet = null;
+
+            _timetableContext.Set<ActualTimetableCell>().Update(actualTimetableCell);
+            await _timetableContext.SaveChangesAsync(cancellationToken);
+            return ServiceResult.Ok("Ячейка обновлена.");
+        }
+
+        public async Task<ServiceResult> Insert(int actualTimetableId, ActualTimetableCell actualTimetableCell, CancellationToken cancellationToken = default)
+        {
+#warning проверить
+            if (actualTimetableCell is null)
             {
-                bool teacherExist = await _timetableContext.Set<TeacherCM>().AnyAsync(e => e.TeacherId == actualTimetableCell.TeacherId, cancellationToken);
-                if (teacherExist is false) return ServiceResult.Fail("Учителя с таким Id не существует.");
-
-                bool subjectExist = await _timetableContext.Set<Subject>().AnyAsync(e => e.SubjectId == actualTimetableCell.SubjectId, cancellationToken);
-                if (subjectExist is false) return ServiceResult.Fail("Предмета с таким Id не существует.");
-
-                bool lessontimeExist = await _timetableContext.Set<LessonTime>().AnyAsync(e => e.LessonTimeId == actualTimetableCell.LessonTimeId, cancellationToken);
-                if (lessontimeExist is false) return ServiceResult.Fail("Лессон тайма с таким Id не существует.");
-
-                bool cabonetExist = await _timetableContext.Set<Cabinet>().AnyAsync(e => e.CabinetId == actualTimetableCell.CabinetId, cancellationToken);
-                if (cabonetExist is false) return ServiceResult.Fail("Кабинета с таким Id не существует.");
-
-                var actualTimetable = await _timetableContext.Set<ActualTimetable>().Include(e=>e.ActualTimetableCells)
-                    .SingleOrDefaultAsync(e => e.TimetableId == actualTimetableId, cancellationToken);
-                if (actualTimetable is null) return ServiceResult.Fail(ResponseMessage.GetMessageForDefaultValue("actualTimetableId"));
-
-                _timetableContext.Set<ActualTimetableCell>().Add(actualTimetableCell);
-                actualTimetable.ActualTimetableCells.Add(actualTimetableCell);
-                await _timetableContext.SaveChangesAsync(cancellationToken);
-                return ServiceResult.Ok("Ячейка добавлена.");
+                return ServiceResult.Fail("ActualTimetableCell is null.");
             }
-            else
+
+            var validateIds = new TimetableCellIdValidator().Validate(actualTimetableCell);
+            if (validateIds.IsValid is false)
             {
-                // Обнуляю нав. свойства, чтобы не было исключения из-за повторяющихся айдишников в локальном контексте. Обновлем данные по айдишникам из других таблиц.
-                actualTimetableCell.Teacher = null;
-                actualTimetableCell.Subject = null;
-                actualTimetableCell.LessonTime = null;
-                actualTimetableCell.Cabinet = null;
-
-                _timetableContext.Set<ActualTimetableCell>().Update(actualTimetableCell);
-                await _timetableContext.SaveChangesAsync(cancellationToken);
-                return ServiceResult.Ok("Ячейка обновлена.");
+                return ServiceResult.Fail(validateIds.ToString());
             }
+
+            bool teacherExist = await _timetableContext.Set<TeacherCM>().AnyAsync(e => e.TeacherId == actualTimetableCell.TeacherId, cancellationToken);
+            if (teacherExist is false) return ServiceResult.Fail("Учителя с таким Id не существует.");
+
+            bool subjectExist = await _timetableContext.Set<Subject>().AnyAsync(e => e.SubjectId == actualTimetableCell.SubjectId, cancellationToken);
+            if (subjectExist is false) return ServiceResult.Fail("Предмета с таким Id не существует.");
+
+            bool lessontimeExist = await _timetableContext.Set<LessonTime>().AnyAsync(e => e.LessonTimeId == actualTimetableCell.LessonTimeId, cancellationToken);
+            if (lessontimeExist is false) return ServiceResult.Fail("Лессон тайма с таким Id не существует.");
+
+            bool cabonetExist = await _timetableContext.Set<Cabinet>().AnyAsync(e => e.CabinetId == actualTimetableCell.CabinetId, cancellationToken);
+            if (cabonetExist is false) return ServiceResult.Fail("Кабинета с таким Id не существует.");
+
+            var actualTimetable = await _timetableContext.Set<ActualTimetable>().Include(e => e.ActualTimetableCells)
+                .SingleOrDefaultAsync(e => e.TimetableId == actualTimetableId, cancellationToken);
+            if (actualTimetable is null) return ServiceResult.Fail(ResponseMessage.GetMessageIfNotFoundInDb("actualTimetable"));
+
+            _timetableContext.Set<ActualTimetableCell>().Add(actualTimetableCell);
+            actualTimetable.ActualTimetableCells.Add(actualTimetableCell);
+            await _timetableContext.SaveChangesAsync(cancellationToken);
+            return ServiceResult.Ok("Ячейка добавлена.");
         }
     }
 }
