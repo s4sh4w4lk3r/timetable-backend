@@ -1,38 +1,37 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models.Entities.Identity.Users;
 using Validation;
 using WebApi.Extensions;
-using WebApi.Services.Identity.Implementations;
+using WebApi.Services.Identity.Interfaces;
 
-namespace WebApi.Controllers.Account;
+namespace WebApi.Controllers.Identity;
 
 [ApiController, Route("identity")]
-public class UpdateController : Controller
+public class UpdateController : ControllerBase
 {
-    private readonly EmailUpdater _emailService;
-    private readonly PasswordService _passwordService;
+    private readonly IEmailUpdater _emailService;
+    private readonly IPasswordService _passwordService;
 
-    public UpdateController(EmailUpdater emailService, PasswordService passwordService)
+    public UpdateController(IEmailUpdater emailService, IPasswordService passwordService)
     {
         _emailService = emailService;
         _passwordService = passwordService;
     }
 
     [HttpPost, Route("update/password"), Authorize]
-    public async Task<IActionResult> UpdatePassword([Bind("Password")] User user, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdatePassword([FromBody] PasswordDto passwordDto, CancellationToken cancellationToken)
     {
-        if (StaticValidator.ValidatePassword(user.Password) is false)
+        if (StaticValidator.ValidatePassword(passwordDto.Password) is false)
         {
             return BadRequest("Пароль не проходит проверку.");
         }
 
-        if ((HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false) || userId == default)
+        if (HttpContext.User.TryGetUserIdFromClaimPrincipal(out int userId) is false || userId == default)
         {
             return BadRequest("Не получилось получить id из клеймов.");
         }
 
-        var updatePasswordResult = await _passwordService.UpdatePassword(userId, user.Password!, cancellationToken);
+        var updatePasswordResult = await _passwordService.UpdatePassword(userId, passwordDto.Password, cancellationToken);
         if (updatePasswordResult.Success is false)
         {
             return BadRequest(updatePasswordResult);
@@ -85,5 +84,5 @@ public class UpdateController : Controller
         return Ok(serviceResult);
     }
 
+    public record class PasswordDto(string Password);
 }
-#warning возможно надо сделать чтобы при разворачивании приложения была 1 учетка админа, а он уже вручную регистрирует других админов. Добавить enum с большим админом, который может удалять маленьких админов. Или может сделать приватный ендпоинт для регистрации админов.

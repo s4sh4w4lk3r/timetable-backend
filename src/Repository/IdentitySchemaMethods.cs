@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Models.Entities.Identity;
-using Models.Entities.Identity.Users;
+using Core.Entities.Identity;
+using Core.Entities.Identity.Users;
 
 namespace Repository
 {
@@ -54,6 +54,14 @@ namespace Repository
             entity.HasOne(e => e.Approval).WithOne(e => e.EmailUpdateEntity).IsRequired();
             entity.Property(e => e.OldEmail).IsRequired();
             entity.Property(e => e.NewEmail).IsRequired();
+        }
+
+        public static void ConfigureRegistrationEntity(EntityTypeBuilder<RegistrationEntity> entity)
+        {
+            entity.ToTable("RegistrationEntity", "identity");
+            entity.HasKey(e => e.RegistrationEntityId);
+            entity.Property(e => e.SecretKey).IsRequired();
+            entity.HasOne(e => e.Group).WithMany(e => e.RegistrationEntities).HasForeignKey(e => e.StudentGroupId).IsRequired(false);
         }
     }
 }

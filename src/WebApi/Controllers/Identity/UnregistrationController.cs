@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebApi.Extensions;
 using WebApi.Services.Identity.Interfaces;
 
-namespace WebApi.Controllers.Account
+namespace WebApi.Controllers.Identity
 {
     [ApiController, Route("identity/unregister")]
     public class UnregistrationController : ControllerBase

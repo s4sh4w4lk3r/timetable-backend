@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models.Entities.Identity.Users;
+using Core.Entities.Identity.Users;
 using Repository;
 using Validation;
+using WebApi.Services.Identity.Interfaces;
 
 namespace WebApi.Services.Identity.Implementations;
 
-public class PasswordService
+public class PasswordService : IPasswordService
 {
     private readonly TimetableContext _dbContext;
 
@@ -60,7 +61,7 @@ public class PasswordService
                 userFromRepo = await _dbContext.Set<Admin>().SingleOrDefaultAsync(e => e.Email == email, cancellationToken);
             }
         }
-        
+
 
         if (userFromRepo is null)
         {

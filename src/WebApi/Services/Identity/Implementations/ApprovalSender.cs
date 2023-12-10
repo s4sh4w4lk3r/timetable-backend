@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models.Entities.Identity;
-using Models.Entities.Identity.Users;
+using Core.Entities.Identity;
+using Core.Entities.Identity.Users;
 using Repository;
 using Validation;
 using WebApi.Services.Identity.Interfaces;
-using static Models.Entities.Identity.Approval;
+using static Core.Entities.Identity.Approval;
 
 namespace WebApi.Services.Identity.Implementations
 {

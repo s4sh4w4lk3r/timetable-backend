@@ -1,12 +1,18 @@
-﻿using Microsoft.AspNetCore.HttpOverrides;
+﻿using HotChocolate.AspNetCore;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.OpenApi.Models;
 using Repository;
 using Serilog;
 using System.Reflection;
-using WebApi.GraphQL;
+using WebApi.GraphQL.EnumTypes;
+using WebApi.GraphQL.ObjectTypes;
+using WebApi.GraphQL.OperationTypes;
 using WebApi.Middlewares.Authentication;
 using WebApi.Services.Identity.Implementations;
 using WebApi.Services.Identity.Interfaces;
+using WebApi.Services.Timetables.Implementations;
+using WebApi.Services.Timetables.Interfaces;
 using WebApi.Types.Configuration;
 
 namespace WebApi;
@@ -22,6 +28,7 @@ public class Program
         .ReadFrom.Configuration(ctx.Configuration));
 
         ConfigureServices(builder);
+        ConfigureGraphQL(builder);
         ConfigureDependencies(builder);
         ConfigureIOptions(builder);
 
@@ -35,7 +42,6 @@ public class Program
             db.Database.EnsureCreated();
             db.Dispose();
         }
-
         app.Run();
     }
 
@@ -48,19 +54,8 @@ public class Program
             options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Version = "v1",
-                Title = "ToDo API",
-                Description = "An ASP.NET Core Web API for managing ToDo items",
-                TermsOfService = new Uri("https://example.com/terms"),
-                Contact = new OpenApiContact
-                {
-                    Name = "Example Contact",
-                    Url = new Uri("https://example.com/contact")
-                },
-                License = new OpenApiLicense
-                {
-                    Name = "Example License",
-                    Url = new Uri("https://example.com/license")
-                }
+                Title = "Timetable WebApi",
+                Description = "Timetable WebApi"
             });
 
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -70,24 +65,24 @@ public class Program
         builder.Services.AddAuthentication(AccessTokenAuthenticationOptions.DefaultScheme)
          .AddScheme<AccessTokenAuthenticationOptions, AccessTokenAuthenticationHandler>(AccessTokenAuthenticationOptions.DefaultScheme, _ => { });
         builder.Services.AddAuthorization();
-        builder.Services.AddGraphQLServer()
-           .AddQueryType<Queries>()
-           .AddProjections()
-           .AddFiltering()
-           .AddSorting()
-           .AddAuthorization();
+
+
     }
     private static void ConfigureDependencies(WebApplicationBuilder builder)
     {
-        builder.Services.AddDbContext<TimetableContext>();
-        builder.Services.AddScoped<EmailUpdater>();
-        builder.Services.AddScoped<PasswordService>();
+        builder.Services.AddDbContext<TimetableContext>(contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped);
+        builder.Services.AddScoped<IEmailUpdater, EmailUpdater>();
+        builder.Services.AddScoped<IPasswordService, PasswordService>();
         builder.Services.AddScoped<IRegistrationService, RegistrationService>();
         builder.Services.AddScoped<IUnregistrationService, UnregistrationService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IUserSessionService, UserSessionService>();
         builder.Services.AddScoped<IApprovalService, ApprovalService>();
         builder.Services.AddScoped<IApprovalSender, ApprovalSender>();
+        builder.Services.AddScoped<IRegistrationEntityService, RegistrationEntityService>();
+        builder.Services.AddScoped<IStableTimetableService, StableTimetableService>();
+        builder.Services.AddScoped<IActualTimetableService, ActualTimetableService>();
+        builder.Services.AddScoped<IActualCellEditor, ActualCellEditor>();
 
         if (builder.Environment.IsDevelopment())
         {
@@ -104,15 +99,24 @@ public class Program
         builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetRequiredSection(nameof(JwtConfiguration)));
         builder.Services.Configure<ApiSettings>(builder.Configuration.GetRequiredSection(nameof(ApiSettings)));
         builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetRequiredSection(nameof(EmailConfiguration)));
+        builder.Services.Configure<KestrelServerOptions>(options =>
+        {
+            options.AllowSynchronousIO = true;
+        });
     }
-
     private static void ConfigureMiddlewares(WebApplication app)
     {
 
         app.UseSerilogRequestLogging();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.MapGraphQL();
+        app.MapGraphQL().WithOptions(new GraphQLServerOptions
+        {
+            Tool =
+            {
+                Enable = !app.Environment.IsProduction()
+            }
+        });
         app.MapControllers();
 
         app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -126,4 +130,27 @@ public class Program
             app.UseSwaggerUI();
         }
     }
+    private static void ConfigureGraphQL(WebApplicationBuilder builder)
+    {
+        builder.Services.AddGraphQLServer()
+            .ModifyOptions(options => { options.DefaultBindingBehavior = BindingBehavior.Explicit; })
+            .AddQueryType<QueryType>()
+           //.AddMutationType<Mutations>()
+           .AddType<ActualTimetableType>()
+           .AddType<SubGroupType>()
+           .AddType<GroupType>()
+           .AddType<ActualTimetableCellType>()
+           .AddType<TeacherType>()
+           .AddType<SubjectType>()
+           .AddType<CabinetType>()
+           .AddType<LessonTimeType>()
+           .AddType<StableTimetableType>()
+           .AddType<StableTimetableCellType>()
+           .AddType<DayOfWeekType>()
+           .AddProjections()
+           .AddFiltering()
+           .AddSorting()
+           .AddAuthorization();
+    }
 }
+#warning почему-то при транкейте таблиц каскадно в схеме таймтейблов, удаляются что-то из схемы идентити и юзеры не могут войти.

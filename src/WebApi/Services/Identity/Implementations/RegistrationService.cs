@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models.Entities.Identity;
-using Models.Entities.Identity.Users;
+using Core.Entities.Identity;
+using Core.Entities.Identity.Users;
+using Core.Entities.Timetables;
 using Repository;
 using Validation;
 using WebApi.Services.Identity.Interfaces;
@@ -13,13 +14,15 @@ public class RegistrationService : IRegistrationService
     private readonly DbSet<User> _users;
     private readonly IApprovalService _approvalService;
     private readonly IApprovalSender _approvalSender;
+    private readonly ILogger _logger;
 
-    public RegistrationService(TimetableContext dbContext, IApprovalService approvalService, IApprovalSender approvalSender)
+    public RegistrationService(TimetableContext dbContext, IApprovalService approvalService, IApprovalSender approvalSender, ILoggerFactory loggerFactory)
     {
         _dbContext = dbContext;
         _users = _dbContext.Set<User>();
         _approvalService = approvalService;
         _approvalSender = approvalSender;
+        _logger = loggerFactory.CreateLogger<RegistrationService>();
     }
     public async Task<ServiceResult> AddUserToRepoAsync(User user, CancellationToken cancellationToken = default)
     {
@@ -43,11 +46,37 @@ public class RegistrationService : IRegistrationService
             return new ServiceResult(false, "Пользователь с таким Email уже есть в бд, но Email не подтвержден.");
         }
 
-        user.IsEmailConfirmed = false;
-        user.Password = PasswordService.HashPassword(user.Password!);
-        await _users.AddAsync(user, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return new ServiceResult(true, "Пользователь добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
+        if (user is Student student)
+        {
+            bool isGroupExist = await _dbContext.Set<Group>().AnyAsync(e => e.GroupId == student.GroupId, cancellationToken);
+            if (isGroupExist is false)
+            {
+                return ServiceResult.Fail("Группы с таким id не существует");
+            }
+
+            student.Password = PasswordService.HashPassword(student.Password);
+            await _dbContext.Set<Student>().AddAsync(student, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return ServiceResult.Ok("Студент добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
+        }
+        else if (user is Teacher teacher)
+        {
+            teacher.Password = PasswordService.HashPassword(teacher.Password);
+            await _dbContext.Set<Teacher>().AddAsync(teacher, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return ServiceResult.Ok("Учитель добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
+        }
+        else if (user is Admin admin)
+        {
+            admin.Password = PasswordService.HashPassword(admin.Password);
+            await _dbContext.Set<Admin>().AddAsync(admin, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return ServiceResult.Ok("Админ добавлен в базу, но имеет не подтвержденный Email. Запросите отправку email.");
+        }
+
+        string errorMsg = "Была произведена попытка зарегать юзера неизветсного типа.";
+        _logger.LogCritical("Класс: {class}, Метод: {method}, {msg}", nameof(RegistrationService), nameof(AddUserToRepoAsync), errorMsg);
+        return ServiceResult.Fail(errorMsg);
     }
     public async Task<ServiceResult> ConfirmAsync(string userEmail, int approvalCode, CancellationToken cancellationToken = default)
     {

@@ -2,10 +2,10 @@
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using Throw;
 using WebApi.Services.Identity.Interfaces;
+using WebApi.StaticsAndExtensions;
 using WebApi.Types.Configuration;
 
 namespace WebApi.Services.Identity.Implementations;
@@ -38,13 +38,7 @@ public class TokenService : ITokenService
         return tokenString;
     }
 
-    public string GenerateRefreshToken()
-    {
-        var randomNumber = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomNumber);
-        return Convert.ToBase64String(randomNumber);
-    }
+    public string GenerateRefreshToken() => KeyGen.Generate();
 
     public ServiceResult<ClaimsPrincipal?> GetPrincipalFromAccessToken(string token, bool isLifetimeValidationRequired = true)
     {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Models.Entities.Identity;
-using Models.Entities.Identity.Users;
+using Core.Entities.Identity;
+using Core.Entities.Identity.Users;
 using System.Security.Claims;
 using Validation;
 using WebApi.Extensions;
@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost, Route("login")]
-    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] EmailPasswordPairDto emailPasswordPair, [FromServices] PasswordService passwordService, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Login([FromBody, Bind("Email", "Password")] EmailPasswordPairDto emailPasswordPair, [FromServices] IPasswordService passwordService, CancellationToken cancellationToken = default)
     {
         if (StaticValidator.ValidateEmail(emailPasswordPair.Email) is false)
         {
@@ -199,6 +199,17 @@ public class AuthController : ControllerBase
         return Ok(userSessionResult);
     }
 
+    [HttpGet, Authorize, Route("whoami")]
+    public IActionResult CheckAuthorization()
+    {
+        bool? isAuthenticated = HttpContext.User?.Identity?.IsAuthenticated;
+        if (isAuthenticated is false || isAuthenticated is null)
+        {
+            return Unauthorized();
+        }
+        string? rolename = HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
+        return Ok(rolename);
+    }
 
     public record class TokenPairDto(string? AccessToken, string? RefreshToken);
     public record class EmailPasswordPairDto(string? Email, string? Password);

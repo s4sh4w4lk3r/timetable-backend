@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Models.Entities.Identity;
+using Core.Entities.Identity;
 
 namespace Validation;
 

@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models.Entities.Identity;
-using Models.Entities.Identity.Users;
+using Core.Entities.Identity;
+using Core.Entities.Identity.Users;
 using Repository;
 using Validation;
 using WebApi.Services.Identity.Interfaces;
 
 namespace WebApi.Services.Identity.Implementations;
 
-public class EmailUpdater
+public class EmailUpdater : IEmailUpdater
 {
     private readonly TimetableContext _dbContext;
     private readonly DbSet<User> _users;
